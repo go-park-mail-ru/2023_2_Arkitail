@@ -14,10 +14,6 @@ func main() {
 		fmt.Fprintf(w, "Привет, мир!")
 	})
 
-	r.HandleFunc("/api/data", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Это ваше API!")
-	})
-
 	fmt.Println("Server is running on :8080")
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
