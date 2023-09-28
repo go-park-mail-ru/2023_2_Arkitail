@@ -1,0 +1,144 @@
+openapi: 3.0.0
+info:
+  title: Documentation for GoTo api
+  version: 0.0.1
+servers:
+- url: http://localhost:8080
+  description: Dev server
+paths:
+  /api/v1/login:
+    post:
+      summary: Logs in and returns the authentication  cookie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      security: []    # no authentication
+      responses:
+        '200':
+          description: logged in
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: sessionId=abcde12345;
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /api/v1/signup:
+    post:
+      summary: Signs up and returns the authentication  cookie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      security: []    # no authentication
+      responses:
+        '201':
+          description: Created a new account
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: sessionId=abcde12345;
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResponse'
+        '401':
+          description: sign up error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResponse'
+  /api/v1/logout:
+    delete:
+      summary: Logs out by deleting sessionId cookie
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Ok
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+  /api/v1/attractions:
+    get:
+      summary: Returns list of attractions
+      security: []    # no authentication
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttractionList'
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+    LoginResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        error:
+          type: string
+    SignupRequest:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+    SignupResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        error:
+          type: string
+    Attraction:
+      type: object
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+    AttractionList:
+      type: object
+      properties:
+        status:
+          type: integer
+        body:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attraction'
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionId
+
+
+security:
+  - cookieAuth: []
