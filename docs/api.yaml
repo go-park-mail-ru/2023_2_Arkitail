@@ -74,9 +74,9 @@ paths:
             Set-Cookie:
               schema:
                 type: string
-  /api/v1/attractions:
+  /api/v1/places:
     get:
-      summary: Returns list of attractions
+      summary: Returns list of places
       security: []    # no authentication
       responses:
         '200':
@@ -84,7 +84,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AttractionList'
+                $ref: '#/components/schemas/PlaceList'
 
 components:
   schemas:
@@ -116,14 +116,14 @@ components:
           type: integer
         error:
           type: string
-    Attraction:
+    Place:
       type: object
       properties:
         name:
           type: string
         location:
           type: string
-    AttractionList:
+    PlaceList:
       type: object
       properties:
         status:
@@ -131,7 +131,7 @@ components:
         body:
           type: array
           items:
-            $ref: '#/components/schemas/Attraction'
+            $ref: '#/components/schemas/Place'
 
   securitySchemes:
     cookieAuth:
