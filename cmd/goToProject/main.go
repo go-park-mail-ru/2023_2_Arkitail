@@ -1,19 +1,32 @@
 package main
 
 import (
+    "flag"
+
+	auth "project/internal/delivery"
+
+	"github.com/gorilla/mux"
     "fmt"
     "net/http"
-
     "goTo/handler/delivery"
-    "github.com/gorilla/mux"
 )
 
 func main() {
+    var secret string
+	flag.StringVar(&secret, "secret", "", "secret for jwt encoding")
+	flag.Parse()
+	if secret == "" {
+		flag.Usage()
+		return
+	}
     r := mux.NewRouter()
 
-    r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintf(w, "Привет, мир!")
-    })
+    authHandler := auth.NewAuthHandler(secret)
+	apiPath := "/api/v1"
+	r.HandleFunc(apiPath+"/auth", authHandler.CheckAuth).Methods("GET")
+	r.HandleFunc(apiPath+"/login", authHandler.Login).Methods("POST")
+	r.HandleFunc(apiPath+"/signup", authHandler.Signup).Methods("POST")
+	r.HandleFunc(apiPath+"/logout", authHandler.Logout).Methods("Delete")
 
     r.HandleFunc("/api/v1/places", delivery.CreatePlace).Methods("POST")
     r.HandleFunc("/api/v1/places", delivery.GetPlaces).Methods("GET")
