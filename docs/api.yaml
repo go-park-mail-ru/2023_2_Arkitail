@@ -85,6 +85,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaceList'
+  /api/v1/auth:
+    get:
+      summary: Checks if you have valid sessionId
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: You have valid sessionId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: You dont have valid sessionId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
 
 components:
   schemas:
@@ -98,8 +116,6 @@ components:
     LoginResponse:
       type: object
       properties:
-        status:
-          type: integer
         error:
           type: string
     SignupRequest:
@@ -112,8 +128,6 @@ components:
     SignupResponse:
       type: object
       properties:
-        status:
-          type: integer
         error:
           type: string
     Place:
@@ -126,8 +140,6 @@ components:
     PlaceList:
       type: object
       properties:
-        status:
-          type: integer
         body:
           type: array
           items:
