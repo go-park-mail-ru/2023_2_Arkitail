@@ -1,5 +1,3 @@
-// handler/delivery/places.go
-
 package delivery
 
 import (
@@ -46,7 +44,6 @@ func GetPlaces(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(placeList)
 }
 
-// Функция для генерации уникального ID
 func generateUniqueID() string {
     return fmt.Sprintf("id%d", len(places)+1)
 }
