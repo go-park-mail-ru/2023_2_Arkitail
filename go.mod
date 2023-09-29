@@ -1,4 +1,4 @@
-module project
+module goTo
 
 go 1.21.1
 
