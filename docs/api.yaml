@@ -85,6 +85,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaceList'
+    post:
+      summary: Create a new place
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Place'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Place'
   /api/v1/auth:
     get:
       summary: Checks if you have valid sessionId
@@ -135,8 +150,14 @@ components:
       properties:
         name:
           type: string
-        location:
+        description:
           type: string
+        rating:
+          type: number      
+        cost:
+          type: string      
+        imageUrl:
+          type: string      
     PlaceList:
       type: object
       properties:
