@@ -27,6 +27,9 @@ func main() {
 	r.HandleFunc(apiPath+"/signup", authHandler.Signup).Methods("POST")
 	r.HandleFunc(apiPath+"/logout", authHandler.Logout).Methods("Delete")
 
+	r.HandleFunc(apiPath+"/places", auth.CreatePlace).Methods("POST")
+	r.HandleFunc(apiPath+"/places", auth.GetPlaces).Methods("GET")
+
 	fmt.Println("Server is running on :8080")
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
