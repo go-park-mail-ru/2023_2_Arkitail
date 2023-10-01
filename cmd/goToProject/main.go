@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	auth "project/internal/delivery"
+	"project/internal/router"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -24,18 +24,14 @@ func main() {
 	authHandler := auth.NewAuthHandler(secret)
 	apiPath := "/api/v1"
 
-	credentials := handlers.AllowCredentials()
-	methods := handlers.AllowedMethods([]string{"POST"})
-	handlers.MaxAge(3600)
-	origins := handlers.AllowedOrigins([]string{"www.example.com"})
-
 	r.HandleFunc(apiPath+"/auth", authHandler.CheckAuth).Methods("GET")
 	r.HandleFunc(apiPath+"/login", authHandler.Login).Methods("POST")
 	r.HandleFunc(apiPath+"/signup", authHandler.Signup).Methods("POST")
 	r.HandleFunc(apiPath+"/logout", authHandler.Logout).Methods("Delete")
+	router.AddCors(r, []string{"http://localhost:8080/"})
 
 	fmt.Println("Server is running on :8080")
-	err := http.ListenAndServe(":8080", handlers.CORS(credentials, methods, origins)(r))
+	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		fmt.Println(err)
 	}
