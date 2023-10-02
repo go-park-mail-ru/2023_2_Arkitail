@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	auth "project/internal/delivery"
+	"project/internal/router"
 
 	"github.com/gorilla/mux"
 )
@@ -22,10 +23,12 @@ func main() {
 	r := mux.NewRouter()
 	authHandler := auth.NewAuthHandler(secret)
 	apiPath := "/api/v1"
+
 	r.HandleFunc(apiPath+"/auth", authHandler.CheckAuth).Methods("GET")
 	r.HandleFunc(apiPath+"/login", authHandler.Login).Methods("POST")
 	r.HandleFunc(apiPath+"/signup", authHandler.Signup).Methods("POST")
 	r.HandleFunc(apiPath+"/logout", authHandler.Logout).Methods("Delete")
+	router.AddCors(r, []string{"http://localhost:8080/"})
 
 	r.HandleFunc(apiPath+"/places", auth.CreatePlace).Methods("POST")
 	r.HandleFunc(apiPath+"/places", auth.GetPlaces).Methods("GET")
