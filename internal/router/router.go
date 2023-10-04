@@ -10,8 +10,8 @@ import (
 func AddCors(router *mux.Router, originNames []string) http.Handler {
 	credentials := handlers.AllowCredentials()
 	methods := handlers.AllowedMethods([]string{http.MethodGet, http.MethodPut, http.MethodDelete, http.MethodPost})
-	handlers.MaxAge(3600)
+	age := handlers.MaxAge(3600)
 	origins := handlers.AllowedOrigins(originNames)
-	handler := handlers.CORS(credentials, methods, origins)(router)
+	handler := handlers.CORS(credentials, methods, age, origins)(router)
 	return handler
 }
