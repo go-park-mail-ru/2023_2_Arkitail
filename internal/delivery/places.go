@@ -38,7 +38,7 @@ var places = map[string]Place{
 		Description: "является одним из ведущих технических университетов в России и весьма престижным учебным заведением.",
 		Rating:      5.0,
 		Cost:        "$$$",
-		ImageURL:    "https://example.com/image2.jpg",
+		ImageURL:    "https://example.com/image3.jpg",
 	},
 }
 
