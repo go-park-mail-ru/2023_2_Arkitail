@@ -118,6 +118,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
+  /api/v1/user:
+    get:
+      summary: Returns json with user data
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: User is authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserInfoResponse'
+        '401':
+          description: User is unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserInfoResponse'
+
 
 components:
   schemas:
@@ -132,6 +151,18 @@ components:
       type: object
       properties:
         error:
+          type: string
+    GetUserInfoResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        user:
+            $ref: '#/components/schemas/User'
+    User:
+      type: object
+      properties:
+        login:
           type: string
     SignupRequest:
       type: object
@@ -153,11 +184,11 @@ components:
         description:
           type: string
         rating:
-          type: number      
+          type: number
         cost:
-          type: string      
+          type: string
         imageUrl:
-          type: string      
+          type: string
     PlaceList:
       type: object
       properties:

@@ -28,6 +28,7 @@ func main() {
 	r.HandleFunc(apiPath+"/login", authHandler.Login).Methods("POST")
 	r.HandleFunc(apiPath+"/signup", authHandler.Signup).Methods("POST")
 	r.HandleFunc(apiPath+"/logout", authHandler.Logout).Methods("Delete")
+	r.HandleFunc(apiPath+"/user", authHandler.GetUserInfo).Methods("Get")
 	handler := router.AddCors(r, []string{"http://localhost:8080/"})
 
 	r.HandleFunc(apiPath+"/places", auth.CreatePlace).Methods("POST")
