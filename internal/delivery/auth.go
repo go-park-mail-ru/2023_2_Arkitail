@@ -27,6 +27,18 @@ type AuthResponse struct {
 	Error string `json:"error"`
 }
 
+type User struct {
+	Login string `json:"login"`
+}
+
+type GetUserInfoResponse struct {
+	Error string `json:"error"`
+	User  User   `json:"user"`
+}
+
+type UserResponse struct {
+}
+
 type UserClaim struct {
 	Username string
 	jwt.RegisteredClaims
@@ -36,6 +48,39 @@ func NewAuthHandler(newSecret string) *AuthHandler {
 	storage := storage.NewAuthStorage()
 	handler := &AuthHandler{secret: []byte(newSecret), storage: storage}
 	return handler
+}
+
+func (api *AuthHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		body, _ := CreateUserResponseJson(errTokenInvalid.Error(), nil)
+		WriteResponse(w, http.StatusUnauthorized, body)
+		return
+	}
+
+	tokenString := cookie.Value
+	user := &UserClaim{}
+	token, err := jwt.ParseWithClaims(tokenString, user,
+		func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, errors.New("unexpected signing method")
+			}
+			return api.secret, nil
+		})
+	if err != nil {
+		body, _ := CreateUserResponseJson(err.Error(), nil)
+		WriteResponse(w, http.StatusUnauthorized, body)
+		return
+	}
+
+	if _, ok := token.Claims.(*UserClaim); ok && token.Valid {
+		body, _ := CreateUserResponseJson("", &User{user.Username})
+		WriteResponse(w, http.StatusOK, body)
+		return
+	}
+	body, _ := CreateUserResponseJson(errTokenInvalid.Error(), nil)
+	WriteResponse(w, http.StatusUnauthorized, body)
+	return
 }
 
 func (api *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
@@ -183,6 +228,15 @@ func ParseAuthUserFromJsonBody(r *http.Request) (user AuthUser, err error) {
 
 func CreateAuthResponseJson(errorMsg string) (responseJson []byte, err error) {
 	response := AuthResponse{Error: errorMsg}
+	responseJson, err = json.Marshal(response)
+	return
+}
+
+func CreateUserResponseJson(errorMsg string, user *User) (responseJson []byte, err error) {
+	if user == nil {
+		user = &User{""}
+	}
+	response := GetUserInfoResponse{Error: errorMsg, User: *user}
 	responseJson, err = json.Marshal(response)
 	return
 }

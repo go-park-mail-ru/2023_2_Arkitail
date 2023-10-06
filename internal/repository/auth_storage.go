@@ -1,6 +1,9 @@
 package storage
 
-import "errors"
+import (
+	"errors"
+	"sync"
+)
 
 type User struct {
 	ID       uint   `json:"id"`
@@ -13,19 +16,23 @@ var errUsernameTaken = errors.New("user with this name already exists")
 var errWrongPassword = errors.New("wrong password")
 
 type AuthStorage struct {
-	users map[string]*User
+	users sync.Map
+	len   uint
 }
 
 func NewAuthStorage() *AuthStorage {
-	return &AuthStorage{
-		users: map[string]*User{
-			"rvasily": {1, "rvasily", "love"},
-		},
-	}
+	storage := &AuthStorage{}
+	user := &User{1, "rvasily", "love"}
+	storage.users.Store("rvasily", user)
+	storage.len = 1
+	return storage
 }
 
 func (storage *AuthStorage) GetUser(username string) (user *User, found bool) {
-	user, found = storage.users[username]
+	value, found := storage.users.Load(username)
+	if found {
+		user = value.(*User)
+	}
 	return
 }
 
@@ -36,11 +43,12 @@ func (storage *AuthStorage) AddUser(username string, password string) (err error
 	}
 
 	user := User{
-		uint(len(storage.users) + 1),
+		storage.len + 1,
 		username,
 		password,
 	}
-	storage.users[username] = &user
+	storage.len++
+	storage.users.Store(username, &user)
 	return
 }
 
