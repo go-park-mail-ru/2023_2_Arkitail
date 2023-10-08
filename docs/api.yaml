@@ -147,6 +147,8 @@ components:
           type: string
         password:
           type: string
+          minLength: 8
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])"
     LoginResponse:
       type: object
       properties:
@@ -171,6 +173,8 @@ components:
           type: string
         password:
           type: string
+          minLength: 8
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])"
     SignupResponse:
       type: object
       properties:

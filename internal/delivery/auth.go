@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"time"
+	"regexp"
 
 	storage "project/internal/repository"
 
@@ -151,6 +152,20 @@ func (api *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Проверка длины пароля (пароль должен быть не короче 8 символов)
+	if len(user.Password) < 8 {
+		body, _ := CreateAuthResponseJson("Password should be at least 8 characters long")
+		WriteResponse(w, http.StatusBadRequest, body)
+		return
+	}
+
+	// Дополнительная проверка на наличие букв и специальных символов в пароле
+	if !isValidPassword(user.Password) {
+		body, _ := CreateAuthResponseJson("Password should contain letters, digits, and special characters")
+		WriteResponse(w, http.StatusBadRequest, body)
+		return
+	}
+
 	err = api.storage.AddUser(user.Login, user.Password)
 	if err != nil {
 		body, _ := CreateAuthResponseJson(err.Error())
@@ -169,6 +184,17 @@ func (api *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	body, err := CreateAuthResponseJson("")
 	WriteResponse(w, http.StatusOK, body)
 	return
+}
+
+func isValidPassword(password string) bool {
+	// Проверка наличия хотя бы одной буквы
+	hasLetter := regexp.MustCompile(`[a-zA-Z]`).MatchString(password)
+	// Проверка наличия хотя бы одной цифры
+	hasDigit := regexp.MustCompile(`[0-9]`).MatchString(password)
+	// Проверка наличия хотя бы одного специального символа (пример: !, @, #, $, %, etc.)
+	hasSpecialChar := regexp.MustCompile(`[!@#$%^&*()_+{}\[\]:;<>,.?~\\]`).MatchString(password)
+
+	return hasLetter && hasDigit && hasSpecialChar
 }
 
 func (api *AuthHandler) createSessionCookie(userName string) (cookie *http.Cookie, err error) {

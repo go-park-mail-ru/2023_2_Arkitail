@@ -20,7 +20,7 @@ func TestSignupPositives(t *testing.T) {
 	}{
 		"correct credentials": {
 			login:         "abc",
-			password:      "1234",
+			password:      "normal@1234",
 			addedLogin:    "fdsos",
 			addedPassword: "1234",
 			expectedBody:  `{"error":""}`,
@@ -60,7 +60,7 @@ func TestSignupNegatives(t *testing.T) {
 	}{
 		"Username taken": {
 			login:         "abc",
-			password:      "1234",
+			password:      "noramal@1234",
 			addedLogin:    "abc",
 			addedPassword: "1234",
 			expectedBody:  `{"error":"user with this name already exists"}`,
