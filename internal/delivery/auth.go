@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"regexp"
 	"time"
+	"regexp"
 
 	storage "project/internal/repository"
 
@@ -198,6 +199,7 @@ func isValidPassword(password string) bool {
 
 	return hasLetter && hasDigit && hasSpecialChar
 }
+
 
 func isValidEmail(email string) bool {
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9\-]+\.[a-z]{2,4}$`).MatchString(email)
