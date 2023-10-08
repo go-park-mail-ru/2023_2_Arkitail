@@ -13,6 +13,7 @@ func TestSignupPositives(t *testing.T) {
 	positiveTests := map[string]struct {
 		login         string
 		password      string
+		email         string
 		addedLogin    string
 		addedPassword string
 		expectedBody  string
@@ -21,6 +22,7 @@ func TestSignupPositives(t *testing.T) {
 		"correct credentials": {
 			login:         "abc",
 			password:      "normal@1234",
+			email:         "email@gmail.com",
 			addedLogin:    "fdsos",
 			addedPassword: "1234",
 			expectedBody:  `{"error":""}`,
@@ -32,15 +34,15 @@ func TestSignupPositives(t *testing.T) {
 			t.Parallel()
 			login := test.login
 			password := test.password
-
-			jsonBody := CreateAuthBody(login, password)
+			email := test.email
+			jsonBody := CreateAuthBody(login, password, email)
 			reader := bytes.NewReader(jsonBody)
 			req, err := http.NewRequest("POST", "/login", reader)
 			assert.NoError(t, err)
 
 			rr := httptest.NewRecorder()
 			handler := NewAuthHandler("fdsjhfsidfsd")
-			assert.NoError(t, handler.storage.AddUser(test.addedLogin, test.addedPassword))
+			assert.NoError(t, handler.storage.AddUser(test.addedLogin, test.addedPassword, test.email))
 			loginHandler := http.HandlerFunc(handler.Signup)
 
 			loginHandler.ServeHTTP(rr, req)
@@ -53,14 +55,17 @@ func TestSignupNegatives(t *testing.T) {
 	positiveTests := map[string]struct {
 		login         string
 		password      string
+		email         string
 		addedLogin    string
 		addedPassword string
+		addedEmail    string
 		expectedBody  string
 		expectedCode  int
 	}{
 		"Username taken": {
 			login:         "abc",
 			password:      "noramal@1234",
+			email:         "email@gmail.com",
 			addedLogin:    "abc",
 			addedPassword: "1234",
 			expectedBody:  `{"error":"user with this name already exists"}`,
@@ -73,15 +78,15 @@ func TestSignupNegatives(t *testing.T) {
 			t.Parallel()
 			login := test.login
 			password := test.password
-
-			jsonBody := CreateAuthBody(login, password)
+			email := test.email
+			jsonBody := CreateAuthBody(login, password, email)
 			reader := bytes.NewReader(jsonBody)
 			req, err := http.NewRequest("POST", "/login", reader)
 			assert.NoError(t, err)
 
 			rr := httptest.NewRecorder()
 			handler := NewAuthHandler("fdsjhfsidfsd")
-			assert.NoError(t, handler.storage.AddUser(test.addedLogin, test.addedPassword))
+			assert.NoError(t, handler.storage.AddUser(test.addedLogin, test.addedPassword, test.addedEmail))
 			loginHandler := http.HandlerFunc(handler.Signup)
 
 			loginHandler.ServeHTTP(rr, req)
