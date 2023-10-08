@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"regexp"
 	"time"
 	"regexp"
 
@@ -23,6 +24,7 @@ type AuthHandler struct {
 type AuthUser struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 type AuthResponse struct {
 	Error string `json:"error"`
@@ -92,7 +94,7 @@ func (api *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = api.storage.ComparePassword(user.Login, user.Password)
+	err = api.storage.ComparePassword(user.Login, user.Password, user.Email)
 	if err != nil {
 		body, _ := CreateAuthResponseJson(err.Error())
 		WriteResponse(w, http.StatusUnauthorized, body)
@@ -152,21 +154,25 @@ func (api *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Проверка длины пароля (пароль должен быть не короче 8 символов)
 	if len(user.Password) < 8 {
 		body, _ := CreateAuthResponseJson("Password should be at least 8 characters long")
 		WriteResponse(w, http.StatusBadRequest, body)
 		return
 	}
 
-	// Дополнительная проверка на наличие букв и специальных символов в пароле
 	if !isValidPassword(user.Password) {
 		body, _ := CreateAuthResponseJson("Password should contain letters, digits, and special characters")
 		WriteResponse(w, http.StatusBadRequest, body)
 		return
 	}
 
-	err = api.storage.AddUser(user.Login, user.Password)
+	if !isValidEmail(user.Email){
+		body, _ := CreateAuthResponseJson("Email should contain @ and letters, digits, or special characters")
+		WriteResponse(w, http.StatusBadRequest, body)
+		return
+	}
+
+	err = api.storage.AddUser(user.Login, user.Password, user.Email)
 	if err != nil {
 		body, _ := CreateAuthResponseJson(err.Error())
 		WriteResponse(w, http.StatusUnauthorized, body)
@@ -187,14 +193,18 @@ func (api *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 }
 
 func isValidPassword(password string) bool {
-	// Проверка наличия хотя бы одной буквы
 	hasLetter := regexp.MustCompile(`[a-zA-Z]`).MatchString(password)
-	// Проверка наличия хотя бы одной цифры
 	hasDigit := regexp.MustCompile(`[0-9]`).MatchString(password)
-	// Проверка наличия хотя бы одного специального символа (пример: !, @, #, $, %, etc.)
 	hasSpecialChar := regexp.MustCompile(`[!@#$%^&*()_+{}\[\]:;<>,.?~\\]`).MatchString(password)
 
 	return hasLetter && hasDigit && hasSpecialChar
+}
+
+
+func isValidEmail(email string) bool {
+	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9\-]+\.[a-z]{2,4}$`).MatchString(email)
+
+	return emailRegex
 }
 
 func (api *AuthHandler) createSessionCookie(userName string) (cookie *http.Cookie, err error) {
