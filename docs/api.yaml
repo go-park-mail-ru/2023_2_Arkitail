@@ -92,14 +92,37 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Place'
+              $ref: '#/components/schemas/PlaceResponse'
       responses:
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Place'
+                $ref: '#/components/schemas/PlaceResponse'
+  /api/v1/place/{placeId}:
+    get:
+      summary: Get a place by name
+      parameters:
+        - in: path
+          name: placeId
+          schema:
+            type: integer
+          required: true
+          description: Numeric id if the place to get
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceResponse'
+        '404':
+          description: Cant find a place with id = {placeId}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceResponse'
   /api/v1/auth:
     get:
       summary: Checks if you have valid sessionId
@@ -166,6 +189,18 @@ components:
       properties:
         login:
           type: string
+        username:
+          type: string
+        email:
+          type: string
+        location:
+          type: string
+        web-site:
+          type: string
+        about:
+          type: string
+        avatarUrl:
+          type: string
     SignupRequest:
       type: object
       properties:
@@ -183,6 +218,8 @@ components:
     Place:
       type: object
       properties:
+        id:
+          type: integer
         name:
           type: string
         description:
@@ -193,9 +230,18 @@ components:
           type: string
         imageUrl:
           type: string
+    PlaceResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        Place:
+          $ref: '#/components/schemas/Place'
     PlaceList:
       type: object
       properties:
+        # error:
+        #   type: string
         body:
           type: array
           items:
