@@ -102,14 +102,15 @@ paths:
                 $ref: '#/components/schemas/PlaceResponse'
   /api/v1/place/{placeId}:
     get:
-      summary: Get a place by name
+      summary: Get a place by id
+      security: []    # no authentication
       parameters:
         - in: path
           name: placeId
           schema:
             type: integer
           required: true
-          description: Numeric id if the place to get
+          description: Numeric id of the place to get
       responses:
         '200':
           description: Success
@@ -159,6 +160,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetUserInfoResponse'
+  /api/v1/{username}/reviews:
+    get:
+      summary: Returns all reviews from user
+      security: []    # no authentication
+      parameters:
+        - in: path
+          name: username
+          schema:
+            type: string
+          required: true
+          description: String username of the user to get reviews from
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewsResponse'
+        '404':
+          description: Couldnt find user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewsResponse'
+  /api/v1/{placeId}/reviews:
+    get:
+      summary: Returns all reviews for place
+      security: []    # no authentication
+      parameters:
+        - in: path
+          name: placeId
+          schema:
+            type: integer
+          required: true
+          description: Numeric id the place to get reviews for
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewsResponse'
+        '404':
+          description: Couldnt find user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewsResponse'
+
+
 
 
 components:
@@ -187,9 +238,13 @@ components:
     User:
       type: object
       properties:
-        login:
+        # Возможно стоит оставить логин чисто для авторизации
+        # login:
+        #   type: string
+        name:
           type: string
         username:
+          description: Уникальный username, потом используем в стиле @{username}
           type: string
         email:
           type: string
@@ -246,6 +301,28 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Place'
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        place_id:
+          type: integer
+        text:
+          type: string
+        rating:
+          type: integer
+    ReviewsResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
 
   securitySchemes:
     cookieAuth:
