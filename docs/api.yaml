@@ -100,7 +100,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaceResponse'
-  /api/v1/place/{placeId}:
+  /api/v1/places/{placeId}:
     get:
       summary: Get a place by id
       security: []    # no authentication
@@ -160,7 +160,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetUserInfoResponse'
-  /api/v1/user/{username}/reviews:
+  /api/v1/users/{username}/reviews:
     get:
       summary: Returns all reviews from user
       security: []    # no authentication
@@ -184,7 +184,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReviewsResponse'
-  /api/v1/place/{placeId}/reviews:
+  /api/v1/places/{placeId}/reviews:
     get:
       summary: Returns all reviews for place
       security: []    # no authentication
