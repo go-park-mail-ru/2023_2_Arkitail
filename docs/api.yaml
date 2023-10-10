@@ -280,8 +280,142 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReviewResponse'
-
-
+  /api/v1/trip/{tripId}:
+    get:
+      summary: get a trip by {id}
+      security: []
+      parameters:
+        - in: path
+          name: tripId
+          schema:
+            type: integer
+          required: true
+          description: Numeric id of the trip to get
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripResponse'
+        '401':
+          description: Trip is private and you dont have the rights to view it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripResponse'
+        '404':
+          description: Couldnt find a trip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripResponse'
+    patch:
+      summary: change a trip with {id}
+      security: []
+      parameters:
+        - in: path
+          name: tripId
+          schema:
+            type: integer
+          required: true
+          description: Numeric id of the trip to get
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trip'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripResponse'
+        '401':
+          description: Trip is private and you dont have the rights to change it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripResponse'
+        '404':
+          description: Couldnt find a trip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripResponse'
+    delete:
+      summary: delete a trip with {id}
+      security: []
+      parameters:
+      - in: path
+        name: tripId
+        schema:
+          type: integer
+        required: true
+        description: Numeric id of the trip to get
+      responses:
+        '204':
+          description: Success
+        '401':
+          description: Unauthorized
+        '404':
+          description: Couldnt find a trip
+  /api/v1/{username}/trips:
+    get:
+      summary: Returns a review with id = reviewId
+      security: []    # no authentication
+      parameters:
+        - in: path
+          name: username
+          schema:
+            type: string
+          required: true
+          description: String username of a user to get trips from
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripListResponse'
+        '404':
+          description: User doesnt exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripListResponse'
+  /api/v1/trip:
+    post:
+      summary: Post a trip
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTripRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripResponse'
+        '400':
+          description: Contents of request are wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripResponse'
 
 
 components:
@@ -367,8 +501,6 @@ components:
     PlaceList:
       type: object
       properties:
-        # error:
-        #   type: string
         body:
           type: array
           items:
@@ -378,8 +510,8 @@ components:
       properties:
         id:
           type: integer
-        user_id:
-          type: integer
+        username:
+          type: string
         place_id:
           type: integer
         text:
@@ -405,14 +537,78 @@ components:
     AddReviewRequest:
       type: object
       properties:
-        user_id:
-          type: integer
+        username:
+          type: string
         place_id:
           type: integer
         text:
           type: string
         rating:
           type: integer
+    Trip:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        name:
+          type: string
+        publicity:
+          type: string
+          example: public or private
+        places_in_trip:
+          type: array
+          items:
+            type: object
+            properties:
+              place:
+                $ref: '#/components/schemas/Place'
+              date:
+                type: string
+              comment:
+                type: string
+    AddTripRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+        publicity:
+          type: string
+          example: public or private
+        places_in_trip:
+          type: array
+          items:
+            type: object
+            properties:
+              place:
+                $ref: '#/components/schemas/Place'
+              date:
+                type: string
+              comment:
+                type: string
+    TripResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        trip:
+          $ref: '#/components/schemas/Trip'
+    TripListResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        trips:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trip'
+
+
+
+
 
   securitySchemes:
     cookieAuth:
