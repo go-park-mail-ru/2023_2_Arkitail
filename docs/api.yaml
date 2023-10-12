@@ -27,13 +27,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: access denied
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/signup:
     post:
       summary: Signs up and returns the authentication  cookie
@@ -55,13 +55,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SignupResponse'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: sign up error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SignupResponse'
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/logout:
     delete:
       summary: Logs out by deleting sessionId cookie
@@ -92,14 +92,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PlaceResponse'
+              $ref: '#/components/schemas/CreatePlaceRequest'
       responses:
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlaceResponse'
+                $ref: '#/components/schemas/Place'
   /api/v1/places/{placeId}:
     get:
       summary: Get a place by id
@@ -117,31 +117,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlaceResponse'
+                $ref: '#/components/schemas/Place'
         '404':
           description: Cant find a place with id = {placeId}
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlaceResponse'
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/auth:
     get:
       summary: Checks if you have valid sessionId
       security:
         - cookieAuth: []
       responses:
-        '200':
+        '204':
           description: You have valid sessionId
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoginResponse'
         '401':
           description: You dont have valid sessionId
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/user:
     get:
       summary: Returns json with user data
@@ -149,17 +145,17 @@ paths:
         - cookieAuth: []
       responses:
         '200':
-          description: User is authorized
+          description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetUserInfoResponse'
+                $ref: '#/components/schemas/User'
         '401':
           description: User is unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetUserInfoResponse'
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/users/{username}/reviews:
     get:
       summary: Returns all reviews from user
@@ -177,13 +173,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewsResponse'
+                $ref: '#/components/schemas/ReviewList'
         '404':
           description: Couldnt find user
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewsResponse'
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/places/{placeId}/reviews:
     get:
       summary: Returns all reviews for place
@@ -201,13 +197,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewsResponse'
+                $ref: '#/components/schemas/ReviewList'
         '404':
           description: Couldnt find place
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewsResponse'
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/reviews/{reviewId}:
     get:
       summary: Returns a review with id = reviewId
@@ -225,13 +221,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewResponse'
+                $ref: '#/components/schemas/Review'
         '404':
           description: Couldnt find review
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewResponse'
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: Deletes a review
       security:
@@ -267,19 +263,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewResponse'
+                $ref: '#/components/schemas/Review'
         '400':
           description: Contents of request are wrong
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewResponse'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewResponse'
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/trip/{tripId}:
     get:
       summary: get a trip by {id}
@@ -297,19 +293,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripResponse'
+                $ref: '#/components/schemas/Trip'
         '401':
           description: Trip is private and you dont have the rights to view it
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripResponse'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Couldnt find a trip
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripResponse'
+                $ref: '#/components/schemas/ErrorResponse'
     patch:
       summary: change a trip with {id}
       security: []
@@ -332,19 +328,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripResponse'
+                $ref: '#/components/schemas/Trip'
         '401':
           description: Trip is private and you dont have the rights to change it
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripResponse'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Couldnt find a trip
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripResponse'
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: delete a trip with {id}
       security: []
@@ -379,13 +375,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripListResponse'
+                $ref: '#/components/schemas/TripList'
         '404':
           description: User doesnt exist
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripListResponse'
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/trip:
     post:
       summary: Post a trip
@@ -403,19 +399,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripResponse'
+                $ref: '#/components/schemas/Trip'
         '400':
           description: Contents of request are wrong
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripResponse'
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripResponse'
+                $ref: '#/components/schemas/ErrorResponse'
 
 
 components:
@@ -429,24 +425,9 @@ components:
           type: string
           minLength: 8
           pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])"
-    LoginResponse:
-      type: object
-      properties:
-        error:
-          type: string
-    GetUserInfoResponse:
-      type: object
-      properties:
-        error:
-          type: string
-        user:
-            $ref: '#/components/schemas/User'
     User:
       type: object
       properties:
-        # Возможно стоит оставить логин чисто для авторизации
-        # login:
-        #   type: string
         name:
           type: string
         username:
@@ -471,11 +452,6 @@ components:
           type: string
           minLength: 8
           pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])"
-    SignupResponse:
-      type: object
-      properties:
-        error:
-          type: string
     Place:
       type: object
       properties:
@@ -491,13 +467,6 @@ components:
           type: string
         imageUrl:
           type: string
-    PlaceResponse:
-      type: object
-      properties:
-        error:
-          type: string
-        Place:
-          $ref: '#/components/schemas/Place'
     PlaceList:
       type: object
       properties:
@@ -518,22 +487,13 @@ components:
           type: string
         rating:
           type: integer
-    ReviewsResponse:
+    ReviewList:
       type: object
       properties:
-        error:
-          type: string
         reviews:
           type: array
           items:
             $ref: '#/components/schemas/Review'
-    ReviewResponse:
-      type: object
-      properties:
-        error:
-          type: string
-        reviews:
-          $ref: '#/components/schemas/Review'
     AddReviewRequest:
       type: object
       properties:
@@ -589,22 +549,31 @@ components:
                 type: string
               comment:
                 type: string
-    TripResponse:
+    TripList:
       type: object
       properties:
-        error:
-          type: string
-        trip:
-          $ref: '#/components/schemas/Trip'
-    TripListResponse:
-      type: object
-      properties:
-        error:
-          type: string
         trips:
           type: array
           items:
             $ref: '#/components/schemas/Trip'
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+    CreatePlaceRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        rating:
+          type: number
+        cost:
+          type: string
+        imageUrl:
+          type: string
 
 
 
