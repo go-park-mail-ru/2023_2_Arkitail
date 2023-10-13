@@ -538,8 +538,8 @@ components:
           type: integer
         name:
           type: string
-        publicity:
-          type: string
+        isPublic:
+          type: boolean
           example: public or private
         places_in_trip:
           type: array
