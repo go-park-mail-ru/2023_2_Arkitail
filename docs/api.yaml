@@ -156,17 +156,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /api/v1/users/{username}/reviews:
+  /api/v1/users/{user_id}/reviews:
     get:
       summary: Returns all reviews from user
       security: []    # no authentication
       parameters:
         - in: path
-          name: username
+          name: user_id
           schema:
-            type: string
+            type: integer
           required: true
-          description: String username of the user to get reviews from
+          description: Integer user_id of the user to get reviews from
       responses:
         '200':
           description: Success
@@ -358,17 +358,17 @@ paths:
           description: Unauthorized
         '404':
           description: Couldnt find a trip
-  /api/v1/{username}/trips:
+  /api/v1/{user_id}/trips:
     get:
-      summary: Returns a review with id = reviewId
+      summary: Returns trips of a user with user_id
       security: []    # no authentication
       parameters:
         - in: path
-          name: username
+          name: user_id
           schema:
             type: string
           required: true
-          description: String username of a user to get trips from
+          description: Integer id of a user to get trips from
       responses:
         '200':
           description: Success
@@ -428,12 +428,15 @@ components:
     User:
       type: object
       properties:
+        id:
+          type: integer
         name:
           type: string
         username:
           description: Уникальный username, потом используем в стиле @{username}
           type: string
         email:
+          description: Используем для авторизации
           type: string
         location:
           type: string
@@ -479,8 +482,8 @@ components:
       properties:
         id:
           type: integer
-        username:
-          type: string
+        user_id:
+          type: integer
         place_id:
           type: integer
         text:
@@ -497,8 +500,8 @@ components:
     AddReviewRequest:
       type: object
       properties:
-        username:
-          type: string
+        user_id:
+          type: integer
         place_id:
           type: integer
         text:
@@ -510,8 +513,8 @@ components:
       properties:
         id:
           type: integer
-        username:
-          type: string
+        user_id:
+          type: integer
         name:
           type: string
         publicity:
@@ -531,12 +534,12 @@ components:
     AddTripRequest:
       type: object
       properties:
-        username:
-          type: string
+        user_id:
+          type: integer
         name:
           type: string
-        publicity:
-          type: string
+        isPublic:
+          type: boolean
           example: public or private
         places_in_trip:
           type: array
