@@ -84,7 +84,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlaceList'
+                $ref: '#/components/schemas/PlaceMap'
     post:
       summary: Create a new place
       requestBody:
@@ -238,7 +238,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewList'
+                $ref: '#/components/schemas/ReviewMap'
         '404':
           description: Couldnt find user
           content:
@@ -262,7 +262,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewList'
+                $ref: '#/components/schemas/ReviewMap'
         '404':
           description: Couldnt find place
           content:
@@ -440,7 +440,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripList'
+                $ref: '#/components/schemas/TripMap'
         '404':
           description: User doesnt exist
           content:
@@ -535,13 +535,10 @@ components:
           type: string
         imageUrl:
           type: string
-    PlaceList:
+    PlaceMap:
       type: object
-      properties:
-        body:
-          type: array
-          items:
-            $ref: '#/components/schemas/Place'
+      additionalProperties:
+        $ref: '#/components/schemas/Place'
     Review:
       type: object
       properties:
@@ -555,13 +552,10 @@ components:
           type: string
         rating:
           type: integer
-    ReviewList:
+    ReviewMap:
       type: object
-      properties:
-        reviews:
-          type: array
-          items:
-            $ref: '#/components/schemas/Review'
+      additionalProperties:
+        $ref: '#/components/schemas/Review'
     AddReviewRequest:
       type: object
       properties:
@@ -617,13 +611,10 @@ components:
                 type: string
               comment:
                 type: string
-    TripList:
+    TripMap:
       type: object
-      properties:
-        trips:
-          type: array
-          items:
-            $ref: '#/components/schemas/Trip'
+      additionalProperties:
+        $ref: '#/components/schemas/Trip'
     ErrorResponse:
       type: object
       properties:
