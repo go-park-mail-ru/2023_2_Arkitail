@@ -156,7 +156,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   /api/v1/users/{userId}:
     get:
       summary: Returns data of user with id = {userId}
