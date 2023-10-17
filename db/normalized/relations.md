@@ -37,4 +37,4 @@
 Все функциональные зависимости имеют в качестве детерминанты потенциальные ключи.
 
 #ERD
-[Ссылка на mermaid](https://www.mermaidchart.com/raw/59050c22-2cb9-4145-aba7-8a0d3e338bcc?version=v0.1&theme=light&format=svg)
+![Alt text](image.png)
