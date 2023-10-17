@@ -2,7 +2,6 @@ package repo
 
 import (
 	"math/rand"
-
 	"project/places/model"
 )
 

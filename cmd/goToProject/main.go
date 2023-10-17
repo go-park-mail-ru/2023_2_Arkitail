@@ -36,7 +36,7 @@ func main() {
 	r.HandleFunc(apiPath+"/places", hand.GetPlaces).Methods("GET")
 
 	fmt.Println("Server is running on :8080")
-	err := http.ListenAndServe(":8080", handler)
+	err := http.ListenAndServe(":8088", handler)
 	if err != nil {
 		fmt.Println(err)
 	}
