@@ -6,7 +6,7 @@
 
 #Relation Reviews:
 
-{id} -> user_id, place_id, text, rating, creation_date, last_updated
+{id} -> user_id, place_id, content, rating, creation_date, last_updated
 
 Таблица с отзывами.
 
