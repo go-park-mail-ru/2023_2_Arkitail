@@ -33,13 +33,13 @@ type AuthConfig struct {
 }
 
 type UserUsecase struct {
-    repo   repo.UserRepository
+    repo   *repo.UserRepository
     config AuthConfig
 }
 
 func NewUserUsecase(repo *repo.UserRepository, config AuthConfig) *UserUsecase {
     return &UserUsecase{
-        repo:   *repo,
+        repo:   repo,
         config: config,
     }
 }

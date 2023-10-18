@@ -89,13 +89,14 @@ func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
+	passlen := 8
 	user, err := h.ParseUserFromJsonBody(r)
 	if err != nil {
 		h.WriteResponse(w, http.StatusInternalServerError, h.CreateResponse("error", err.Error()))
 		return
 	}
 
-	if len(user.Password) < 8 {
+	if len(user.Password) < passlen {
 		h.WriteResponse(w, http.StatusBadRequest, h.CreateResponse("error", "Password should be at least 8 characters long"))
 		return
 	}
@@ -155,7 +156,10 @@ func (h *UserHandler) ParseUserFromJsonBody(r *http.Request) (*model.User, error
 
 func (h *UserHandler) CreateResponse(errorMsg string, errMessage string) []byte {
 	response := model.GetUserInfoResponse{Error: errorMsg, User: model.User{Username: errMessage}}
-	responseJson, _ := json.Marshal(response)
+	responseJson, err := json.Marshal(response)
+	if err != nil {
+		return nil
+	}
 	return responseJson
 }
 
