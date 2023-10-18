@@ -1,30 +1,33 @@
 #Relation Users:
 
-{id, username, email} -> name, location, webSite, about, avatarUrl, creationDate, lastUpdated
+{id, username, email} -> name, location, web_site, about, avatar_url, creation_date, last_updated
 
 Таблица с пользователями.
 
 #Relation Reviews:
 
-{id} -> userId, placeId, text, rating, creationDate, lastUpdated
+{id} -> user_id, place_id, text, rating, creation_date, last_updated
+
 
 Таблица с отзывами.
 
 #Relation Places:
 
-{id} -> name, description, cost, imageUrl, creationDate, lastUpdated
+{id} -> name, description, cost, image_url, creation_date, last_updated
+
 
 Таблица с достопримечательностями.
 
 #Relation Trips:
 
-{id} -> userId, name, isPublic, creationDate, lastUpdated
+{id} -> user_id, name, is_public, creation_date, last_updated
+
 
 Таблица с поездками.
 
 #Relation Trips_to_places:
 
-{id} -> placeId, tripId
+{id} -> place_id, trip_id
 
 Таблица для отношения многие ко многим между поездками и достопримечательностями.
 
@@ -44,4 +47,4 @@
 
 #ERD
 
-![Alt text](image-1.png)
+![Alt text](image.png)
