@@ -8,20 +8,17 @@
 
 {id} -> user_id, place_id, text, rating, creation_date, last_updated
 
-
 Таблица с отзывами.
 
 #Relation Places:
 
 {id} -> name, description, cost, image_url, creation_date, last_updated
 
-
 Таблица с достопримечательностями.
 
 #Relation Trips:
 
 {id} -> user_id, name, is_public, creation_date, last_updated
-
 
 Таблица с поездками.
 
