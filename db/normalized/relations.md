@@ -1,29 +1,35 @@
 #Relation Users:
-{id, name, username, email} -> location, webSite, about, avatarUrl, creationDate, lastUpdated
+
+{id, username, email} -> name, location, webSite, about, avatarUrl, creationDate, lastUpdated
 
 Таблица с пользователями.
 
 #Relation Reviews:
+
 {id} -> userId, placeId, text, rating, creationDate, lastUpdated
 
 Таблица с отзывами.
 
 #Relation Places:
+
 {id} -> name, description, cost, imageUrl, creationDate, lastUpdated
 
 Таблица с достопримечательностями.
 
 #Relation Trips:
+
 {id} -> userId, name, isPublic, creationDate, lastUpdated
 
 Таблица с поездками.
 
 #Relation Trips_to_places:
+
 {id} -> placeId, tripId
 
 Таблица для отношения многие ко многим между поездками и достопримечательностями.
 
 #Нормальные формы
+
 - 1ая нормальная форма:
 Каждая таблица содержит только 1 значение для каждого атрибута из кортежа.
 
@@ -37,4 +43,5 @@
 Все функциональные зависимости имеют в качестве детерминанты потенциальные ключи.
 
 #ERD
-![Alt text](image.png)
+
+![Alt text](image-1.png)
