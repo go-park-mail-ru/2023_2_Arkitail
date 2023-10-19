@@ -6,7 +6,10 @@ import (
 	"net/http"
 	"project/users/model"
 	"project/users/usecase"
+	"strconv"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 type UserHandler struct {
@@ -17,7 +20,10 @@ func NewUserHandler(userUsecase *usecase.UserUsecase) *UserHandler {
 	return &UserHandler{usecase: userUsecase}
 }
 
-var errTokenInvalid = errors.New("token is invalid")
+var (
+	errInvalidUrlParam = errors.New("parameter passed by url has wrong format")
+	errTokenInvalid    = errors.New("token is invalid")
+)
 
 func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
@@ -45,8 +51,55 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	h.WriteResponse(w, http.StatusOK, response)
 }
 
+func (h *UserHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(mux.Vars(r)["user_id"])
+	if err != nil {
+		body, _ := h.CreateErrorResponse(errInvalidUrlParam.Error())
+		h.WriteResponse(w, http.StatusBadRequest, body)
+		return
+	}
+
+	user, err := h.usecase.GetUserInfoById(id)
+	if err != nil {
+		body, _ := h.CreateErrorResponse(err.Error())
+		h.WriteResponse(w, http.StatusBadRequest, body)
+		return
+	}
+
+	err = h.ParseUserFromJsonBody(user, r)
+	if err != nil {
+		body, _ := h.CreateErrorResponse(err.Error())
+		h.WriteResponse(w, http.StatusBadRequest, body)
+		return
+	}
+
+	err = h.usecase.IsValidUser(user)
+	if err != nil {
+		body, _ := h.CreateErrorResponse(err.Error())
+		h.WriteResponse(w, http.StatusBadRequest, body)
+		return
+	}
+
+	err = h.usecase.UpdateUser(user)
+	if err != nil {
+		body, _ := h.CreateErrorResponse(err.Error())
+		h.WriteResponse(w, http.StatusInternalServerError, body)
+		return
+	}
+
+	response, err := h.CreateUserResponse(user)
+	if err != nil {
+		body, _ := h.CreateErrorResponse(err.Error())
+		h.WriteResponse(w, http.StatusInternalServerError, body)
+		return
+	}
+
+	h.WriteResponse(w, http.StatusOK, response)
+}
+
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
-	user, err := h.ParseUserFromJsonBody(r)
+	var user *model.User
+	err := h.ParseUserFromJsonBody(user, r)
 	if err != nil {
 		body, _ := h.CreateErrorResponse(errTokenInvalid.Error())
 		h.WriteResponse(w, http.StatusInternalServerError, body)
@@ -84,28 +137,17 @@ func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
-	passlen := 8
-	user, err := h.ParseUserFromJsonBody(r)
+	var user *model.User
+	err := h.ParseUserFromJsonBody(user, r)
 	if err != nil {
-		body, _ := h.CreateErrorResponse("Password should be at least 8 characters long")
+		body, _ := h.CreateErrorResponse(err.Error())
 		h.WriteResponse(w, http.StatusInternalServerError, body)
 		return
 	}
 
-	if len(user.Password) < passlen {
-		body, _ := h.CreateErrorResponse("Password should be at least 8 characters long")
-		h.WriteResponse(w, http.StatusBadRequest, body)
-		return
-	}
-
-	if !h.usecase.IsValidPassword(user.Password) {
-		body, _ := h.CreateErrorResponse("Password should contain letters, digits, and special characters")
-		h.WriteResponse(w, http.StatusBadRequest, body)
-		return
-	}
-
-	if !h.usecase.IsValidEmail(user.Email) {
-		body, _ := h.CreateErrorResponse("Email should contain @ and letters, digits, or special characters")
+	err = h.usecase.IsValidUser(user)
+	if err != nil {
+		body, _ := h.CreateErrorResponse(err.Error())
 		h.WriteResponse(w, http.StatusBadRequest, body)
 		return
 	}
@@ -152,13 +194,12 @@ func (h *UserHandler) WriteResponse(w http.ResponseWriter, status int, body []by
 	w.Write(body)
 }
 
-func (h *UserHandler) ParseUserFromJsonBody(r *http.Request) (*model.User, error) {
+func (h *UserHandler) ParseUserFromJsonBody(user *model.User, r *http.Request) error {
 	decoder := json.NewDecoder(r.Body)
-	var user model.User
-	if err := decoder.Decode(&user); err != nil {
-		return nil, usecase.ErrInvalidCredentials
+	if err := decoder.Decode(user); err != nil {
+		return usecase.ErrInvalidCredentials
 	}
-	return &user, nil
+	return nil
 }
 
 func (h *UserHandler) CreateErrorResponse(errorMsg string) ([]byte, error) {
