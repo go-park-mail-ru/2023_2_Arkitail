@@ -6,9 +6,11 @@ import (
 	"net/http"
 
 	auth "project/internal/delivery"
+	"project/internal/middleware"
 	"project/internal/router"
 
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -20,7 +22,12 @@ func main() {
 		return
 	}
 
+	logrus.SetLevel(logrus.TraceLevel)
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logger := new(logrus.Entry)
+
 	r := mux.NewRouter()
+	r.Use(middleware.AccessLog(logger))
 	authHandler := auth.NewAuthHandler(secret)
 	apiPath := "/api/v1"
 
@@ -29,10 +36,11 @@ func main() {
 	r.HandleFunc(apiPath+"/signup", authHandler.Signup).Methods("POST")
 	r.HandleFunc(apiPath+"/logout", authHandler.Logout).Methods("Delete")
 	r.HandleFunc(apiPath+"/user", authHandler.GetUserInfo).Methods("Get")
-	handler := router.AddCors(r, []string{"http://localhost:8080/"})
 
 	r.HandleFunc(apiPath+"/places", auth.CreatePlace).Methods("POST")
 	r.HandleFunc(apiPath+"/places", auth.GetPlaces).Methods("GET")
+
+	handler := router.AddCors(r, []string{"http://localhost:8080/"})
 
 	fmt.Println("Server is running on :8080")
 	err := http.ListenAndServe(":8080", handler)
