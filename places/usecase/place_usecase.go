@@ -21,7 +21,7 @@ func (uc *PlaceUseCase) AddPlace(place *model.Place) error {
 	return nil
 }
 
-func (uc *PlaceUseCase) GetPlaces() ([]*model.Place, error) {
+func (uc *PlaceUseCase) GetPlaces() (map[string]*model.Place, error) {
 	places, err := uc.repo.GetPlaces()
 	if err != nil {
 		return nil, err
