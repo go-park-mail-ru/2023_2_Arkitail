@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	auth "project/internal/delivery"
+	"project/internal/middleware"
 	"project/internal/router"
 
 	"github.com/gorilla/mux"
@@ -33,6 +34,8 @@ func main() {
 
 	r.HandleFunc(apiPath+"/places", auth.CreatePlace).Methods("POST")
 	r.HandleFunc(apiPath+"/places", auth.GetPlaces).Methods("GET")
+
+	r.Use(middleware.Panic)
 
 	fmt.Println("Server is running on :8080")
 	err := http.ListenAndServe(":8080", handler)
