@@ -13,7 +13,7 @@ func NewPlaceUseCase(repo *repo.PlaceRepository) *PlaceUseCase {
 	return &PlaceUseCase{*repo}
 }
 
-func (uc *PlaceUseCase) AddPlace(place model.Place) error {
+func (uc *PlaceUseCase) AddPlace(place *model.Place) error {
 	err := uc.repo.AddPlace(place)
 	if err != nil {
 		return err
@@ -21,7 +21,7 @@ func (uc *PlaceUseCase) AddPlace(place model.Place) error {
 	return nil
 }
 
-func (uc *PlaceUseCase) GetPlaces() ([]model.Place, error) {
+func (uc *PlaceUseCase) GetPlaces() ([]*model.Place, error) {
 	places, err := uc.repo.GetPlaces()
 	if err != nil {
 		return nil, err

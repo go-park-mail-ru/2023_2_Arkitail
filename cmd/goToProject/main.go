@@ -46,13 +46,11 @@ func getPosgres() *sql.DB {
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		log.Fatal("cant parce database config")
-		return nil
 	}
 
 	err = db.Ping()
 	if err != nil {
 		log.Fatal(err)
-		return nil
 	}
 
 	db.SetMaxOpenConns(connectionConfig.maxConnectionCount)
@@ -77,7 +75,7 @@ func main() {
 	userUsecase := usecase.NewUserUsecase(userRepo, authConfig)
 	userHandler := handler.NewUserHandler(userUsecase)
 
-	placeRepo := prepo.NewPlaceRepository()
+	placeRepo := prepo.NewPlaceRepository(db)
 	placeUseCase := pusecase.NewPlaceUseCase(placeRepo)
 	placeHandler := phandler.NewPlaceHandler(placeUseCase)
 

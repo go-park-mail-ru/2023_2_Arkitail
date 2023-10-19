@@ -21,9 +21,9 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{DB: db}
 }
 
-func (repo *UserRepository) GetUser(username string) (*model.User, error) {
+func (r *UserRepository) GetUser(username string) (*model.User, error) {
 	user := &model.User{}
-	err := repo.DB.
+	err := r.DB.
 		QueryRow(`SELECT id, password, name, username, email, location, web_site, about, avatar_url FROM "user" WHERE username = $1`, username).
 		Scan(&user.ID, &user.Password, &user.Name, &user.Username, &user.Email, &user.Location, &user.WebSite, &user.About, &user.AvatarUrl)
 	if err != nil {
@@ -33,13 +33,13 @@ func (repo *UserRepository) GetUser(username string) (*model.User, error) {
 	return user, err
 }
 
-func (repo *UserRepository) AddUser(user *model.User) error {
-	_, err := repo.GetUser(user.Username)
+func (r *UserRepository) AddUser(user *model.User) error {
+	_, err := r.GetUser(user.Username)
 	if err == nil {
 		return ErrUserExists
 	}
 
-	err = repo.DB.QueryRow(
+	err = r.DB.QueryRow(
 		`INSERT INTO "user" ("name", "username", "password", "email", "location", "web_site", "about", "avatar_url")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
 		user.Name,
@@ -58,6 +58,5 @@ func (repo *UserRepository) AddUser(user *model.User) error {
 		//TODO: чужая ошибка, надо бы нормально обрабатывать
 		return err
 	}
-
-	return err
+	return nil
 }
