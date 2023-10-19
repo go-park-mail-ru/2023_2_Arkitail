@@ -42,7 +42,6 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	h.WriteResponse(w, http.StatusOK, response)
 }
 
-
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	user, err := h.ParseUserFromJsonBody(r)
 	if err != nil {
@@ -164,13 +163,13 @@ func (h *UserHandler) CreateResponse(errorMsg string, errMessage string) []byte 
 }
 
 func (h *UserHandler) CreateUserResponse(errorMsg string, user *model.User) ([]byte, error) {
-    if user == nil {
-        user = &model.User{Username: ""}
-    }
-    response := model.GetUserInfoResponse{Error: errorMsg, User: *user}
-    responseJson, err := json.Marshal(response)
-    if err != nil {
-        return nil, err
-    }
-    return responseJson, nil
+	if user == nil {
+		user = &model.User{Username: ""}
+	}
+	response := model.GetUserInfoResponse{Error: errorMsg, User: *user}
+	responseJson, err := json.Marshal(response)
+	if err != nil {
+		return nil, err
+	}
+	return responseJson, nil
 }

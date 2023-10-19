@@ -1,55 +1,60 @@
 package repo
 
 import (
-    "errors"
-    "sync"
+	"database/sql"
+	"errors"
 
-    "project/users/model"
+	"project/users/model"
 )
 
 type UserRepository struct {
-    users sync.Map
-    len   uint
+	DB *sql.DB
 }
 
 var (
-    ErrUserNotFound = errors.New("user not found")
-    ErrUserExists   = errors.New("user already exists")
-    ErrWrongPassword = errors.New("wrong password")
+	ErrUserNotFound  = errors.New("user not found")
+	ErrUserExists    = errors.New("user already exists")
+	ErrWrongPassword = errors.New("wrong password")
 )
 
-func NewUserRepository() *UserRepository {
-    return &UserRepository{}
+func NewUserRepository(db *sql.DB) *UserRepository {
+	return &UserRepository{DB: db}
 }
 
-func (r *UserRepository) GetUser(username string) (*model.User, error) {
-    value, found := r.users.Load(username)
-    if found {
-        user := value.(*model.User)
-        return user, nil
-    }
-    return nil, ErrUserNotFound
+func (repo *UserRepository) GetUser(username string) (*model.User, error) {
+	user := &model.User{}
+	err := repo.DB.
+		QueryRow(`SELECT id, name, username, email, location, web_site, about, avatar_url FROM "user" WHERE username = $1`, username).
+		Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.Location, &user.WebSite, &user.About, &user.AvatarUrl)
+	if err != nil {
+		return nil, ErrUserNotFound
+	}
+
+	return user, err
 }
 
-func (r *UserRepository) AddUser(user *model.User) error {
-    _, err := r.GetUser(user.Username)
-    if err != nil {
-        return ErrUserExists
-    }
+func (repo *UserRepository) AddUser(user *model.User) error {
+	_, err := repo.GetUser(user.Username)
+	if err == nil {
+		return ErrUserExists
+	}
 
-    user.ID = r.len + 1
-    r.len++
-    r.users.Store(user.Username, user)
-    return nil
-}
+	err = repo.DB.QueryRow(
+		`INSERT INTO "user" ("name", "username", "password", "email", "location", "web_site", "about", "avatar_url")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+		user.Name,
+		user.Username,
+		user.Password,
+		user.Email,
+		user.Location,
+		user.WebSite,
+		user.About,
+		user.AvatarUrl,
+	).Scan()
+	if err != nil {
+		//TODO: чужая ошибка, надо бы нормально обрабатывать
+		return err
+	}
 
-func (r *UserRepository) ComparePassword(username, password string) error {
-    user, err := r.GetUser(username)
-    if err != nil {
-        return err
-    }
-    if user.Password != password {
-        return ErrWrongPassword
-    }
-    return nil
+	return err
 }

@@ -17,17 +17,13 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
       security: []    # no authentication
       responses:
-        '200':
+        '204':
           description: logged in
           headers:
             Set-Cookie:
               schema:
                 type: string
                 example: sessionId=abcde12345;
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: access denied
           content:
@@ -45,17 +41,13 @@ paths:
               $ref: '#/components/schemas/SignupRequest'
       security: []    # no authentication
       responses:
-        '201':
+        '204':
           description: Created a new account
           headers:
             Set-Cookie:
               schema:
                 type: string
                 example: sessionId=abcde12345;
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: sign up error
           content:

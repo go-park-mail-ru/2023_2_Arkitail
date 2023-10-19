@@ -1,8 +1,10 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 
 	"project/internal/router"
@@ -16,7 +18,46 @@ import (
 	pusecase "project/places/usecase"
 
 	"github.com/gorilla/mux"
+	_ "github.com/jackc/pgx/stdlib"
 )
+
+type DBconfig struct {
+	user     string
+	dbname   string
+	password string
+	host     string
+	port     int
+	sslmode  string
+}
+
+type ConnectionConfig struct {
+	maxConnectionCount int
+}
+
+func getPosgres() *sql.DB {
+	dbConfig := DBconfig{
+		"GoTo", "GoTO", "qwerty", "127.0.0.1", 5432, "disable",
+	}
+	connectionConfig := ConnectionConfig{10}
+
+	dsn := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%d sslmode=%s",
+		dbConfig.user, dbConfig.dbname, dbConfig.password,
+		dbConfig.host, dbConfig.port, dbConfig.sslmode)
+	db, err := sql.Open("pgx", dsn)
+	if err != nil {
+		log.Fatal("cant parce database config")
+		return nil
+	}
+
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+
+	db.SetMaxOpenConns(connectionConfig.maxConnectionCount)
+	return db
+}
 
 func main() {
 	var secret string
@@ -30,7 +71,9 @@ func main() {
 		Secret: []byte(secret),
 	}
 
-	userRepo := repo.NewUserRepository()
+	db := getPosgres()
+
+	userRepo := repo.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepo, authConfig)
 	userHandler := handler.NewUserHandler(userUsecase)
 
