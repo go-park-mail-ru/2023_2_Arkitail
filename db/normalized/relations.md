@@ -14,17 +14,20 @@
 
 {id} -> name, description, cost, image_url, creation_date, last_updated
 
+
 Таблица с достопримечательностями.
 
 #Relation Trips:
 
 {id} -> user_id, name, is_public, creation_date, last_updated
 
+
 Таблица с поездками.
 
 #Relation Trips_to_places:
 
 {id} -> place_id, trip_id
+
 
 Таблица для отношения многие ко многим между поездками и достопримечательностями.
 
