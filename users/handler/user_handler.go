@@ -49,21 +49,10 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.usecase.Login(user.Username, user.Password)
+	cookie, err := h.usecase.Login(user.Username, user.Password)
 	if err != nil {
 		h.WriteResponse(w, http.StatusUnauthorized, h.CreateResponse("error", err.Error()))
 		return
-	}
-
-	sessionCookie, err := h.usecase.CreateSessionCookie(user.Username)
-	if err != nil {
-		h.WriteResponse(w, http.StatusInternalServerError, h.CreateResponse("error", err.Error()))
-		return
-	}
-
-	cookie := &http.Cookie{
-		Name:  "session_id",
-		Value: sessionCookie,
 	}
 	http.SetCookie(w, cookie)
 
@@ -110,16 +99,18 @@ func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.usecase.Signup(user)
+	err = h.usecase.Signup(user)
 	if err != nil {
 		h.WriteResponse(w, http.StatusUnauthorized, h.CreateResponse("error", err.Error()))
 		return
 	}
-	_, err = h.usecase.CreateSessionCookie(user.Username)
+	cookie, err := h.usecase.CreateSessionCookie(user.Username)
 	if err != nil {
 		h.WriteResponse(w, http.StatusInternalServerError, h.CreateResponse("error", err.Error()))
 		return
 	}
+
+	http.SetCookie(w, cookie)
 	h.WriteResponse(w, http.StatusOK, h.CreateResponse("error", ""))
 }
 
