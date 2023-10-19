@@ -18,7 +18,7 @@ CREATE TABLE
         id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         description TEXT NOT NULL,
-        cost DECIMAL(19, 4) NOT NULL,
+        cost varchar(10) NOT NULL,
         image_url VARCHAR(255) NOT NULL,
         creation_date TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
         last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
