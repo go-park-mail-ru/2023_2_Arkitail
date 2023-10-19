@@ -2,6 +2,7 @@ CREATE TABLE
     "user" (
         id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         name VARCHAR(30) NOT NULL,
+        password VARCHAR(30) NOT NULL,
         username VARCHAR(30) UNIQUE NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         location VARCHAR(100) DEFAULT '' NOT NULL,

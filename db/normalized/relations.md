@@ -1,6 +1,6 @@
 #Relation Users:
 
-{id, username, email} -> name, location, web_site, about, avatar_url, creation_date, last_updated
+{id, username, email} -> name, password, location, web_site, about, avatar_url, creation_date, last_updated
 
 Таблица с пользователями.
 
