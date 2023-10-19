@@ -84,7 +84,7 @@ func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
-	passlen := 8
+	const passlen = 8
 	user, err := h.ParseUserFromJsonBody(r)
 	if err != nil {
 		body, _ := h.CreateErrorResponse("Password should be at least 8 characters long")
