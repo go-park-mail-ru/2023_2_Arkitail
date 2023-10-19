@@ -36,7 +36,7 @@ type ConnectionConfig struct {
 
 func getPosgres() *sql.DB {
 	dbConfig := DBconfig{
-		"GoTo", "GoTO", "qwerty", "127.0.0.1", 5432, "disable",
+		"GoTo", "GoTo", "qwerty", "127.0.0.1", 5432, "disable",
 	}
 	connectionConfig := ConnectionConfig{10}
 
