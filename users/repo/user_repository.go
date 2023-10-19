@@ -47,16 +47,17 @@ func (r *UserRepository) GetUserById(id int) (*model.User, error) {
 
 func (r *UserRepository) UpdateUser(user *model.User) error {
 	_, err := r.DB.Exec(
-		`UPDATE items SET "password" = $1`+
+		`UPDATE "user" SET "password" = $1`+
 			`,"name" = $2`+
 			`,"username" = $3`+
-			`,"email" = $5`+
-			`,"location" = $6`+
-			`,"web_site" = $7`+
-			`,"about" = $8`+
-			`,"avatar_url" = $9`+
-			`WHERE id = $10`,
+			`,"email" = $4`+
+			`,"location" = $5`+
+			`,"web_site" = $6`+
+			`,"about" = $7`+
+			`,"avatar_url" = $8`+
+			`WHERE id = $9`,
 		user.Password,
+		user.Name,
 		user.Username,
 		user.Email,
 		user.Location,

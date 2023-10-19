@@ -98,17 +98,17 @@ func (h *UserHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
-	var user *model.User
+	user := &model.User{}
 	err := h.ParseUserFromJsonBody(user, r)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(errTokenInvalid.Error())
+		body, _ := h.CreateErrorResponse(err.Error())
 		h.WriteResponse(w, http.StatusInternalServerError, body)
 		return
 	}
 
 	cookie, err := h.usecase.Login(user.Username, user.Password)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(errTokenInvalid.Error())
+		body, _ := h.CreateErrorResponse(err.Error())
 		h.WriteResponse(w, http.StatusUnauthorized, body)
 		return
 	}
@@ -136,8 +136,9 @@ func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	h.WriteResponse(w, http.StatusNoContent, nil)
 }
 
+// TODO: выдал "error": "ERROR: duplicate key value violates unique constraint \"user_email_key\" (SQLSTATE 23505)"
 func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
-	var user *model.User
+	user := &model.User{}
 	err := h.ParseUserFromJsonBody(user, r)
 	if err != nil {
 		body, _ := h.CreateErrorResponse(err.Error())
