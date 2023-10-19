@@ -68,7 +68,6 @@ func (u *UserUsecase) CreateSessionCookie(userName string) (*http.Cookie, error)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
-
 	str, err := token.SignedString(u.config.Secret)
 	if err != nil {
 		return nil, err
@@ -122,7 +121,6 @@ func (u *UserUsecase) CheckAuth(tokenString string) error {
 
 func (u *UserUsecase) Signup(user *model.User) error {
 	err := u.repo.AddUser(user)
-
 	return err
 }
 
@@ -138,14 +136,12 @@ func (u *UserUsecase) ValidateToken(tokenString string) (*UserClaim, error) {
 			}
 			return u.config.Secret, nil
 		})
-
 	if err != nil {
 		return nil, err
 	}
 
 	if claims, ok := token.Claims.(*UserClaim); ok && token.Valid {
 		return claims, nil
-	} else {
-		return nil, ErrInvalidToken
 	}
+	return nil, ErrInvalidToken
 }

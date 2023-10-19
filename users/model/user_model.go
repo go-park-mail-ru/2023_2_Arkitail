@@ -12,11 +12,6 @@ type User struct {
 	AvatarUrl string `json:"avatarUrl"`
 }
 
-type AuthResponse struct {
+type ErrorResponse struct {
 	Error string `json:"error"`
-}
-
-type GetUserInfoResponse struct {
-	Error string `json:"error"`
-	User  User   `json:"user"`
 }
