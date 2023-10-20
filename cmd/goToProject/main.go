@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 
-	auth "project/internal/delivery"
 	"project/internal/middleware"
 	"project/internal/router"
 
