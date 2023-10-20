@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"errors"
-  "net/http"
+	"net/http"
 	"regexp"
 	"time"
 
