@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"net/http"
 	"encoding/json"
+	"net/http"
 	"project/places/model"
 	"project/places/usecase"
 )

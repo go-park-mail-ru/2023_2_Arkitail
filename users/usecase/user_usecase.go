@@ -11,16 +11,16 @@ import (
 )
 
 type UserUseCase interface {
-    GetUserInfo(tokenString string) (*model.User, error)
-    Login(username, password string) (string, error)
-    CheckAuth(tokenString string) error
-    Signup(user *model.User) (string, error)
-    Logout() error
+	GetUserInfo(tokenString string) (*model.User, error)
+	Login(username, password string) (string, error)
+	CheckAuth(tokenString string) error
+	Signup(user *model.User) (string, error)
+	Logout() error
 }
 
 var (
-    ErrInvalidToken = errors.New("invalid token")
-    ErrInvalidCredentials = errors.New("invalid username or password")
+	ErrInvalidToken       = errors.New("invalid token")
+	ErrInvalidCredentials = errors.New("invalid username or password")
 )
 
 type UserClaim struct {
@@ -29,19 +29,19 @@ type UserClaim struct {
 }
 
 type AuthConfig struct {
-    Secret []byte
+	Secret []byte
 }
 
 type UserUsecase struct {
-    repo   *repo.UserRepository
-    config AuthConfig
+	repo   *repo.UserRepository
+	config AuthConfig
 }
 
 func NewUserUsecase(repo *repo.UserRepository, config AuthConfig) *UserUsecase {
-    return &UserUsecase{
-        repo:   repo,
-        config: config,
-    }
+	return &UserUsecase{
+		repo:   repo,
+		config: config,
+	}
 }
 
 func (u *UserUsecase) IsValidPassword(password string) bool {

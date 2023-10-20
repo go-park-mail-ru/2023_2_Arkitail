@@ -35,7 +35,6 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	response, err := h.CreateUserResponse("error", user)
 	if err != nil {
 		body, _ := h.CreateResponse(errTokenInvalid.Error())
@@ -45,7 +44,6 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 
 	h.WriteResponse(w, http.StatusOK, response)
 }
-
 
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	user, err := h.ParseUserFromJsonBody(r)
@@ -179,13 +177,13 @@ func (h *UserHandler) CreateResponse(errorMsg string) ([]byte, error) {
 }
 
 func (h *UserHandler) CreateUserResponse(errorMsg string, user *model.User) ([]byte, error) {
-    if user == nil {
-        user = &model.User{Username: ""}
-    }
-    response := model.GetUserInfoResponse{Error: errorMsg, User: *user}
-    responseJson, err := json.Marshal(response)
-    if err != nil {
-        return nil, err
-    }
-    return responseJson, nil
+	if user == nil {
+		user = &model.User{Username: ""}
+	}
+	response := model.GetUserInfoResponse{Error: errorMsg, User: *user}
+	responseJson, err := json.Marshal(response)
+	if err != nil {
+		return nil, err
+	}
+	return responseJson, nil
 }
