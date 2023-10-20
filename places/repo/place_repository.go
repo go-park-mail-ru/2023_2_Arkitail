@@ -2,7 +2,7 @@ package repo
 
 import (
 	"database/sql"
-	"errors"
+	"fmt"
 
 	"project/places/model"
 )
@@ -10,8 +10,6 @@ import (
 type PlaceRepository struct {
 	DB *sql.DB
 }
-
-var ErrInnerDBError = errors.New("database error")
 
 func NewPlaceRepository(db *sql.DB) *PlaceRepository {
 	return &PlaceRepository{
@@ -32,7 +30,7 @@ func (r *PlaceRepository) AddPlace(place *model.Place) error {
 		err = nil
 	}
 	if err != nil {
-		return ErrInnerDBError
+		return fmt.Errorf("error adding place in a database: %v", err)
 	}
 	return nil
 }

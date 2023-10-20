@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"project/users/model"
 )
@@ -15,7 +16,6 @@ var (
 	ErrUserNotFound  = errors.New("user not found")
 	ErrUserExists    = errors.New("user already exists")
 	ErrWrongPassword = errors.New("wrong password")
-	ErrInnerDBError  = errors.New("database error")
 )
 
 func NewUserRepository(db *sql.DB) *UserRepository {
@@ -55,7 +55,7 @@ func (r *UserRepository) AddUser(user *model.User) error {
 		err = nil
 	}
 	if err != nil {
-		return ErrInnerDBError
+		return fmt.Errorf("error adding user in a database: %v", err)
 	}
 	return nil
 }
