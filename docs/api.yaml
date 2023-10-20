@@ -82,7 +82,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlaceList'
+                $ref: '#/components/schemas/PlaceMap'
     post:
       summary: Create a new place
       requestBody:
@@ -138,7 +138,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/v1/user:
     get:
-      summary: Returns json with user data
+      summary: Returns data of currently authotized user
       security:
         - cookieAuth: []
       responses:
@@ -154,24 +154,88 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /api/v1/users/{user_id}/reviews:
+  /api/v1/users/{userId}:
     get:
-      summary: Returns all reviews from user
+      summary: Returns data of user with id = {userId}
       security: []    # no authentication
       parameters:
         - in: path
-          name: user_id
+          name: userId
           schema:
             type: integer
           required: true
-          description: Integer user_id of the user to get reviews from
+          description: Integer userId of the user to get data for
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewList'
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Couldnt find user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      summary: Changes data of user with id = {userId}
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: Integer userId of the user to patch data for
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Trip is private and you dont have the rights to change it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Couldnt find a user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+
+
+  /api/v1/users/{userId}/reviews:
+    get:
+      summary: Returns all reviews from user
+      security: []    # no authentication
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: Integer userId of the user to get reviews from
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewMap'
         '404':
           description: Couldnt find user
           content:
@@ -195,7 +259,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewList'
+                $ref: '#/components/schemas/ReviewMap'
         '404':
           description: Couldnt find place
           content:
@@ -356,13 +420,13 @@ paths:
           description: Unauthorized
         '404':
           description: Couldnt find a trip
-  /api/v1/{user_id}/trips:
+  /api/v1/{userId}/trips:
     get:
-      summary: Returns trips of a user with user_id
+      summary: Returns trips of a user with userId
       security: []    # no authentication
       parameters:
         - in: path
-          name: user_id
+          name: userId
           schema:
             type: string
           required: true
@@ -373,7 +437,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripList'
+                $ref: '#/components/schemas/TripMap'
         '404':
           description: User doesnt exist
           content:
@@ -468,13 +532,10 @@ components:
           type: string
         imageUrl:
           type: string
-    PlaceList:
+    PlaceMap:
       type: object
-      properties:
-        body:
-          type: array
-          items:
-            $ref: '#/components/schemas/Place'
+      additionalProperties:
+        $ref: '#/components/schemas/Place'
     Review:
       type: object
       properties:
@@ -488,13 +549,10 @@ components:
           type: string
         rating:
           type: integer
-    ReviewList:
+    ReviewMap:
       type: object
-      properties:
-        reviews:
-          type: array
-          items:
-            $ref: '#/components/schemas/Review'
+      additionalProperties:
+        $ref: '#/components/schemas/Review'
     AddReviewRequest:
       type: object
       properties:
@@ -550,13 +608,10 @@ components:
                 type: string
               comment:
                 type: string
-    TripList:
+    TripMap:
       type: object
-      properties:
-        trips:
-          type: array
-          items:
-            $ref: '#/components/schemas/Trip'
+      additionalProperties:
+        $ref: '#/components/schemas/Trip'
     ErrorResponse:
       type: object
       properties:

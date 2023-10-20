@@ -76,6 +76,7 @@ func main() {
 	userHandler := handler.NewUserHandler(userUsecase)
 
 	placeRepo := prepo.NewPlaceRepository(db)
+
 	placeUseCase := pusecase.NewPlaceUseCase(placeRepo)
 	placeHandler := phandler.NewPlaceHandler(placeUseCase)
 

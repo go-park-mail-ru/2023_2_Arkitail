@@ -2,11 +2,12 @@ package usecase
 
 import (
 	"errors"
-	"net/http"
-	"project/users/model"
-	"project/users/repo"
+  "net/http"
 	"regexp"
 	"time"
+
+	"project/users/model"
+	"project/users/repo"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -136,6 +137,7 @@ func (u *UserUsecase) ValidateToken(tokenString string) (*UserClaim, error) {
 			}
 			return u.config.Secret, nil
 		})
+
 	if err != nil {
 		return nil, err
 	}

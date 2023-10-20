@@ -3,10 +3,12 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
+	"time"
+
 	"project/users/model"
 	"project/users/usecase"
-	"time"
 )
 
 type UserHandler struct {
