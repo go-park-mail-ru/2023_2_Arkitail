@@ -32,11 +32,6 @@ func (r *UserRepository) GetUser(username string) (*model.User, error) {
 }
 
 func (r *UserRepository) AddUser(user *model.User) error {
-	_, err := r.GetUser(user.Username)
-	if err != nil {
-		return ErrUserExists
-	}
-
 	user.ID = r.len + 1
 	r.len++
 	r.users.Store(user.Username, user)
