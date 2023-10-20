@@ -7,7 +7,7 @@ type User struct {
     Email    string `json:"email"`
 }
 
-type AuthResponse struct {
+type ErrorResponse struct {
     Error string `json:"error"`
 }
 
