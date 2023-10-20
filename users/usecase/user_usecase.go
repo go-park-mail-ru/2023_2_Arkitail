@@ -2,10 +2,11 @@ package usecase
 
 import (
 	"errors"
-	"project/users/model"
-	"project/users/repo"
 	"regexp"
 	"time"
+
+	"project/users/model"
+	"project/users/repo"
 
 	"github.com/golang-jwt/jwt/v4"
 )

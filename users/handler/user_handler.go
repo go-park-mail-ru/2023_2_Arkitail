@@ -5,9 +5,10 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
+
 	"project/users/model"
 	"project/users/usecase"
-	"time"
 )
 
 type UserHandler struct {
@@ -23,43 +24,42 @@ var errTokenInvalid = errors.New("token is invalid")
 func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		h.WriteResponse(w, http.StatusUnauthorized, h.CreateResponse("error", errTokenInvalid.Error()))
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 
 	tokenString := cookie.Value
 	user, err := h.usecase.GetUserInfo(tokenString)
 	if err != nil {
-		h.WriteResponse(w, http.StatusUnauthorized, h.CreateResponse("error", err.Error()))
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	response, err := h.CreateUserResponse("error", user)
 	if err != nil {
-		h.WriteResponse(w, http.StatusInternalServerError, h.CreateResponse("error", err.Error()))
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	h.WriteResponse(w, http.StatusOK, response)
 }
 
-
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	user, err := h.ParseUserFromJsonBody(r)
 	if err != nil {
-		h.WriteResponse(w, http.StatusInternalServerError, h.CreateResponse("error", err.Error()))
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	_, err = h.usecase.Login(user.Username, user.Password)
 	if err != nil {
-		h.WriteResponse(w, http.StatusUnauthorized, h.CreateResponse("error", err.Error()))
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	sessionCookie, err := h.usecase.CreateSessionCookie(user.Username)
 	if err != nil {
-		h.WriteResponse(w, http.StatusInternalServerError, h.CreateResponse("error", err.Error()))
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
@@ -69,60 +69,60 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, cookie)
 
-	h.WriteResponse(w, http.StatusOK, h.CreateResponse("error", ""))
+	h.WriteResponse(w, http.StatusOK, h.CreateErrorResponse(""))
 }
 
 func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		h.WriteResponse(w, http.StatusUnauthorized, h.CreateResponse("error", errTokenInvalid.Error()))
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 
 	tokenString := cookie.Value
 	err = h.usecase.CheckAuth(tokenString)
 	if err != nil {
-		h.WriteResponse(w, http.StatusUnauthorized, h.CreateResponse("error", err.Error()))
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
-	h.WriteResponse(w, http.StatusOK, h.CreateResponse("error", ""))
+	h.WriteResponse(w, http.StatusOK, h.CreateErrorResponse(""))
 }
 
 func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	const passlen = 8
 	user, err := h.ParseUserFromJsonBody(r)
 	if err != nil {
-		h.WriteResponse(w, http.StatusInternalServerError, h.CreateResponse("error", err.Error()))
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	if len(user.Password) < passlen {
-		h.WriteResponse(w, http.StatusBadRequest, h.CreateResponse("error", "Password should be at least 8 characters long"))
+		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse("Password should be at least 8 characters long"))
 		return
 	}
 
 	if !h.usecase.IsValidPassword(user.Password) {
-		h.WriteResponse(w, http.StatusBadRequest, h.CreateResponse("error", "Password should contain letters, digits, and special characters"))
+		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse("Password should contain letters, digits, and special characters"))
 		return
 	}
 
 	if !h.usecase.IsValidEmail(user.Email) {
-		h.WriteResponse(w, http.StatusBadRequest, h.CreateResponse("error", "Email should contain @ and letters, digits, or special characters"))
+		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse("Email should contain @ and letters, digits, or special characters"))
 		return
 	}
 
 	_, err = h.usecase.Signup(user)
 	if err != nil {
-		h.WriteResponse(w, http.StatusUnauthorized, h.CreateResponse("error", err.Error()))
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
 		return
 	}
 	_, err = h.usecase.CreateSessionCookie(user.Username)
 	if err != nil {
-		h.WriteResponse(w, http.StatusInternalServerError, h.CreateResponse("error", err.Error()))
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
-	h.WriteResponse(w, http.StatusOK, h.CreateResponse("error", ""))
+	h.WriteResponse(w, http.StatusOK, h.CreateErrorResponse(""))
 }
 
 func (h *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
@@ -155,7 +155,7 @@ func (h *UserHandler) ParseUserFromJsonBody(r *http.Request) (*model.User, error
 	return &user, nil
 }
 
-func (h *UserHandler) CreateResponse(errorMsg string, errMessage string) []byte {
+func (h *UserHandler) CreateErrorResponse (errorMsg string) []byte {
 	response := model.ErrorResponse{Error: errorMsg}
 	responseJson, err := json.Marshal(response)
 	if err != nil {
@@ -166,13 +166,13 @@ func (h *UserHandler) CreateResponse(errorMsg string, errMessage string) []byte 
 }
 
 func (h *UserHandler) CreateUserResponse(errorMsg string, user *model.User) ([]byte, error) {
-    if user == nil {
-        user = &model.User{Username: ""}
-    }
-    response := model.GetUserInfoResponse{Error: errorMsg, User: *user}
-    responseJson, err := json.Marshal(response)
-    if err != nil {
-        return nil, err
-    }
-    return responseJson, nil
+	if user == nil {
+		user = &model.User{Username: ""}
+	}
+	response := model.GetUserInfoResponse{Error: errorMsg, User: *user}
+	responseJson, err := json.Marshal(response)
+	if err != nil {
+		return nil, err
+	}
+	return responseJson, nil
 }
