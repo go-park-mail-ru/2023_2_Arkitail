@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
-  "strconv"
 	"net/http"
+	"strconv"
 	"time"
 
 	"project/users/model"
 	"project/users/usecase"
-  
-  "github.com/gorilla/mux"
+
+	"github.com/gorilla/mux"
 )
 
 type UserHandler struct {
@@ -53,43 +53,37 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["user_id"])
 	if err != nil {
-		body, _ := h.CreateErrorResponse(errInvalidUrlParam.Error())
-		h.WriteResponse(w, http.StatusBadRequest, body)
+		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse(errInvalidUrlParam.Error()))
 		return
 	}
 
 	user, err := h.usecase.GetUserInfoById(id)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusBadRequest, body)
+		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	err = h.ParseUserFromJsonBody(user, r)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusBadRequest, body)
+		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	err = h.usecase.IsValidUser(user)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusBadRequest, body)
+		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	err = h.usecase.UpdateUser(user)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusInternalServerError, body)
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	response, err := h.CreateUserResponse(user)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusInternalServerError, body)
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
@@ -135,7 +129,6 @@ func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	err := h.ParseUserFromJsonBody(user, r)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
 		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
