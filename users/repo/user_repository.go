@@ -55,7 +55,6 @@ func (r *UserRepository) AddUser(user *model.User) error {
 		err = nil
 	}
 	if err != nil {
-		//TODO: чужая ошибка, надо бы нормально обрабатывать
 		return err
 	}
 	return nil

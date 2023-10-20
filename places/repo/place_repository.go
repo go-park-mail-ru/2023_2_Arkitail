@@ -29,7 +29,6 @@ func (r *PlaceRepository) AddPlace(place *model.Place) error {
 		err = nil
 	}
 	if err != nil {
-		//TODO: чужая ошибка, надо бы нормально обрабатывать
 		return err
 	}
 	return nil
