@@ -3,13 +3,15 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"log"
+  "strconv"
 	"net/http"
-	"project/users/model"
-	"project/users/usecase"
-	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
+	"project/users/model"
+	"project/users/usecase"
+  
+  "github.com/gorilla/mux"
 )
 
 type UserHandler struct {
@@ -28,23 +30,20 @@ var (
 func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		body, _ := h.CreateErrorResponse(errTokenInvalid.Error())
-		h.WriteResponse(w, http.StatusUnauthorized, body)
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 
 	tokenString := cookie.Value
 	user, err := h.usecase.GetUserInfo(tokenString)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusUnauthorized, body)
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	response, err := h.CreateUserResponse(user)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusInternalServerError, body)
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
@@ -101,15 +100,13 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	err := h.ParseUserFromJsonBody(user, r)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusInternalServerError, body)
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 
 	cookie, err := h.usecase.Login(user.Username, user.Password)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusUnauthorized, body)
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 	http.SetCookie(w, cookie)
@@ -120,50 +117,44 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		body, _ := h.CreateErrorResponse(errTokenInvalid.Error())
-		h.WriteResponse(w, http.StatusUnauthorized, body)
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 
 	tokenString := cookie.Value
 	err = h.usecase.CheckAuth(tokenString)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusUnauthorized, body)
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	h.WriteResponse(w, http.StatusNoContent, nil)
 }
 
-// TODO: выдал "error": "ERROR: duplicate key value violates unique constraint \"user_email_key\" (SQLSTATE 23505)"
 func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	err := h.ParseUserFromJsonBody(user, r)
 	if err != nil {
 		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusInternalServerError, body)
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	err = h.usecase.IsValidUser(user)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusBadRequest, body)
+		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	err = h.usecase.Signup(user)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusUnauthorized, body)
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	cookie, err := h.usecase.CreateSessionCookie(user.Username)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusInternalServerError, body)
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
@@ -203,13 +194,14 @@ func (h *UserHandler) ParseUserFromJsonBody(user *model.User, r *http.Request) e
 	return nil
 }
 
-func (h *UserHandler) CreateErrorResponse(errorMsg string) ([]byte, error) {
+func (h *UserHandler) CreateErrorResponse(errorMsg string) []byte {
 	response := model.ErrorResponse{Error: errorMsg}
 	responseJson, err := json.Marshal(response)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil
 	}
-	return responseJson, err
+	return responseJson
 }
 
 func (h *UserHandler) CreateUserResponse(user *model.User) ([]byte, error) {

@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"project/users/model"
 )
@@ -91,8 +92,7 @@ func (r *UserRepository) AddUser(user *model.User) error {
 		err = nil
 	}
 	if err != nil {
-		//TODO: чужая ошибка, надо бы нормально обрабатывать
-		return err
+		return fmt.Errorf("error adding user in a database: %v", err)
 	}
 	return nil
 }

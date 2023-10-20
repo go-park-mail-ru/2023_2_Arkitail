@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -34,7 +35,10 @@ type ConnectionConfig struct {
 	maxConnectionCount int
 }
 
-func getPosgres() *sql.DB {
+var ErrCantParseConfig = errors.New("cant parce database config")
+var ErrCantConnectToDB = errors.New("cant connect to db")
+
+func getPosgres() (*sql.DB, error) {
 	dbConfig := DBconfig{
 		"GoTo", "GoTo", "qwerty", "127.0.0.1", 5432, "disable",
 	}
@@ -45,16 +49,16 @@ func getPosgres() *sql.DB {
 		dbConfig.host, dbConfig.port, dbConfig.sslmode)
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
-		log.Fatal("cant parce database config")
+		return nil, ErrCantConnectToDB
 	}
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatal(err)
+		return nil, ErrCantParseConfig
 	}
 
 	db.SetMaxOpenConns(connectionConfig.maxConnectionCount)
-	return db
+	return db, nil
 }
 
 func main() {
@@ -69,13 +73,17 @@ func main() {
 		Secret: []byte(secret),
 	}
 
-	db := getPosgres()
+	db, err := getPosgres()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	userRepo := repo.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepo, authConfig)
 	userHandler := handler.NewUserHandler(userUsecase)
 
 	placeRepo := prepo.NewPlaceRepository(db)
+
 	placeUseCase := pusecase.NewPlaceUseCase(placeRepo)
 	placeHandler := phandler.NewPlaceHandler(placeUseCase)
 
@@ -95,7 +103,7 @@ func main() {
 	r.HandleFunc(apiPath+"/places", placeHandler.GetPlaces).Methods("GET")
 
 	fmt.Println("Server is running on :8080")
-	err := http.ListenAndServe(":8080", h)
+	err = http.ListenAndServe(":8080", h)
 	if err != nil {
 		fmt.Println(err)
 	}
