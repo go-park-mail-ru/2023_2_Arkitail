@@ -1,8 +1,11 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 
 	"project/internal/router"
@@ -16,7 +19,47 @@ import (
 	pusecase "project/places/usecase"
 
 	"github.com/gorilla/mux"
+	_ "github.com/jackc/pgx/stdlib"
 )
+
+type DBconfig struct {
+	user     string
+	dbname   string
+	password string
+	host     string
+	port     int
+	sslmode  string
+}
+
+type ConnectionConfig struct {
+	maxConnectionCount int
+}
+
+var ErrCantParseConfig = errors.New("cant parce database config")
+var ErrCantConnectToDB = errors.New("cant connect to db")
+
+func getPosgres() (*sql.DB, error) {
+	dbConfig := DBconfig{
+		"GoTo", "GoTo", "qwerty", "127.0.0.1", 5432, "disable",
+	}
+	connectionConfig := ConnectionConfig{10}
+
+	dsn := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%d sslmode=%s",
+		dbConfig.user, dbConfig.dbname, dbConfig.password,
+		dbConfig.host, dbConfig.port, dbConfig.sslmode)
+	db, err := sql.Open("pgx", dsn)
+	if err != nil {
+		return nil, ErrCantConnectToDB
+	}
+
+	err = db.Ping()
+	if err != nil {
+		return nil, ErrCantParseConfig
+	}
+
+	db.SetMaxOpenConns(connectionConfig.maxConnectionCount)
+	return db, nil
+}
 
 func main() {
 	var secret string
@@ -30,11 +73,17 @@ func main() {
 		Secret: []byte(secret),
 	}
 
-	userRepo := repo.NewUserRepository()
+	db, err := getPosgres()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	userRepo := repo.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepo, authConfig)
 	userHandler := handler.NewUserHandler(userUsecase)
 
-	placeRepo := prepo.NewPlaceRepository()
+	placeRepo := prepo.NewPlaceRepository(db)
+
 	placeUseCase := pusecase.NewPlaceUseCase(placeRepo)
 	placeHandler := phandler.NewPlaceHandler(placeUseCase)
 
@@ -53,7 +102,7 @@ func main() {
 	r.HandleFunc(apiPath+"/places", placeHandler.GetPlaces).Methods("GET")
 
 	fmt.Println("Server is running on :8080")
-	err := http.ListenAndServe(":8080", h)
+	err = http.ListenAndServe(":8080", h)
 	if err != nil {
 		fmt.Println(err)
 	}

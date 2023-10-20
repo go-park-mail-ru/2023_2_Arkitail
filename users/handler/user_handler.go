@@ -35,7 +35,7 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := h.CreateUserResponse("error", user)
+	response, err := h.CreateUserResponse(user)
 	if err != nil {
 		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
@@ -47,29 +47,18 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	user, err := h.ParseUserFromJsonBody(r)
 	if err != nil {
-		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 
-	_, err = h.usecase.Login(user.Username, user.Password)
+	cookie, err := h.usecase.Login(user.Username, user.Password)
 	if err != nil {
-		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
-	}
-
-	sessionCookie, err := h.usecase.CreateSessionCookie(user.Username)
-	if err != nil {
-		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	cookie := &http.Cookie{
-		Name:  "session_id",
-		Value: sessionCookie,
 	}
 	http.SetCookie(w, cookie)
 
-	h.WriteResponse(w, http.StatusOK, h.CreateErrorResponse(""))
+	h.WriteResponse(w, http.StatusNoContent, nil)
 }
 
 func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
@@ -86,14 +75,14 @@ func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.WriteResponse(w, http.StatusOK, h.CreateErrorResponse(""))
+	h.WriteResponse(w, http.StatusNoContent, nil)
 }
 
 func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	const passlen = 8
 	user, err := h.ParseUserFromJsonBody(r)
 	if err != nil {
-		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse("Password should be at least 8 characters long"))
 		return
 	}
 
@@ -112,26 +101,29 @@ func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.usecase.Signup(user)
+	err = h.usecase.Signup(user)
 	if err != nil {
 		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
 		return
 	}
-	_, err = h.usecase.CreateSessionCookie(user.Username)
+
+	cookie, err := h.usecase.CreateSessionCookie(user.Username)
 	if err != nil {
 		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
-	h.WriteResponse(w, http.StatusOK, h.CreateErrorResponse(""))
+
+	http.SetCookie(w, cookie)
+	h.WriteResponse(w, http.StatusNoContent, nil)
 }
 
 func (h *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	expire := time.Now().Add(-7 * 24 * time.Hour)
 	_, err := r.Cookie("session_id")
 	if err != nil {
 		return
 	}
 
+	expire := time.Now().Add(-7 * 24 * time.Hour)
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   "value",
@@ -141,6 +133,9 @@ func (h *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) WriteResponse(w http.ResponseWriter, status int, body []byte) {
+	if body == nil {
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	w.Write(body)
@@ -155,7 +150,7 @@ func (h *UserHandler) ParseUserFromJsonBody(r *http.Request) (*model.User, error
 	return &user, nil
 }
 
-func (h *UserHandler) CreateErrorResponse (errorMsg string) []byte {
+func (h *UserHandler) CreateErrorResponse(errorMsg string) []byte {
 	response := model.ErrorResponse{Error: errorMsg}
 	responseJson, err := json.Marshal(response)
 	if err != nil {
@@ -165,14 +160,7 @@ func (h *UserHandler) CreateErrorResponse (errorMsg string) []byte {
 	return responseJson
 }
 
-func (h *UserHandler) CreateUserResponse(errorMsg string, user *model.User) ([]byte, error) {
-	if user == nil {
-		user = &model.User{Username: ""}
-	}
-	response := model.GetUserInfoResponse{Error: errorMsg, User: *user}
-	responseJson, err := json.Marshal(response)
-	if err != nil {
-		return nil, err
-	}
-	return responseJson, nil
+func (h *UserHandler) CreateUserResponse(user *model.User) ([]byte, error) {
+	responseJson, err := json.Marshal(user)
+	return responseJson, err
 }

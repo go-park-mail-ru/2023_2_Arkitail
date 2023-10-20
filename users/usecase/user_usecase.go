@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"net/http"
 	"regexp"
 	"time"
 
@@ -59,23 +60,27 @@ func (u *UserUsecase) IsValidEmail(email string) bool {
 	return emailRegex
 }
 
-func (u *UserUsecase) CreateSessionCookie(userName string) (string, error) {
+func (u *UserUsecase) CreateSessionCookie(userName string) (*http.Cookie, error) {
 	claim := UserClaim{
 		Username: userName,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-			Issuer:    "test",
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
-
 	str, err := token.SignedString(u.config.Secret)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return str, nil
+	cookie := &http.Cookie{
+		Name:     "session_id",
+		Value:    str,
+		HttpOnly: true,
+	}
+
+	return cookie, nil
 }
 
 func (u *UserUsecase) GetUserInfo(tokenString string) (*model.User, error) {
@@ -92,22 +97,22 @@ func (u *UserUsecase) GetUserInfo(tokenString string) (*model.User, error) {
 	return user, nil
 }
 
-func (u *UserUsecase) Login(username, password string) (string, error) {
+func (u *UserUsecase) Login(username, password string) (*http.Cookie, error) {
 	user, err := u.repo.GetUser(username)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if user.Password != password {
-		return "", ErrInvalidCredentials
+		return nil, ErrInvalidCredentials
 	}
 
-	token, err := u.CreateSessionCookie(username)
+	cookie, err := u.CreateSessionCookie(username)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return token, nil
+	return cookie, nil
 }
 
 func (u *UserUsecase) CheckAuth(tokenString string) error {
@@ -115,18 +120,9 @@ func (u *UserUsecase) CheckAuth(tokenString string) error {
 	return err
 }
 
-func (u *UserUsecase) Signup(user *model.User) (string, error) {
+func (u *UserUsecase) Signup(user *model.User) error {
 	err := u.repo.AddUser(user)
-	if err != nil {
-		return "", err
-	}
-
-	token, err := u.CreateSessionCookie(user.Username)
-	if err != nil {
-		return "", err
-	}
-
-	return token, nil
+	return err
 }
 
 func (u *UserUsecase) Logout() error {
@@ -148,7 +144,6 @@ func (u *UserUsecase) ValidateToken(tokenString string) (*UserClaim, error) {
 
 	if claims, ok := token.Claims.(*UserClaim); ok && token.Valid {
 		return claims, nil
-	} else {
-		return nil, ErrInvalidToken
 	}
+	return nil, ErrInvalidToken
 }
