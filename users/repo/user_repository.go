@@ -15,6 +15,7 @@ var (
 	ErrUserNotFound  = errors.New("user not found")
 	ErrUserExists    = errors.New("user already exists")
 	ErrWrongPassword = errors.New("wrong password")
+	ErrInnerDBError  = errors.New("database error")
 )
 
 func NewUserRepository(db *sql.DB) *UserRepository {
@@ -29,7 +30,6 @@ func (r *UserRepository) GetUser(username string) (*model.User, error) {
 	if err != nil {
 		return nil, ErrUserNotFound
 	}
-
 	return user, err
 }
 
@@ -55,7 +55,7 @@ func (r *UserRepository) AddUser(user *model.User) error {
 		err = nil
 	}
 	if err != nil {
-		return err
+		return ErrInnerDBError
 	}
 	return nil
 }
