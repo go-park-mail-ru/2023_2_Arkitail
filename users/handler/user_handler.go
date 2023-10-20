@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -23,23 +24,20 @@ var errTokenInvalid = errors.New("token is invalid")
 func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		body, _ := h.CreateErrorResponse(errTokenInvalid.Error())
-		h.WriteResponse(w, http.StatusUnauthorized, body)
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 
 	tokenString := cookie.Value
 	user, err := h.usecase.GetUserInfo(tokenString)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusUnauthorized, body)
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	response, err := h.CreateUserResponse(user)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusInternalServerError, body)
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
@@ -49,15 +47,13 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	user, err := h.ParseUserFromJsonBody(r)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(errTokenInvalid.Error())
-		h.WriteResponse(w, http.StatusInternalServerError, body)
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 
 	cookie, err := h.usecase.Login(user.Username, user.Password)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(errTokenInvalid.Error())
-		h.WriteResponse(w, http.StatusUnauthorized, body)
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 	http.SetCookie(w, cookie)
@@ -68,16 +64,14 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		body, _ := h.CreateErrorResponse(errTokenInvalid.Error())
-		h.WriteResponse(w, http.StatusUnauthorized, body)
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 
 	tokenString := cookie.Value
 	err = h.usecase.CheckAuth(tokenString)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusUnauthorized, body)
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
@@ -88,40 +82,34 @@ func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	const passlen = 8
 	user, err := h.ParseUserFromJsonBody(r)
 	if err != nil {
-		body, _ := h.CreateErrorResponse("Password should be at least 8 characters long")
-		h.WriteResponse(w, http.StatusInternalServerError, body)
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse("Password should be at least 8 characters long"))
 		return
 	}
 
 	if len(user.Password) < passlen {
-		body, _ := h.CreateErrorResponse("Password should be at least 8 characters long")
-		h.WriteResponse(w, http.StatusBadRequest, body)
+		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse("Password should be at least 8 characters long"))
 		return
 	}
 
 	if !h.usecase.IsValidPassword(user.Password) {
-		body, _ := h.CreateErrorResponse("Password should contain letters, digits, and special characters")
-		h.WriteResponse(w, http.StatusBadRequest, body)
+		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse("Password should contain letters, digits, and special characters"))
 		return
 	}
 
 	if !h.usecase.IsValidEmail(user.Email) {
-		body, _ := h.CreateErrorResponse("Email should contain @ and letters, digits, or special characters")
-		h.WriteResponse(w, http.StatusBadRequest, body)
+		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse("Email should contain @ and letters, digits, or special characters"))
 		return
 	}
 
 	err = h.usecase.Signup(user)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusUnauthorized, body)
+		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	cookie, err := h.usecase.CreateSessionCookie(user.Username)
 	if err != nil {
-		body, _ := h.CreateErrorResponse(err.Error())
-		h.WriteResponse(w, http.StatusInternalServerError, body)
+		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
 	}
 
@@ -162,13 +150,14 @@ func (h *UserHandler) ParseUserFromJsonBody(r *http.Request) (*model.User, error
 	return &user, nil
 }
 
-func (h *UserHandler) CreateErrorResponse(errorMsg string) ([]byte, error) {
+func (h *UserHandler) CreateErrorResponse(errorMsg string) []byte {
 	response := model.ErrorResponse{Error: errorMsg}
 	responseJson, err := json.Marshal(response)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil
 	}
-	return responseJson, err
+	return responseJson
 }
 
 func (h *UserHandler) CreateUserResponse(user *model.User) ([]byte, error) {
