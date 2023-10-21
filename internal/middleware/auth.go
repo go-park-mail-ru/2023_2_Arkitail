@@ -26,7 +26,7 @@ var (
 
 var (
 	errTokenInvalid = errors.New("token is invalid")
-	errLogout       = errors.New("you must logout first")
+	errLogout       = errors.New("you must logaout first")
 )
 
 func Auth(ucase usecase.UserUseCase) mux.MiddlewareFunc {

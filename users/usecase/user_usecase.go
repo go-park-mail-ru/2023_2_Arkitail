@@ -28,7 +28,7 @@ var (
 )
 
 type UserClaim struct {
-	Username string
+	Id uint
 	jwt.RegisteredClaims
 }
 
@@ -62,9 +62,9 @@ func (u *UserUsecase) IsValidEmail(email string) bool {
 	return emailRegex
 }
 
-func (u *UserUsecase) CreateSessionCookie(userName string) (*http.Cookie, error) {
+func (u *UserUsecase) CreateSessionCookie(user *model.User) (*http.Cookie, error) {
 	claim := UserClaim{
-		Username: userName,
+		Id: user.ID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
@@ -109,7 +109,7 @@ func (u *UserUsecase) Login(username, password string) (*http.Cookie, error) {
 		return nil, ErrInvalidCredentials
 	}
 
-	cookie, err := u.CreateSessionCookie(username)
+	cookie, err := u.CreateSessionCookie(user)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (u *UserUsecase) Logout() error {
 }
 
 func (u *UserUsecase) GetUserFromClaims(userClaim *UserClaim) (*model.User, error) {
-	user, err := u.repo.GetUser(userClaim.Username)
+	user, err := u.repo.GetUserById(userClaim.Id)
 	if err != nil {
 		return nil, err
 	}

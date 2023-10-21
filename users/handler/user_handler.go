@@ -98,7 +98,7 @@ func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie, err := h.usecase.CreateSessionCookie(user.Username)
+	cookie, err := h.usecase.CreateSessionCookie(user)
 	if err != nil {
 		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
 		return
