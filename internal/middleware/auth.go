@@ -29,7 +29,6 @@ var (
 	errLogout       = errors.New("you must logout first")
 )
 
-// TODO: выделить урлы, для которых не должно быть сессии
 func Auth(ucase usecase.UserUseCase) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
