@@ -109,6 +109,7 @@ func main() {
 	r.HandleFunc(apiPath+"/places", placeHandler.GetPlaces).Methods("GET")
 
 	r.Use(middleware.AccessLog(logger))
+	r.Use(middleware.Panic)
 
 	fmt.Println("Server is running on :8080")
 	err = http.ListenAndServe(":8080", h)
