@@ -19,6 +19,7 @@ type UserUseCase interface {
 	Signup(user *model.User) error
 	Logout() error
 	ValidateToken(tokenString string) (*UserClaim, error)
+	GetUserFromClaims(userClaim *UserClaim) (*model.User, error)
 }
 
 var (
@@ -90,7 +91,7 @@ func (u *UserUsecase) GetUserInfo(tokenString string) (*model.User, error) {
 		return nil, err
 	}
 
-	user, err := u.repo.GetUser(userClaim.Username)
+	user, err := u.GetUserFromClaims(userClaim)
 	if err != nil {
 		return nil, err
 	}
@@ -128,6 +129,14 @@ func (u *UserUsecase) Signup(user *model.User) error {
 
 func (u *UserUsecase) Logout() error {
 	return nil
+}
+
+func (u *UserUsecase) GetUserFromClaims(userClaim *UserClaim) (*model.User, error) {
+	user, err := u.repo.GetUser(userClaim.Username)
+	if err != nil {
+		return nil, err
+	}
+	return user, err
 }
 
 func (u *UserUsecase) ValidateToken(tokenString string) (*UserClaim, error) {

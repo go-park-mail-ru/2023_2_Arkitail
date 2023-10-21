@@ -24,6 +24,7 @@ var (
 
 var errTokenInvalid = errors.New("token is invalid")
 
+// TODO: выделить урлы, для которых не должно быть сессии
 func Auth(ucase usecase.UserUseCase) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +45,7 @@ func Auth(ucase usecase.UserUseCase) mux.MiddlewareFunc {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), "userClaims", user)
+			ctx := context.WithValue(r.Context(), "userClaim", user)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

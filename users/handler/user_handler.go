@@ -22,14 +22,13 @@ func NewUserHandler(userUsecase *usecase.UserUsecase) *UserHandler {
 var errTokenInvalid = errors.New("token is invalid")
 
 func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("session_id")
-	if err != nil {
+	userClaim := r.Context().Value("userClaim")
+	if userClaim == nil {
 		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 
-	tokenString := cookie.Value
-	user, err := h.usecase.GetUserInfo(tokenString)
+	user, err := h.usecase.GetUserFromClaims(userClaim.(*usecase.UserClaim))
 	if err != nil {
 		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
 		return
@@ -62,19 +61,11 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("session_id")
-	if err != nil {
+	userClaim := r.Context().Value("userClaim")
+	if userClaim == nil {
 		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
-
-	tokenString := cookie.Value
-	err = h.usecase.CheckAuth(tokenString)
-	if err != nil {
-		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(err.Error()))
-		return
-	}
-
 	h.WriteResponse(w, http.StatusNoContent, nil)
 }
 
