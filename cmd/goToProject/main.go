@@ -104,7 +104,6 @@ func main() {
 	r.HandleFunc(apiPath+api.Places, placeHandler.GetPlaces).Methods("GET").Name(api.Places)
 
 	r.Use(middleware.Auth(userUsecase))
-
 	r.Use(middleware.AccessLog)
 	r.Use(middleware.Panic)
 
