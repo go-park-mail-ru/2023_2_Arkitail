@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 
+	"project/internal/middleware"
 	"project/internal/router"
 
 	"project/users/handler"
@@ -90,16 +91,18 @@ func main() {
 	r := mux.NewRouter()
 
 	apiPath := "/api/v1"
-	r.HandleFunc(apiPath+"/auth", userHandler.CheckAuth).Methods("GET")
-	r.HandleFunc(apiPath+"/login", userHandler.Login).Methods("POST")
-	r.HandleFunc(apiPath+"/signup", userHandler.Signup).Methods("POST")
-	r.HandleFunc(apiPath+"/logout", userHandler.Logout).Methods("DELETE")
-	r.HandleFunc(apiPath+"/user", userHandler.GetUserInfo).Methods("GET")
+	r.HandleFunc(apiPath+"/auth", userHandler.CheckAuth).Methods("GET").Name("Auth")
+	r.HandleFunc(apiPath+"/login", userHandler.Login).Methods("POST").Name("Login")
+	r.HandleFunc(apiPath+"/signup", userHandler.Signup).Methods("POST").Name("Signup")
+	r.HandleFunc(apiPath+"/logout", userHandler.Logout).Methods("DELETE").Name("Logout")
+	r.HandleFunc(apiPath+"/user", userHandler.GetUserInfo).Methods("GET").Name("User")
 
 	h := router.AddCors(r, []string{"http://localhost:8080/"})
 
-	r.HandleFunc(apiPath+"/places", placeHandler.CreatePlace).Methods("POST")
-	r.HandleFunc(apiPath+"/places", placeHandler.GetPlaces).Methods("GET")
+	r.HandleFunc(apiPath+"/places", placeHandler.CreatePlace).Methods("POST").Name("CreatePlace")
+	r.HandleFunc(apiPath+"/places", placeHandler.GetPlaces).Methods("GET").Name("GetPlaces")
+
+	r.Use(middleware.Auth(userUsecase))
 
 	fmt.Println("Server is running on :8080")
 	err = http.ListenAndServe(":8080", h)

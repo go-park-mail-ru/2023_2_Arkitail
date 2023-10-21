@@ -14,10 +14,11 @@ import (
 
 type UserUseCase interface {
 	GetUserInfo(tokenString string) (*model.User, error)
-	Login(username, password string) (string, error)
+	Login(username, password string) (*http.Cookie, error)
 	CheckAuth(tokenString string) error
-	Signup(user *model.User) (string, error)
+	Signup(user *model.User) error
 	Logout() error
+	ValidateToken(tokenString string) (*UserClaim, error)
 }
 
 var (
