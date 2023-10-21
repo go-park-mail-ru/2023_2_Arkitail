@@ -51,12 +51,12 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 
 func (h *UserHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["user_id"])
-	if err != nil {
+	if err != nil || id < 0 {
 		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse(errInvalidUrlParam.Error()))
 		return
 	}
 
-	user, err := h.usecase.GetUserInfoById(id)
+	user, err := h.usecase.GetUserInfoById(uint(id))
 	if err != nil {
 		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse(err.Error()))
 		return

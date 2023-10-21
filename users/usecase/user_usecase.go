@@ -21,7 +21,7 @@ type UserUseCase interface {
 	ValidateToken(tokenString string) (*UserClaim, error)
 	GetUserFromClaims(userClaim *UserClaim) (*model.User, error)
 	IsValidUser(user *model.User) error
-	GetUserInfoById(id int) (*model.User, error)
+	GetUserInfoById(id uint) (*model.User, error)
 }
 
 var (
@@ -72,7 +72,7 @@ func (u *UserUsecase) UpdateUser(user *model.User) error {
 	return err
 }
 
-func (u *UserUsecase) CreateSessionCookie(userName string) (*http.Cookie, error) {
+func (u *UserUsecase) CreateSessionCookie(user *model.User) (*http.Cookie, error) {
 	claim := UserClaim{
 		Id: user.ID,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -109,7 +109,7 @@ func (u *UserUsecase) GetUserInfo(tokenString string) (*model.User, error) {
 	return user, nil
 }
 
-func (u *UserUsecase) GetUserInfoById(id int) (*model.User, error) {
+func (u *UserUsecase) GetUserInfoById(id uint) (*model.User, error) {
 	user, err := u.repo.GetUserById(id)
 	if err != nil {
 		return nil, err
