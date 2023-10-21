@@ -46,5 +46,11 @@ func (h *PlaceHandler) GetPlaces(w http.ResponseWriter, r *http.Request) {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(ErrFailedToAddPlace.Error()))
 		return
 	}
-	json.NewEncoder(w).Encode(places)
+	h.WritePlacesIntoJsonResponse(w, http.StatusOK, places)
+}
+
+func (h *PlaceHandler) WritePlacesIntoJsonResponse(w http.ResponseWriter, status int, objects map[string]*model.Place) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(objects)
 }
