@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	
+
 	"project/places/model"
 	"project/places/usecase"
 )
@@ -23,7 +23,7 @@ func (h *PlaceHandler) CreatePlace(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-  
+
 	err = h.usecase.AddPlace(&place)
 	if err != nil {
 		http.Error(w, "Failed to add place", http.StatusInternalServerError)

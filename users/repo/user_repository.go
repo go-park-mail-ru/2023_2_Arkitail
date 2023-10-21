@@ -30,8 +30,22 @@ func (r *UserRepository) GetUser(username string) (*model.User, error) {
 	if err != nil {
 		return nil, ErrUserNotFound
 	}
+
 	return user, err
 }
+
+func (r *UserRepository) GetUserById(id int) (*model.User, error) {
+	user := &model.User{}
+	err := r.DB.
+		QueryRow(`SELECT id, password, name, username, email, location, web_site, about, avatar_url FROM "user" WHERE id = $1`, id).
+		Scan(&user.ID, &user.Password, &user.Name, &user.Username, &user.Email, &user.Location, &user.WebSite, &user.About, &user.AvatarUrl)
+	if err != nil {
+		return nil, ErrUserNotFound
+	}
+
+	return user, err
+}
+
 
 func (r *UserRepository) GetUserById(id uint) (*model.User, error) {
 	user := &model.User{}
@@ -43,6 +57,29 @@ func (r *UserRepository) GetUserById(id uint) (*model.User, error) {
 	}
 
 	return user, err
+
+func (r *UserRepository) UpdateUser(user *model.User) error {
+	_, err := r.DB.Exec(
+		`UPDATE "user" SET "password" = $1`+
+			`,"name" = $2`+
+			`,"username" = $3`+
+			`,"email" = $4`+
+			`,"location" = $5`+
+			`,"web_site" = $6`+
+			`,"about" = $7`+
+			`,"avatar_url" = $8`+
+			`WHERE id = $9`,
+		user.Password,
+		user.Name,
+		user.Username,
+		user.Email,
+		user.Location,
+		user.WebSite,
+		user.About,
+		user.AvatarUrl,
+		user.ID,
+	)
+	return err
 }
 
 func (r *UserRepository) AddUser(user *model.User) error {

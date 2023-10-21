@@ -104,6 +104,9 @@ func main() {
 
 	r.Use(middleware.Auth(userUsecase))
 
+	r.Use(middleware.AccessLog)
+	r.Use(middleware.Panic)
+
 	fmt.Println("Server is running on :8080")
 	err = http.ListenAndServe(":8080", h)
 	if err != nil {
