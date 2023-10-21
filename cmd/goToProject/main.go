@@ -96,12 +96,12 @@ func main() {
 	r.HandleFunc(apiPath+"/signup", userHandler.Signup).Methods("POST")
 	r.HandleFunc(apiPath+"/logout", userHandler.Logout).Methods("DELETE")
 	r.HandleFunc(apiPath+"/user", userHandler.GetUserInfo).Methods("GET")
-
 	h := router.AddCors(r, []string{"http://localhost:8080/"})
 
 	r.HandleFunc(apiPath+"/places", placeHandler.CreatePlace).Methods("POST")
 	r.HandleFunc(apiPath+"/places", placeHandler.GetPlaces).Methods("GET")
 
+	r.Use(middleware.AccessLog)
 	r.Use(middleware.Panic)
 
 	fmt.Println("Server is running on :8080")
