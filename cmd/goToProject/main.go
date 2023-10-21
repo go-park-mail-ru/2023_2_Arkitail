@@ -21,8 +21,8 @@ import (
 	pusecase "project/places/usecase"
 
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
 	_ "github.com/jackc/pgx/stdlib"
+	"github.com/sirupsen/logrus"
 )
 
 type DBconfig struct {
@@ -109,7 +109,6 @@ func main() {
 	r.HandleFunc(apiPath+"/places", placeHandler.GetPlaces).Methods("GET")
 
 	r.Use(middleware.AccessLog(logger))
-	handler := router.AddCors(r, []string{"http://localhost:8080/"})
 
 	fmt.Println("Server is running on :8080")
 	err = http.ListenAndServe(":8080", h)
