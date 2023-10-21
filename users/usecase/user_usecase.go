@@ -18,11 +18,16 @@ type UserUseCase interface {
 	CheckAuth(tokenString string) error
 	Signup(user *model.User) (string, error)
 	Logout() error
+	IsValidUser(user *model.User) error
+	GetUserInfoById(id int) (*model.User, error)
 }
 
 var (
-	ErrInvalidToken       = errors.New("invalid token")
-	ErrInvalidCredentials = errors.New("invalid username or password")
+	ErrInvalidToken           = errors.New("invalid token")
+	ErrInvalidCredentials     = errors.New("invalid username or password")
+	ErrInvalidPasswordLength  = errors.New("password should be at least 8 characters long")
+	ErrInvalidPasswordSymbols = errors.New("password should contain letters, digits, and special characters")
+	ErrInvalidEmail           = errors.New("email should contain @ and letters, digits, or special characters")
 )
 
 type UserClaim struct {
@@ -60,6 +65,11 @@ func (u *UserUsecase) IsValidEmail(email string) bool {
 	return emailRegex
 }
 
+func (u *UserUsecase) UpdateUser(user *model.User) error {
+	err := u.repo.UpdateUser(user)
+	return err
+}
+
 func (u *UserUsecase) CreateSessionCookie(userName string) (*http.Cookie, error) {
 	claim := UserClaim{
 		Username: userName,
@@ -90,6 +100,15 @@ func (u *UserUsecase) GetUserInfo(tokenString string) (*model.User, error) {
 	}
 
 	user, err := u.repo.GetUser(userClaim.Username)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (u *UserUsecase) GetUserInfoById(id int) (*model.User, error) {
+	user, err := u.repo.GetUserById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -146,4 +165,23 @@ func (u *UserUsecase) ValidateToken(tokenString string) (*UserClaim, error) {
 		return claims, nil
 	}
 	return nil, ErrInvalidToken
+}
+
+func (u *UserUsecase) IsValidUser(user *model.User) error {
+	passlen := 8
+	if len(user.Password) < passlen {
+		err := ErrInvalidPasswordLength
+		return err
+	}
+
+	if !u.IsValidPassword(user.Password) {
+		err := ErrInvalidPasswordSymbols
+		return err
+	}
+
+	if !u.IsValidEmail(user.Email) {
+		err := ErrInvalidEmail
+		return err
+	}
+	return nil
 }
