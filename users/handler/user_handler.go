@@ -130,10 +130,12 @@ func (h *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		Expires: expire,
 	}
 	http.SetCookie(w, &cookie)
+	h.WriteResponse(w, http.StatusNoContent, nil)
 }
 
 func (h *UserHandler) WriteResponse(w http.ResponseWriter, status int, body []byte) {
 	if body == nil {
+		w.WriteHeader(status)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
