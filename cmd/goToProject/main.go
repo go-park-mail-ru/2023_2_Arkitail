@@ -14,6 +14,7 @@ import (
 	"project/users/handler"
 	"project/users/repo"
 	"project/users/usecase"
+	"project/utils/api"
 
 	phandler "project/places/handler"
 	prepo "project/places/repo"
@@ -91,16 +92,16 @@ func main() {
 	r := mux.NewRouter()
 
 	apiPath := "/api/v1"
-	r.HandleFunc(apiPath+"/auth", userHandler.CheckAuth).Methods("GET").Name("Auth")
-	r.HandleFunc(apiPath+"/login", userHandler.Login).Methods("POST").Name("Login")
-	r.HandleFunc(apiPath+"/signup", userHandler.Signup).Methods("POST").Name("Signup")
-	r.HandleFunc(apiPath+"/logout", userHandler.Logout).Methods("DELETE").Name("Logout")
-	r.HandleFunc(apiPath+"/user", userHandler.GetUserInfo).Methods("GET").Name("User")
+	r.HandleFunc(apiPath+api.Auth, userHandler.CheckAuth).Methods("GET").Name(api.Auth)
+	r.HandleFunc(apiPath+api.Login, userHandler.Login).Methods("POST").Name(api.Login)
+	r.HandleFunc(apiPath+api.Signup, userHandler.Signup).Methods("POST").Name(api.Signup)
+	r.HandleFunc(apiPath+api.Logout, userHandler.Logout).Methods("DELETE").Name(api.Logout)
+	r.HandleFunc(apiPath+api.User, userHandler.GetUserInfo).Methods("GET").Name(api.User)
 
 	h := router.AddCors(r, []string{"http://localhost:8080/"})
 
-	r.HandleFunc(apiPath+"/places", placeHandler.CreatePlace).Methods("POST").Name("CreatePlace")
-	r.HandleFunc(apiPath+"/places", placeHandler.GetPlaces).Methods("GET").Name("GetPlaces")
+	r.HandleFunc(apiPath+api.Places, placeHandler.CreatePlace).Methods("POST").Name(api.Places)
+	r.HandleFunc(apiPath+api.Places, placeHandler.GetPlaces).Methods("GET").Name(api.Places)
 
 	r.Use(middleware.Auth(userUsecase))
 

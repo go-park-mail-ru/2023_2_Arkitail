@@ -9,17 +9,18 @@ import (
 
 	"project/users/model"
 	"project/users/usecase"
+	"project/utils/api"
 
 	"github.com/gorilla/mux"
 )
 
 var (
-	NoAuthNames = map[string]struct{}{
-		"GetPlaces": struct{}{},
+	NoAuthNames = map[string]string{
+		api.Places: http.MethodGet,
 	}
-	NoSessionNames = map[string]struct{}{
-		"Login":  struct{}{},
-		"Signup": struct{}{},
+	NoSessionNames = map[string]string{
+		api.Login:  http.MethodPost,
+		api.Signup: http.MethodPost,
 	}
 	apiPath = "api/v1"
 )
@@ -32,12 +33,14 @@ var (
 func Auth(ucase usecase.UserUseCase) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if _, ok := NoAuthNames[mux.CurrentRoute(r).GetName()]; ok {
+			if method, ok := NoAuthNames[mux.CurrentRoute(r).GetName()]; ok && r.Method == method {
 				next.ServeHTTP(w, r)
 				return
 			}
 
-			_, mustBeWithouthSess := NoSessionNames[mux.CurrentRoute(r).GetName()]
+			method, _ := NoSessionNames[mux.CurrentRoute(r).GetName()]
+			mustBeWithouthSess := (method == r.Method)
+
 			cookie, err := r.Cookie("session_id")
 			if err != nil {
 				if mustBeWithouthSess {
