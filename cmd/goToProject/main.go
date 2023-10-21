@@ -18,6 +18,7 @@ import (
 	prepo "project/places/repo"
 	pusecase "project/places/usecase"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/stdlib"
 )
@@ -62,6 +63,7 @@ func getPosgres() (*sql.DB, error) {
 }
 
 func main() {
+	govalidator.SetFieldsRequiredByDefault(true)
 	var secret string
 	flag.StringVar(&secret, "secret", "", "secret for jwt encoding")
 	flag.Parse()
