@@ -2,10 +2,18 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
-	
+
 	"project/places/model"
 	"project/places/usecase"
+	"project/utils"
+)
+
+var (
+	ErrInvalidJson       = errors.New("Invalid JSON")
+	ErrFailedToAddPlace  = errors.New("Failed to add place")
+	ErrFailedToGetPlaces = errors.New("Failed to get places")
 )
 
 type PlaceHandler struct {
@@ -20,22 +28,22 @@ func (h *PlaceHandler) CreatePlace(w http.ResponseWriter, r *http.Request) {
 	var place model.Place
 	err := json.NewDecoder(r.Body).Decode(&place)
 	if err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(ErrInvalidJson.Error()))
 		return
 	}
-  
+
 	err = h.usecase.AddPlace(&place)
 	if err != nil {
-		http.Error(w, "Failed to add place", http.StatusInternalServerError)
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(ErrFailedToAddPlace.Error()))
 		return
 	}
-	w.WriteHeader(http.StatusCreated)
+	utils.WriteResponse(w, http.StatusCreated, nil)
 }
 
 func (h *PlaceHandler) GetPlaces(w http.ResponseWriter, r *http.Request) {
 	places, err := h.usecase.GetPlaces()
 	if err != nil {
-		http.Error(w, "Failed to get places", http.StatusInternalServerError)
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(ErrFailedToAddPlace.Error()))
 		return
 	}
 	json.NewEncoder(w).Encode(places)
