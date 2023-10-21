@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 
+	"project/internal/middleware"
 	"project/internal/router"
 
 	"project/users/handler"
@@ -101,6 +102,9 @@ func main() {
 
 	r.HandleFunc(apiPath+"/places", placeHandler.CreatePlace).Methods("POST")
 	r.HandleFunc(apiPath+"/places", placeHandler.GetPlaces).Methods("GET")
+
+	r.Use(middleware.AccessLog)
+	r.Use(middleware.Panic)
 
 	fmt.Println("Server is running on :8080")
 	err = http.ListenAndServe(":8080", h)
