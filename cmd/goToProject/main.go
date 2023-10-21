@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"project/internal/middleware"
 	"project/internal/router"
@@ -22,7 +21,6 @@ import (
 
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/stdlib"
-	"github.com/sirupsen/logrus"
 )
 
 type DBconfig struct {
@@ -90,11 +88,6 @@ func main() {
 	placeUseCase := pusecase.NewPlaceUseCase(placeRepo)
 	placeHandler := phandler.NewPlaceHandler(placeUseCase)
 
-	logger := new(logrus.Logger)
-	logger.SetLevel(logrus.InfoLevel)
-	logger.SetFormatter(&logrus.JSONFormatter{})
-	logger.SetOutput(os.Stdout)
-
 	r := mux.NewRouter()
 
 	apiPath := "/api/v1"
@@ -108,7 +101,7 @@ func main() {
 	r.HandleFunc(apiPath+"/places", placeHandler.CreatePlace).Methods("POST")
 	r.HandleFunc(apiPath+"/places", placeHandler.GetPlaces).Methods("GET")
 
-	r.Use(middleware.AccessLog(logger))
+	r.Use(middleware.AccessLog)
 	r.Use(middleware.Panic)
 
 	fmt.Println("Server is running on :8080")

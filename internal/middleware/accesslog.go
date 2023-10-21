@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"net/http"
+	"os"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,19 +34,21 @@ func (rw *responseWriter) WriteHeader(code int) {
 	return
 }
 
-func AccessLog(logger *logrus.Logger) mux.MiddlewareFunc {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			start := time.Now()
-			wrapped := wrapResponseWriter(w)
-			next.ServeHTTP(wrapped, r)
+func AccessLog(next http.Handler) http.Handler {
+	logger := new(logrus.Logger)
+	logger.SetLevel(logrus.InfoLevel)
+	logger.SetFormatter(&logrus.JSONFormatter{})
+	logger.SetOutput(os.Stdout)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		wrapped := wrapResponseWriter(w)
+		next.ServeHTTP(wrapped, r)
 
-			logger.WithFields(logrus.Fields{
-				"method":      r.Method,
-				"remote_addr": r.RemoteAddr,
-				"work_time":   time.Since(start),
-				"status_code": wrapped.Status(),
-			}).Info(r.URL.Path)
-		})
-	}
+		logger.WithFields(logrus.Fields{
+			"method":      r.Method,
+			"remote_addr": r.RemoteAddr,
+			"work_time":   time.Since(start),
+			"status_code": wrapped.Status(),
+		}).Info(r.URL.Path)
+	})
 }
