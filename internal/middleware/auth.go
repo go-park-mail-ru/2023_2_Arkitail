@@ -14,26 +14,37 @@ import (
 )
 
 var (
-	AuthNames = map[string]struct{}{
-		"CreatePlace": struct{}{},
-		"Auth":        struct{}{},
-		"User":        struct{}{},
+	NoAuthNames = map[string]struct{}{
+		"GetPlaces": struct{}{},
+	}
+	NoSessionNames = map[string]struct{}{
+		"Login":  struct{}{},
+		"Signup": struct{}{},
 	}
 	apiPath = "api/v1"
 )
 
-var errTokenInvalid = errors.New("token is invalid")
+var (
+	errTokenInvalid = errors.New("token is invalid")
+	errLogout       = errors.New("you must logout first")
+)
 
 // TODO: выделить урлы, для которых не должно быть сессии
 func Auth(ucase usecase.UserUseCase) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if _, ok := AuthNames[mux.CurrentRoute(r).GetName()]; !ok {
+			if _, ok := NoAuthNames[mux.CurrentRoute(r).GetName()]; ok {
 				next.ServeHTTP(w, r)
 				return
 			}
+
+			_, mustBeWithouthSess := NoSessionNames[mux.CurrentRoute(r).GetName()]
 			cookie, err := r.Cookie("session_id")
 			if err != nil {
+				if mustBeWithouthSess {
+					next.ServeHTTP(w, r)
+					return
+				}
 				writeResponse(w, http.StatusUnauthorized, createErrorResponse(errTokenInvalid.Error()))
 				return
 			}
@@ -41,7 +52,16 @@ func Auth(ucase usecase.UserUseCase) mux.MiddlewareFunc {
 			token := cookie.Value
 			user, err := ucase.ValidateToken(token)
 			if err != nil {
+				if mustBeWithouthSess {
+					next.ServeHTTP(w, r)
+					return
+				}
 				writeResponse(w, http.StatusUnauthorized, createErrorResponse(errTokenInvalid.Error()))
+				return
+			}
+
+			if mustBeWithouthSess {
+				writeResponse(w, http.StatusUnauthorized, createErrorResponse(errLogout.Error()))
 				return
 			}
 
