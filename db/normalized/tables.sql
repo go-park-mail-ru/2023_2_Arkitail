@@ -5,9 +5,9 @@ CREATE TABLE
         PASSWORD VARCHAR(100) NOT NULL,
         username VARCHAR(30) UNIQUE NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
-        LOCATION VARCHAR(100) DEFAULT '' NOT NULL,
-        web_site TEXT DEFAULT '' NOT NULL,
-        about TEXT DEFAULT '' NOT NULL,
+        LOCATION VARCHAR(100),
+        web_site TEXT,
+        about TEXT,
         avatar_url VARCHAR(255),
         creation_date TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
         last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
