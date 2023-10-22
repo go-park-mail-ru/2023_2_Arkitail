@@ -65,8 +65,6 @@ paths:
   /api/v1/logout:
     delete:
       summary: Logs out by deleting sessionId cookie
-      security:
-        - cookieAuth: []
       responses:
         '204':
           description: Ok
@@ -87,6 +85,8 @@ paths:
                 $ref: '#/components/schemas/PlaceMap'
     post:
       summary: Create a new place
+      security:
+        - cookieAuth: []
       requestBody:
         required: true
         content:
@@ -372,7 +372,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     patch:
       summary: change a trip with {id}
-      security: []
+      security:
+        - cookieAuth: []
       parameters:
         - in: path
           name: tripId
@@ -407,7 +408,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: delete a trip with {id}
-      security: []
+      security:
+        - cookieAuth: []
       parameters:
       - in: path
         name: tripId
