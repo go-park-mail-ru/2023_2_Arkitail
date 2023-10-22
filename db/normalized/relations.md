@@ -10,26 +10,29 @@
 
 Таблица с отзывами.
 
-#Relation Places:
+#Relation Place:
 
-{id} -> name, description, cost, image_url, creation_date, last_updated
-
+{id} -> name, description, cost, creation_date, last_updated
 
 Таблица с достопримечательностями.
 
-#Relation Trips:
+#Relation Trip:
 
 {id} -> user_id, name, is_public, creation_date, last_updated
 
-
 Таблица с поездками.
 
-#Relation Trips_to_places:
+#Relation Trip_to_place:
 
-{id} -> place_id, trip_id
+{place_id, trip_id} -> visit_date
 
+Таблица для отношения многие ко многим между поездками и достопримечательностями + дата посещения места в поездке.
 
-Таблица для отношения многие ко многим между поездками и достопримечательностями.
+#Relation place_photo
+
+{id} -> place_id, image_url, creation_date, last_updated
+
+Таблица с фотографиями мест
 
 #Нормальные формы
 
