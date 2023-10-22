@@ -2,13 +2,13 @@ CREATE TABLE
     "user" (
         id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         name VARCHAR(30) NOT NULL,
-        password VARCHAR(30) NOT NULL,
+        password VARCHAR(100) NOT NULL,
         username VARCHAR(30) UNIQUE NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         location VARCHAR(100) DEFAULT '' NOT NULL,
         web_site TEXT DEFAULT '' NOT NULL,
         about TEXT DEFAULT '' NOT NULL,
-        avatar_url VARCHAR(255) NOT NULL,
+        avatar_url VARCHAR(255),
         creation_date TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
         last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
     );
@@ -39,7 +39,7 @@ CREATE TABLE
         id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         user_id INTEGER NOT NULL REFERENCES "user" ON DELETE CASCADE,
         place_id INTEGER NOT NULL REFERENCES place(id) ON DELETE CASCADE,
-        content TEXT NOT NULL,
+        content TEXT,
         rating INTEGER CHECK (rating BETWEEN 1 AND 5) NOT NULL,
         creation_date TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
         last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
