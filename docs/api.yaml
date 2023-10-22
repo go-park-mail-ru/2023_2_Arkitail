@@ -532,8 +532,15 @@ components:
           type: number
         cost:
           type: string
-        imageUrl:
-          type: string
+        images:
+          $ref: '#/components/schemas/ImageMap'
+    ImageMap:
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          image_url:
+            type: string
     PlaceMap:
       type: object
       additionalProperties:
