@@ -5,32 +5,33 @@ $$
     declare
     begin
         new.last_updated := now();
+        RAISE NOTICE 'pepega';
         return new;
     end;
 $$
 language plpgsql;
 
-create trigger "update_after_user_trigger"
-    AFTER update on "user"
+create trigger "before_update_user_trigger"
+    BEFORE update on "user"
     for each row
     execute procedure "update_time"();
 
-create trigger "update_after_place_trigger"
-    AFTER update on place
+create trigger "before_update_place_trigger"
+    BEFORE update on place
     for each row
     execute procedure "update_time"();
 
-create trigger "update_after_trip_trigger"
-    AFTER update on trip
+create trigger "before_update_trip_trigger"
+    BEFORE update on trip
     for each row
     execute procedure "update_time"();
 
-create trigger "update_after_review_trigger"
-    AFTER update on review
+create trigger "before_update_review_trigger"
+    BEFORE update on review
     for each row
     execute procedure "update_time"();
 
-create trigger "update_after_place_photo"
-    AFTER update on place_photo
+create trigger "before_update_place_photo"
+    BEFORE update on place_photo
     for each row
     execute procedure "update_time"();
