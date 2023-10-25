@@ -97,6 +97,7 @@ func main() {
 	r.HandleFunc(apiPath+api.Signup, userHandler.Signup).Methods("POST").Name(api.Signup)
 	r.HandleFunc(apiPath+api.Logout, userHandler.Logout).Methods("DELETE").Name(api.Logout)
 	r.HandleFunc(apiPath+api.User, userHandler.GetUserInfo).Methods("GET").Name(api.User)
+	r.HandleFunc(apiPath+api.Users_by_id, userHandler.PatchUser).Methods("Patch").Name(api.Users_by_id)
 
 	h := router.AddCors(r, []string{"http://localhost:8080/"})
 

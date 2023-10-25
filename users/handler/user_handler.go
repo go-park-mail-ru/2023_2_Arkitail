@@ -30,7 +30,7 @@ var (
 func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	userClaim := r.Context().Value("userClaim")
 	if userClaim == nil {
-		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 
@@ -52,41 +52,41 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["user_id"])
 	if err != nil || id < 0 {
-		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse(errInvalidUrlParam.Error()))
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
 		return
 	}
 
 	user, err := h.usecase.GetUserInfoById(uint(id))
 	if err != nil {
-		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse(err.Error()))
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	err = h.ParseUserFromJsonBody(user, r)
 	if err != nil {
-		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse(err.Error()))
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	err = h.usecase.IsValidUser(user)
 	if err != nil {
-		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse(err.Error()))
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	err = h.usecase.UpdateUser(user)
 	if err != nil {
-		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	response, err := h.CreateUserResponse(user)
 	if err != nil {
-		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
-	h.WriteResponse(w, http.StatusOK, response)
+	utils.WriteResponse(w, http.StatusOK, response)
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
@@ -110,23 +110,23 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	userClaim := r.Context().Value("userClaim")
 	if userClaim == nil {
-		h.WriteResponse(w, http.StatusUnauthorized, h.CreateErrorResponse(errTokenInvalid.Error()))
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
-	h.WriteResponse(w, http.StatusNoContent, nil)
+	utils.WriteResponse(w, http.StatusNoContent, nil)
 }
 
 func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	err := h.ParseUserFromJsonBody(user, r)
 	if err != nil {
-		h.WriteResponse(w, http.StatusInternalServerError, h.CreateErrorResponse(err.Error()))
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	err = h.usecase.IsValidUser(user)
 	if err != nil {
-		h.WriteResponse(w, http.StatusBadRequest, h.CreateErrorResponse(err.Error()))
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
