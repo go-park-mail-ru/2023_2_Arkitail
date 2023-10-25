@@ -86,9 +86,9 @@ func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (map[string]*model.
 
 // Читаем при удалении, наверно можно сделать лучше
 func (r *ReviewRepository) DeleteReviewsById(id uint) error {
-	review := &model.Review{}
+	var reviewId uint
 	err := r.DB.
 		QueryRow("DELETE from review where id = $1", id).
-		Scan(&review.ID, &review.UserId, &review.Content, &review.Rating)
+		Scan(&reviewId)
 	return err
 }
