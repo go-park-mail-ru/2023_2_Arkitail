@@ -84,6 +84,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaceMap'
     post:
+      security:
+        - cookieAuth: []
       summary: Create a new place
       requestBody:
         required: true
@@ -370,7 +372,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     patch:
       summary: change a trip with {id}
-      security: []
+      security:
+        - cookieAuth: []
       parameters:
         - in: path
           name: tripId
@@ -405,7 +408,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: delete a trip with {id}
-      security: []
+      security:
+        - cookieAuth: []
       parameters:
       - in: path
         name: tripId

@@ -41,7 +41,7 @@ func (h *ReviewHandler) AddReview(w http.ResponseWriter, r *http.Request) {
 	review := &model.Review{}
 	err := h.ParseReviewFromBody(review, r)
 	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
