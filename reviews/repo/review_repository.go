@@ -18,22 +18,20 @@ func NewPlaceRepository(db *sql.DB) *ReviewRepository {
 	}
 }
 
-func (r *ReviewRepository) AddReview(review *model.Review) error {
+func (r *ReviewRepository) AddReview(review *model.Review) (uint, error) {
+	var insertedId uint
 	err := r.DB.QueryRow(
 		`INSERT INTO place ("user_id", "place_id", "content", "rating")
-        VALUES ($1, $2, $3, $4)`,
+        VALUES ($1, $2, $3, $4) returning id`,
 		review.UserId,
 		review.PlaceId,
 		review.Content,
 		review.Rating,
-	).Scan()
-	if err == sql.ErrNoRows {
-		err = nil
-	}
+	).Scan(&insertedId)
 	if err != nil {
-		return fmt.Errorf("error adding place in a database: %v", err)
+		return insertedId, fmt.Errorf("error adding place in a database: %v", err)
 	}
-	return nil
+	return insertedId, nil
 }
 
 func (r *ReviewRepository) GetReviewById(id uint) (*model.Review, error) {
@@ -84,11 +82,12 @@ func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (map[string]*model.
 	return reviews, nil
 }
 
-// Читаем при удалении, наверно можно сделать лучше
 func (r *ReviewRepository) DeleteReviewsById(id uint) error {
-	var reviewId uint
 	err := r.DB.
 		QueryRow("DELETE from review where id = $1", id).
-		Scan(&reviewId)
+		Scan()
+	if err == sql.ErrNoRows {
+		err = nil
+	}
 	return err
 }
