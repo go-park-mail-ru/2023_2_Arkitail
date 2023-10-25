@@ -14,6 +14,11 @@ import (
 	"project/users/handler"
 	"project/users/repo"
 	"project/users/usecase"
+
+	rhandler "project/reviews/handler"
+	rrepo "project/reviews/repo"
+	rusecase "project/reviews/usecase"
+
 	"project/utils/api"
 
 	phandler "project/places/handler"
@@ -85,9 +90,12 @@ func main() {
 	userHandler := handler.NewUserHandler(userUsecase)
 
 	placeRepo := prepo.NewPlaceRepository(db)
-
 	placeUseCase := pusecase.NewPlaceUseCase(placeRepo)
 	placeHandler := phandler.NewPlaceHandler(placeUseCase)
+
+	reviewRepo := rrepo.NewReviewRepository(db)
+	reviewUseCase := rusecase.NewUserUsecase(reviewRepo)
+	reviewHandler := rhandler.NewReviewHandler(reviewUseCase)
 
 	r := mux.NewRouter()
 
@@ -97,7 +105,13 @@ func main() {
 	r.HandleFunc(apiPath+api.Signup, userHandler.Signup).Methods("POST").Name(api.Signup)
 	r.HandleFunc(apiPath+api.Logout, userHandler.Logout).Methods("DELETE").Name(api.Logout)
 	r.HandleFunc(apiPath+api.User, userHandler.GetUserInfo).Methods("GET").Name(api.User)
-	r.HandleFunc(apiPath+api.Users_by_id, userHandler.PatchUser).Methods("Patch").Name(api.Users_by_id)
+	r.HandleFunc(apiPath+api.UserById, userHandler.PatchUser).Methods("Patch").Name(api.UserById)
+
+	r.HandleFunc(apiPath+api.UserById, reviewHandler.GetReview).Methods("GET").Name(api.UserById)
+	r.HandleFunc(apiPath+api.UserById, reviewHandler.DeleteReview).Methods("Delete").Name(api.UserById)
+	r.HandleFunc(apiPath+api.Review, reviewHandler.AddReview).Methods("POST").Name(api.Review)
+	r.HandleFunc(apiPath+api.PlaceReviews, reviewHandler.GetPlaceReviews).Methods("GET").Name(api.PlaceReviews)
+	r.HandleFunc(apiPath+api.UserReviews, reviewHandler.GetUserReviews).Methods("GET").Name(api.UserReviews)
 
 	h := router.AddCors(r, []string{"http://localhost:8080/"})
 

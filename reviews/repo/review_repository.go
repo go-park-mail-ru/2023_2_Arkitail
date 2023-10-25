@@ -12,7 +12,7 @@ type ReviewRepository struct {
 	DB *sql.DB
 }
 
-func NewPlaceRepository(db *sql.DB) *ReviewRepository {
+func NewReviewRepository(db *sql.DB) *ReviewRepository {
 	return &ReviewRepository{
 		DB: db,
 	}
