@@ -83,3 +83,12 @@ func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (map[string]*model.
 	}
 	return reviews, nil
 }
+
+// Читаем при удалении, наверно можно сделать лучше
+func (r *ReviewRepository) DeleteReviewsById(id uint) error {
+	review := &model.Review{}
+	err := r.DB.
+		QueryRow("DELETE from review where id = $1", id).
+		Scan(&review.ID, &review.UserId, &review.Content, &review.Rating)
+	return err
+}
