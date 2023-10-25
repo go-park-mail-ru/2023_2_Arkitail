@@ -107,8 +107,8 @@ func main() {
 	r.HandleFunc(apiPath+api.User, userHandler.GetUserInfo).Methods("GET").Name(api.User)
 	r.HandleFunc(apiPath+api.UserById, userHandler.PatchUser).Methods("Patch").Name(api.UserById)
 
-	r.HandleFunc(apiPath+api.UserById, reviewHandler.GetReview).Methods("GET").Name(api.UserById)
-	r.HandleFunc(apiPath+api.UserById, reviewHandler.DeleteReview).Methods("Delete").Name(api.UserById)
+	r.HandleFunc(apiPath+api.ReviewById, reviewHandler.GetReview).Methods("GET").Name(api.ReviewById)
+	r.HandleFunc(apiPath+api.ReviewById, reviewHandler.DeleteReview).Methods("Delete").Name(api.ReviewById)
 	r.HandleFunc(apiPath+api.Review, reviewHandler.AddReview).Methods("POST").Name(api.Review)
 	r.HandleFunc(apiPath+api.PlaceReviews, reviewHandler.GetPlaceReviews).Methods("GET").Name(api.PlaceReviews)
 	r.HandleFunc(apiPath+api.UserReviews, reviewHandler.GetUserReviews).Methods("GET").Name(api.UserReviews)

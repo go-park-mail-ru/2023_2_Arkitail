@@ -21,7 +21,7 @@ func NewReviewRepository(db *sql.DB) *ReviewRepository {
 func (r *ReviewRepository) AddReview(review *model.Review) (uint, error) {
 	var insertedId uint
 	err := r.DB.QueryRow(
-		`INSERT INTO place ("user_id", "place_id", "content", "rating")
+		`INSERT INTO review ("user_id", "place_id", "content", "rating")
         VALUES ($1, $2, $3, $4) returning id`,
 		review.UserId,
 		review.PlaceId,
@@ -38,7 +38,7 @@ func (r *ReviewRepository) GetReviewById(id uint) (*model.Review, error) {
 	review := &model.Review{}
 	err := r.DB.
 		QueryRow("SELECT id, user_id, place_id, content, rating FROM review where id = $1", id).
-		Scan(&review.ID, &review.UserId, &review.Content, &review.Rating)
+		Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (r *ReviewRepository) GetReviewsByUserId(userId uint) (map[string]*model.Re
 	defer rows.Close()
 	for rows.Next() {
 		review := &model.Review{}
-		err = rows.Scan(&review.ID, &review.UserId, &review.Content, &review.Rating)
+		err = rows.Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating)
 		if err != nil {
 			return nil, err
 		}
@@ -73,7 +73,7 @@ func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (map[string]*model.
 	defer rows.Close()
 	for rows.Next() {
 		review := &model.Review{}
-		err = rows.Scan(&review.ID, &review.UserId, &review.Content, &review.Rating)
+		err = rows.Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating)
 		if err != nil {
 			return nil, err
 		}

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -14,9 +15,10 @@ import (
 )
 
 var (
-	errInvalidReview   = errors.New("review is invalid")
-	errTokenInvalid    = errors.New("token is invalid")
-	errInvalidUrlParam = errors.New("wrong parameters passed in url")
+	errInvalidReview     = errors.New("review is invalid")
+	errTokenInvalid      = errors.New("token is invalid")
+	errInvalidUrlParam   = errors.New("invalid parameters passed in url")
+	errReviewDoesntExist = errors.New("review with given id doesnt exist")
 )
 
 // GetPlaceReviews
@@ -86,8 +88,11 @@ func (h *ReviewHandler) GetReview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//TODO: здесь по-хорошему нужно проверять, что ошибка не из-за плохо запроса(например: review с id не существует)
 	review, err := h.usecase.GetReviewById(uint(id))
+	if err == sql.ErrNoRows {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errReviewDoesntExist.Error()))
+		return
+	}
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
@@ -108,8 +113,11 @@ func (h *ReviewHandler) GetUserReviews(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//TODO: здесь по-хорошему нужно проверять, что ошибка не из-за плохо запроса(например: review с id не существует)
 	reviews, err := h.usecase.GetReviewsByUserId(uint(id))
+	if err == sql.ErrNoRows {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errReviewDoesntExist.Error()))
+		return
+	}
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
@@ -125,8 +133,11 @@ func (h *ReviewHandler) GetPlaceReviews(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	//TODO: здесь по-хорошему нужно проверять, что ошибка не из-за плохо запроса(например: review с id не существует)
-	reviews, err := h.usecase.GetReviewsByUserId(uint(id))
+	reviews, err := h.usecase.GetReviewsByPlaceId(uint(id))
+	if err == sql.ErrNoRows {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errReviewDoesntExist.Error()))
+		return
+	}
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return

@@ -10,6 +10,6 @@ const (
 	UserById     = "/users/{user_id}"
 	ReviewById   = "/reviews/{reviewId}"
 	Review       = "/review"
-	PlaceReviews = "places/{placeId}/reviews"
-	UserReviews  = "users/{userId}/reviews"
+	PlaceReviews = "/places/{placeId}/reviews"
+	UserReviews  = "/users/{userId}/reviews"
 )
