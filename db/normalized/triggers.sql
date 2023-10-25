@@ -5,7 +5,6 @@ $$
     declare
     begin
         new.last_updated := now();
-        RAISE NOTICE 'pepega';
         return new;
     end;
 $$
