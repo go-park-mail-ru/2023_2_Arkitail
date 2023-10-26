@@ -14,10 +14,9 @@ import (
 )
 
 var (
-	errInvalidReview     = errors.New("review is invalid")
-	errTokenInvalid      = errors.New("token is invalid")
-	errInvalidUrlParam   = errors.New("invalid parameters passed in url")
-	errReviewDoesntExist = errors.New("review with given id doesnt exist")
+	errInvalidReview   = errors.New("review is invalid")
+	errTokenInvalid    = errors.New("token is invalid")
+	errInvalidUrlParam = errors.New("invalid parameters passed in url")
 )
 
 type ReviewHandler struct {

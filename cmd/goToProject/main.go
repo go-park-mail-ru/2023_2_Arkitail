@@ -11,9 +11,9 @@ import (
 	"project/internal/middleware"
 	"project/internal/router"
 
-	"project/users/handler"
-	"project/users/repo"
-	"project/users/usecase"
+	userHandler "project/users/handler"
+	userRepo "project/users/repo"
+	userUsecase "project/users/usecase"
 
 	reviewHandler "project/reviews/handler"
 	reviewRepo "project/reviews/repo"
@@ -76,7 +76,7 @@ func main() {
 		flag.Usage()
 		return
 	}
-	authConfig := usecase.AuthConfig{
+	authConfig := userUsecase.AuthConfig{
 		Secret: []byte(secret),
 	}
 
@@ -85,9 +85,9 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	userRepo := repo.NewUserRepository(db)
-	userUsecase := usecase.NewUserUsecase(userRepo, authConfig)
-	userHandler := handler.NewUserHandler(userUsecase)
+	userRepo := userRepo.NewUserRepository(db)
+	userUsecase := userUsecase.NewUserUsecase(userRepo, authConfig)
+	userHandler := userHandler.NewUserHandler(userUsecase)
 
 	placeRepo := placeRepo.NewPlaceRepository(db)
 	placeUseCase := placeUsecase.NewPlaceUseCase(placeRepo)
