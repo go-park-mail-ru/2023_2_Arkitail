@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -20,8 +19,6 @@ var (
 	errInvalidUrlParam   = errors.New("invalid parameters passed in url")
 	errReviewDoesntExist = errors.New("review with given id doesnt exist")
 )
-
-// GetPlaceReviews
 
 type ReviewHandler struct {
 	usecase *usecase.ReviewUseCase
@@ -89,10 +86,6 @@ func (h *ReviewHandler) GetReview(w http.ResponseWriter, r *http.Request) {
 	}
 
 	review, err := h.usecase.GetReviewById(uint(id))
-	if err == sql.ErrNoRows {
-		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errReviewDoesntExist.Error()))
-		return
-	}
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
@@ -114,10 +107,6 @@ func (h *ReviewHandler) GetUserReviews(w http.ResponseWriter, r *http.Request) {
 	}
 
 	reviews, err := h.usecase.GetReviewsByUserId(uint(id))
-	if err == sql.ErrNoRows {
-		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errReviewDoesntExist.Error()))
-		return
-	}
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
@@ -134,10 +123,6 @@ func (h *ReviewHandler) GetPlaceReviews(w http.ResponseWriter, r *http.Request) 
 	}
 
 	reviews, err := h.usecase.GetReviewsByPlaceId(uint(id))
-	if err == sql.ErrNoRows {
-		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errReviewDoesntExist.Error()))
-		return
-	}
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return

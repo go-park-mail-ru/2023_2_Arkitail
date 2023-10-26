@@ -15,15 +15,15 @@ import (
 	"project/users/repo"
 	"project/users/usecase"
 
-	rhandler "project/reviews/handler"
-	rrepo "project/reviews/repo"
-	rusecase "project/reviews/usecase"
+	reviewHandler "project/reviews/handler"
+	reviewRepo "project/reviews/repo"
+	reviewUsecase "project/reviews/usecase"
 
 	"project/utils/api"
 
-	phandler "project/places/handler"
-	prepo "project/places/repo"
-	pusecase "project/places/usecase"
+	placeHandler "project/places/handler"
+	placeRepo "project/places/repo"
+	placeUsecase "project/places/usecase"
 
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/stdlib"
@@ -89,13 +89,13 @@ func main() {
 	userUsecase := usecase.NewUserUsecase(userRepo, authConfig)
 	userHandler := handler.NewUserHandler(userUsecase)
 
-	placeRepo := prepo.NewPlaceRepository(db)
-	placeUseCase := pusecase.NewPlaceUseCase(placeRepo)
-	placeHandler := phandler.NewPlaceHandler(placeUseCase)
+	placeRepo := placeRepo.NewPlaceRepository(db)
+	placeUseCase := placeUsecase.NewPlaceUseCase(placeRepo)
+	placeHandler := placeHandler.NewPlaceHandler(placeUseCase)
 
-	reviewRepo := rrepo.NewReviewRepository(db)
-	reviewUseCase := rusecase.NewUserUsecase(reviewRepo)
-	reviewHandler := rhandler.NewReviewHandler(reviewUseCase)
+	reviewRepo := reviewRepo.NewReviewRepository(db)
+	reviewUseCase := reviewUsecase.NewUserUsecase(reviewRepo)
+	reviewHandler := reviewHandler.NewReviewHandler(reviewUseCase)
 
 	r := mux.NewRouter()
 

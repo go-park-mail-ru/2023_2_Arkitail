@@ -49,7 +49,7 @@ func (u *ReviewUseCase) AddReview(review *model.Review) error {
 	}
 
 	review.ID = id
-	return err
+	return nil
 }
 
 func (u *ReviewUseCase) DeleteReviewById(id uint) error {
