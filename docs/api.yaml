@@ -532,10 +532,10 @@ components:
         email:
           description: Используем для авторизации
           type: string
-        location:
+        birth_date:
           type: string
-        web-site:
-          type: string
+          example: "2017-01-01"
+          format: date
         about:
           type: string
         avatarUrl:
@@ -550,12 +550,12 @@ components:
         username:
           description: Уникальный username, потом используем в стиле @{username}
           type: string
-        location:
-          type: string
-        web-site:
-          type: string
         about:
           type: string
+        birth_date:
+          type: string
+          example: "2017-01-01"
+          format: date
         avatarUrl:
           type: string
     CleanUserMap:
@@ -571,7 +571,7 @@ components:
         - name
         - email
         - password
-        - birthDate
+        - birth_date
       properties:
         name:
           type: string
@@ -581,7 +581,7 @@ components:
           type: string
           minLength: 8
           pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])"
-        birthDate:
+        birth_date:
           type: string
           example: "2017-01-01"
           format: date
