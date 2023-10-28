@@ -341,7 +341,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /api/v1/trip/{tripId}:
+  /api/v1/trips/{tripId}:
     get:
       summary: get a trip by {id}
       security: []
