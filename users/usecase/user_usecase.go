@@ -118,8 +118,8 @@ func (u *UserUsecase) GetUserInfoById(id uint) (*model.User, error) {
 	return user, nil
 }
 
-func (u *UserUsecase) Login(username, password string) (*http.Cookie, error) {
-	user, err := u.repo.GetUser(username)
+func (u *UserUsecase) Login(email, password string) (*http.Cookie, error) {
+	user, err := u.repo.GetUser(email)
 	if err != nil {
 		return nil, err
 	}

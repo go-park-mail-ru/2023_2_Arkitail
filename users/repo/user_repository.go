@@ -22,10 +22,10 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{DB: db}
 }
 
-func (r *UserRepository) GetUser(username string) (*model.User, error) {
+func (r *UserRepository) GetUser(email string) (*model.User, error) {
 	user := &model.User{}
 	err := r.DB.
-		QueryRow(`SELECT id, password, name, username, email, location, web_site, about, avatar_url FROM "user" WHERE username = $1`, username).
+		QueryRow(`SELECT id, password, name, username, email, location, web_site, about, avatar_url FROM "user" WHERE email = $1`, email).
 		Scan(&user.ID, &user.Password, &user.Name, &user.Username, &user.Email, &user.Location, &user.WebSite, &user.About, &user.AvatarUrl)
 	if err != nil {
 		return nil, ErrUserNotFound
@@ -71,7 +71,7 @@ func (r *UserRepository) UpdateUser(user *model.User) error {
 }
 
 func (r *UserRepository) AddUser(user *model.User) error {
-	_, err := r.GetUser(user.Username)
+	_, err := r.GetUser(user.Email)
 	if err == nil {
 		return ErrUserExists
 	}

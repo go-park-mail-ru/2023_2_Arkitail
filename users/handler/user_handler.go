@@ -49,7 +49,7 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	utils.WriteResponse(w, http.StatusOK, response)
 }
 
-func (h *UserHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["user_id"])
 	if err != nil || id < 0 {
 		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
@@ -59,6 +59,28 @@ func (h *UserHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 	user, err := h.usecase.GetUserInfoById(uint(id))
 	if err != nil {
 		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	response, err := h.CreateUserResponse(user)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	utils.WriteResponse(w, http.StatusOK, response)
+}
+
+func (h *UserHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
+	userClaim := r.Context().Value("userClaim")
+	if userClaim == nil {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(errTokenInvalid.Error()))
+		return
+	}
+
+	user, err := h.usecase.GetUserFromClaims(userClaim.(*usecase.UserClaim))
+	if err != nil {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 

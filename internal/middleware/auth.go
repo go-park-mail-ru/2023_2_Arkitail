@@ -17,9 +17,8 @@ import (
 var (
 	NoAuthNames = map[string]string{
 		api.Places:       http.MethodGet,
-		api.ReviewById:   http.MethodGet,
+		api.UserById:     http.MethodGet,
 		api.PlaceReviews: http.MethodGet,
-		api.UserReviews:  http.MethodGet,
 	}
 	NoSessionNames = map[string]string{
 		api.Login:  http.MethodPost,
