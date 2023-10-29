@@ -533,9 +533,6 @@ components:
           type: integer
         name:
           type: string
-        username:
-          description: Уникальный username, потом используем в стиле @{username}
-          type: string
         email:
           description: Используем для авторизации
           type: string
@@ -571,9 +568,6 @@ components:
         id:
           type: integer
         name:
-          type: string
-        username:
-          description: Уникальный username, потом используем в стиле @{username}
           type: string
         about:
           type: string
