@@ -1,17 +1,16 @@
 package model
 
-type User struct {
-	ID        uint   `json:"id"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Email     string `json:"email"`
-	Name      string `json:"name"`
-	Location  string `json:"location"`
-	WebSite   string `json:"web-site"`
-	About     string `json:"about"`
-	AvatarUrl string `json:"avatarUrl"`
-}
+import (
+	"github.com/jackc/pgx/pgtype"
+)
 
-type ErrorResponse struct {
-	Error string `json:"error"`
+type User struct {
+	ID        uint        `json:"id"`
+	Username  string      `json:"username"`
+	Password  string      `json:"password"`
+	Email     string      `json:"email"`
+	Name      string      `json:"name"`
+	BirthDate pgtype.Date `json:"birth_date"`
+	About     string      `json:"about"`
+	AvatarUrl string      `json:"avatarUrl"`
 }

@@ -25,8 +25,8 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 func (r *UserRepository) GetUser(email string) (*model.User, error) {
 	user := &model.User{}
 	err := r.DB.
-		QueryRow(`SELECT id, password, name, username, email, location, web_site, about, avatar_url FROM "user" WHERE email = $1`, email).
-		Scan(&user.ID, &user.Password, &user.Name, &user.Username, &user.Email, &user.Location, &user.WebSite, &user.About, &user.AvatarUrl)
+		QueryRow(`SELECT id, password, name, username, email, birth_date, about, avatar_url FROM "user" WHERE email = $1`, email).
+		Scan(&user.ID, &user.Password, &user.Name, &user.Username, &user.Email, &user.BirthDate, &user.About, &user.AvatarUrl)
 	if err != nil {
 		return nil, ErrUserNotFound
 	}
@@ -37,8 +37,8 @@ func (r *UserRepository) GetUser(email string) (*model.User, error) {
 func (r *UserRepository) GetUserById(id uint) (*model.User, error) {
 	user := &model.User{}
 	err := r.DB.
-		QueryRow(`SELECT id, password, name, username, email, location, web_site, about, avatar_url FROM "user" WHERE id = $1`, id).
-		Scan(&user.ID, &user.Password, &user.Name, &user.Username, &user.Email, &user.Location, &user.WebSite, &user.About, &user.AvatarUrl)
+		QueryRow(`SELECT id, password, name, username, email, birth_date, about, avatar_url FROM "user" WHERE id = $1`, id).
+		Scan(&user.ID, &user.Password, &user.Name, &user.Username, &user.Email, user.BirthDate, &user.About, &user.AvatarUrl)
 	if err != nil {
 		return nil, ErrUserNotFound
 	}
@@ -52,17 +52,15 @@ func (r *UserRepository) UpdateUser(user *model.User) error {
 			`,"name" = $2`+
 			`,"username" = $3`+
 			`,"email" = $4`+
-			`,"location" = $5`+
-			`,"web_site" = $6`+
-			`,"about" = $7`+
-			`,"avatar_url" = $8`+
-			`WHERE id = $9`,
+			`,"birth_date" = $5`+
+			`,"about" = $6`+
+			`,"avatar_url" = $7`+
+			`WHERE id = $8`,
 		user.Password,
 		user.Name,
 		user.Username,
 		user.Email,
-		user.Location,
-		user.WebSite,
+		user.BirthDate,
 		user.About,
 		user.AvatarUrl,
 		user.ID,
@@ -77,14 +75,13 @@ func (r *UserRepository) AddUser(user *model.User) error {
 	}
 
 	err = r.DB.QueryRow(
-		`INSERT INTO "user" ("name", "username", "password", "email", "location", "web_site", "about", "avatar_url")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+		`INSERT INTO "user" ("name", "username", "password", "email", "birth_date", "about", "avatar_url")
+        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
 		user.Name,
 		user.Username,
 		user.Password,
 		user.Email,
-		user.Location,
-		user.WebSite,
+		user.BirthDate,
 		user.About,
 		user.AvatarUrl,
 	).Scan()

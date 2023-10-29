@@ -9,6 +9,7 @@ import (
 
 	"project/users/model"
 	"project/users/usecase"
+	"project/utils"
 	"project/utils/api"
 
 	"github.com/gorilla/mux"
@@ -76,7 +77,7 @@ func Auth(ucase usecase.UserUseCase) mux.MiddlewareFunc {
 }
 
 func createErrorResponse(errorMsg string) []byte {
-	response := model.ErrorResponse{Error: errorMsg}
+	response := utils.ErrorResponse{Error: errorMsg}
 	responseJson, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err)
