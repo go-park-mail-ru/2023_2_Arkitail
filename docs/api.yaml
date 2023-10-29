@@ -146,7 +146,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/PatchUserRequest'
       responses:
         '200':
           description: Success
@@ -207,6 +207,8 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - avatarUrl
                 properties:
                   avatarUrl:
                     type: string
@@ -387,7 +389,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Trip'
+              $ref: '#/components/schemas/PatchTripRequest'
       responses:
         '200':
           description: Success
@@ -521,6 +523,11 @@ components:
           pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])"
     User:
       type: object
+      required:
+        - id
+        - name
+        - email
+        - birth_date
       properties:
         id:
           type: integer
@@ -540,8 +547,26 @@ components:
           type: string
         avatarUrl:
           type: string
+    PatchUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          description: Используем для авторизации
+          type: string
+        birth_date:
+          type: string
+          example: "2017-01-01"
+          format: date
+        about:
+          type: string
     CleanUser:
       type: object
+      required:
+        - id
+        - name
+        - birth_date
       properties:
         id:
           type: integer
@@ -588,6 +613,12 @@ components:
 
     Place:
       type: object
+      required:
+        - id
+        - name
+        - description
+        - rating
+        - cost
       properties:
         id:
           type: integer
@@ -610,6 +641,11 @@ components:
             $ref: '#/components/schemas/Place'
     Review:
       type: object
+      required:
+        - id
+        - user_id
+        - place_id
+        - rating
       properties:
         id:
           type: integer
@@ -646,6 +682,11 @@ components:
         rating:
           type: integer
     Trip:
+      required:
+        - id
+        - user_id
+        - name
+        - publicity
       type: object
       properties:
         id:
@@ -663,9 +704,38 @@ components:
           type: object
           additionalProperties:
             type: object
+            required:
+              - place
             properties:
               place:
                 $ref: '#/components/schemas/Place'
+              first_date:
+                type: string
+                example: "2017-01-01"
+                format: date
+              last_date:
+                type: string
+                example: "2017-01-02"
+                format: date
+    PatchTripRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        publicity:
+          type: string
+          example: public or private
+        description:
+          type: string
+        places_in_trip:
+          type: object
+          additionalProperties:
+            type: object
+            required:  # List the required properties here
+              - place_id
+            properties:
+              place_id:
+                type: integer
               first_date:
                 type: string
                 example: "2017-01-01"
@@ -692,7 +762,6 @@ components:
             type: object
             required:  # List the required properties here
               - place_id
-              - first_date
             properties:
               place_id:
                 type: integer
@@ -713,6 +782,8 @@ components:
             $ref: '#/components/schemas/Trip'
     ErrorResponse:
       type: object
+      required:
+        - error
       properties:
         error:
           type: string
