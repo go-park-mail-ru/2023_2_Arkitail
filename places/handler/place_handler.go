@@ -43,7 +43,7 @@ func (h *PlaceHandler) CreatePlace(w http.ResponseWriter, r *http.Request) {
 func (h *PlaceHandler) GetPlaces(w http.ResponseWriter, r *http.Request) {
 	places, err := h.usecase.GetPlaces()
 	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(ErrFailedToAddPlace.Error()))
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(ErrFailedToGetPlaces.Error()))
 		return
 	}
 	h.WritePlacesIntoJsonResponse(w, http.StatusOK, places)
