@@ -65,14 +65,12 @@ func (r *UserRepository) UpdateUser(user *model.User) error {
 			`,"email" = $3`+
 			`,"birth_date" = $4`+
 			`,"about" = $5`+
-			`,"avatar_url" = $6`+
-			`WHERE id = $7`,
+			`WHERE id = $6`,
 		user.Password,
 		user.Name,
 		user.Email,
 		user.BirthDate.Time,
 		user.About,
-		user.AvatarUrl,
 		user.ID,
 	)
 	return err
@@ -85,14 +83,13 @@ func (r *UserRepository) AddUser(user *model.User) error {
 	}
 
 	err = r.DB.QueryRow(
-		`INSERT INTO "user" ("name", "password", "email", "birth_date", "about", "avatar_url")
+		`INSERT INTO "user" ("name", "password", "email", "birth_date", "about")
         VALUES ($1, $2, $3, $4, $5, $6)`,
 		user.Name,
 		user.Password,
 		user.Email,
 		user.BirthDate.Time,
 		user.About,
-		user.AvatarUrl,
 	).Scan()
 	if err == sql.ErrNoRows {
 		err = nil
