@@ -34,7 +34,7 @@ func (r *UserRepository) GetUser(username string) (*model.User, error) {
 	return user, err
 }
 
-func (r *UserRepository) GetUserById(id int) (*model.User, error) {
+func (r *UserRepository) GetUserById(id uint) (*model.User, error) {
 	user := &model.User{}
 	err := r.DB.
 		QueryRow(`SELECT id, password, name, username, email, location, web_site, about, avatar_url FROM "user" WHERE id = $1`, id).

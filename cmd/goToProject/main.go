@@ -11,13 +11,19 @@ import (
 	"project/internal/middleware"
 	"project/internal/router"
 
-	"project/users/handler"
-	"project/users/repo"
-	"project/users/usecase"
+	userHandler "project/users/handler"
+	userRepo "project/users/repo"
+	userUsecase "project/users/usecase"
 
-	phandler "project/places/handler"
-	prepo "project/places/repo"
-	pusecase "project/places/usecase"
+	reviewHandler "project/reviews/handler"
+	reviewRepo "project/reviews/repo"
+	reviewUsecase "project/reviews/usecase"
+
+	"project/utils/api"
+
+	placeHandler "project/places/handler"
+	placeRepo "project/places/repo"
+	placeUsecase "project/places/usecase"
 
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/stdlib"
@@ -70,7 +76,7 @@ func main() {
 		flag.Usage()
 		return
 	}
-	authConfig := usecase.AuthConfig{
+	authConfig := userUsecase.AuthConfig{
 		Secret: []byte(secret),
 	}
 
@@ -79,30 +85,40 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	userRepo := repo.NewUserRepository(db)
-	userUsecase := usecase.NewUserUsecase(userRepo, authConfig)
-	userHandler := handler.NewUserHandler(userUsecase)
+	userRepo := userRepo.NewUserRepository(db)
+	userUsecase := userUsecase.NewUserUsecase(userRepo, authConfig)
+	userHandler := userHandler.NewUserHandler(userUsecase)
 
-	placeRepo := prepo.NewPlaceRepository(db)
+	placeRepo := placeRepo.NewPlaceRepository(db)
+	placeUseCase := placeUsecase.NewPlaceUseCase(placeRepo)
+	placeHandler := placeHandler.NewPlaceHandler(placeUseCase)
 
-	placeUseCase := pusecase.NewPlaceUseCase(placeRepo)
-	placeHandler := phandler.NewPlaceHandler(placeUseCase)
+	reviewRepo := reviewRepo.NewReviewRepository(db)
+	reviewUseCase := reviewUsecase.NewUserUsecase(reviewRepo)
+	reviewHandler := reviewHandler.NewReviewHandler(reviewUseCase)
 
 	r := mux.NewRouter()
 
 	apiPath := "/api/v1"
-	r.HandleFunc(apiPath+"/auth", userHandler.CheckAuth).Methods("GET")
-	r.HandleFunc(apiPath+"/login", userHandler.Login).Methods("POST")
-	r.HandleFunc(apiPath+"/signup", userHandler.Signup).Methods("POST")
-	r.HandleFunc(apiPath+"/logout", userHandler.Logout).Methods("DELETE")
-	r.HandleFunc(apiPath+"/user", userHandler.GetUserInfo).Methods("GET")
-	r.HandleFunc(apiPath+"/user/{user_id}", userHandler.PatchUser).Methods("PATCH")
+	r.HandleFunc(apiPath+api.Auth, userHandler.CheckAuth).Methods("GET").Name(api.Auth)
+	r.HandleFunc(apiPath+api.Login, userHandler.Login).Methods("POST").Name(api.Login)
+	r.HandleFunc(apiPath+api.Signup, userHandler.Signup).Methods("POST").Name(api.Signup)
+	r.HandleFunc(apiPath+api.Logout, userHandler.Logout).Methods("DELETE").Name(api.Logout)
+	r.HandleFunc(apiPath+api.User, userHandler.GetUserInfo).Methods("GET").Name(api.User)
+	r.HandleFunc(apiPath+api.UserById, userHandler.PatchUser).Methods("Patch").Name(api.UserById)
+
+	r.HandleFunc(apiPath+api.ReviewById, reviewHandler.GetReview).Methods("GET").Name(api.ReviewById)
+	r.HandleFunc(apiPath+api.ReviewById, reviewHandler.DeleteReview).Methods("Delete").Name(api.ReviewById)
+	r.HandleFunc(apiPath+api.Review, reviewHandler.AddReview).Methods("POST").Name(api.Review)
+	r.HandleFunc(apiPath+api.PlaceReviews, reviewHandler.GetPlaceReviews).Methods("GET").Name(api.PlaceReviews)
+	r.HandleFunc(apiPath+api.UserReviews, reviewHandler.GetUserReviews).Methods("GET").Name(api.UserReviews)
 
 	h := router.AddCors(r, []string{"http://localhost:8080/"})
 
-	r.HandleFunc(apiPath+"/places", placeHandler.CreatePlace).Methods("POST")
-	r.HandleFunc(apiPath+"/places", placeHandler.GetPlaces).Methods("GET")
+	r.HandleFunc(apiPath+api.Places, placeHandler.CreatePlace).Methods("POST").Name(api.Places)
+	r.HandleFunc(apiPath+api.Places, placeHandler.GetPlaces).Methods("GET").Name(api.Places)
 
+	r.Use(middleware.Auth(userUsecase))
 	r.Use(middleware.AccessLog)
 	r.Use(middleware.Panic)
 

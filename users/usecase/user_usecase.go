@@ -14,12 +14,14 @@ import (
 
 type UserUseCase interface {
 	GetUserInfo(tokenString string) (*model.User, error)
-	Login(username, password string) (string, error)
+	Login(username, password string) (*http.Cookie, error)
 	CheckAuth(tokenString string) error
-	Signup(user *model.User) (string, error)
+	Signup(user *model.User) error
 	Logout() error
+	ValidateToken(tokenString string) (*UserClaim, error)
+	GetUserFromClaims(userClaim *UserClaim) (*model.User, error)
 	IsValidUser(user *model.User) error
-	GetUserInfoById(id int) (*model.User, error)
+	GetUserInfoById(id uint) (*model.User, error)
 }
 
 var (
@@ -31,7 +33,7 @@ var (
 )
 
 type UserClaim struct {
-	Username string
+	Id uint
 	jwt.RegisteredClaims
 }
 
@@ -70,9 +72,9 @@ func (u *UserUsecase) UpdateUser(user *model.User) error {
 	return err
 }
 
-func (u *UserUsecase) CreateSessionCookie(userName string) (*http.Cookie, error) {
+func (u *UserUsecase) CreateSessionCookie(user *model.User) (*http.Cookie, error) {
 	claim := UserClaim{
-		Username: userName,
+		Id: user.ID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
@@ -99,7 +101,7 @@ func (u *UserUsecase) GetUserInfo(tokenString string) (*model.User, error) {
 		return nil, err
 	}
 
-	user, err := u.repo.GetUser(userClaim.Username)
+	user, err := u.GetUserFromClaims(userClaim)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +109,7 @@ func (u *UserUsecase) GetUserInfo(tokenString string) (*model.User, error) {
 	return user, nil
 }
 
-func (u *UserUsecase) GetUserInfoById(id int) (*model.User, error) {
+func (u *UserUsecase) GetUserInfoById(id uint) (*model.User, error) {
 	user, err := u.repo.GetUserById(id)
 	if err != nil {
 		return nil, err
@@ -126,7 +128,7 @@ func (u *UserUsecase) Login(username, password string) (*http.Cookie, error) {
 		return nil, ErrInvalidCredentials
 	}
 
-	cookie, err := u.CreateSessionCookie(username)
+	cookie, err := u.CreateSessionCookie(user)
 	if err != nil {
 		return nil, err
 	}
@@ -146,6 +148,14 @@ func (u *UserUsecase) Signup(user *model.User) error {
 
 func (u *UserUsecase) Logout() error {
 	return nil
+}
+
+func (u *UserUsecase) GetUserFromClaims(userClaim *UserClaim) (*model.User, error) {
+	user, err := u.repo.GetUserById(userClaim.Id)
+	if err != nil {
+		return nil, err
+	}
+	return user, err
 }
 
 func (u *UserUsecase) ValidateToken(tokenString string) (*UserClaim, error) {
