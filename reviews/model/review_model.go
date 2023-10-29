@@ -3,7 +3,7 @@ package model
 import "github.com/jackc/pgx/pgtype"
 
 type Review struct {
-	ID           uint        `json:"id`
+	ID           uint        `json:"id"`
 	UserId       uint        `json:"user_id"`
 	PlaceId      uint        `json:"place_id"`
 	Content      string      `json:"content"`
