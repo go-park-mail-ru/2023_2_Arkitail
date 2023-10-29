@@ -18,20 +18,20 @@ func NewReviewRepository(db *sql.DB) *ReviewRepository {
 	}
 }
 
-func (r *ReviewRepository) AddReview(review *model.Review) (uint, error) {
+func (r *ReviewRepository) AddReview(review *model.Review) error {
 	var insertedId uint
 	err := r.DB.QueryRow(
 		`INSERT INTO review ("user_id", "place_id", "content", "rating")
-        VALUES ($1, $2, $3, $4) returning id`,
+        VALUES ($1, $2, $3, $4) returning id, DATE_TRUNC('second', creation_date)`,
 		review.UserId,
 		review.PlaceId,
 		review.Content,
 		review.Rating,
-	).Scan(&insertedId)
+	).Scan(&insertedId, &review.CreationDate)
 	if err != nil {
-		return insertedId, fmt.Errorf("error adding place in a database: %v", err)
+		return fmt.Errorf("error adding place in a database: %v", err)
 	}
-	return insertedId, nil
+	return nil
 }
 
 func (r *ReviewRepository) GetReviewById(id uint) (*model.Review, error) {

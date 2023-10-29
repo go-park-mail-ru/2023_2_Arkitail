@@ -43,12 +43,10 @@ func (u *ReviewUseCase) GetReviewsByPlaceId(placeId uint) (map[string]*model.Rev
 }
 
 func (u *ReviewUseCase) AddReview(review *model.Review) error {
-	id, err := u.repo.AddReview(review)
+	err := u.repo.AddReview(review)
 	if err != nil {
 		return err
 	}
-
-	review.ID = id
 	return nil
 }
 
