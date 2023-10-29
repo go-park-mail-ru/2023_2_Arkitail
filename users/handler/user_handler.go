@@ -49,14 +49,14 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	utils.WriteResponse(w, http.StatusOK, response)
 }
 
-func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) GetCleanUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["user_id"])
 	if err != nil || id < 0 {
 		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
 		return
 	}
 
-	user, err := h.usecase.GetUserInfoById(uint(id))
+	user, err := h.usecase.GetCleanUserInfoById(uint(id))
 	if err != nil {
 		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
 		return
