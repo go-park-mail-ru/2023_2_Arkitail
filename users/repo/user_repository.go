@@ -25,8 +25,8 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 func (r *UserRepository) GetUser(email string) (*model.User, error) {
 	user := &model.User{}
 	err := r.DB.
-		QueryRow(`SELECT id, password, name, username, email, birth_date, about, avatar_url FROM "user" WHERE email = $1`, email).
-		Scan(&user.ID, &user.Password, &user.Name, &user.Username, &user.Email, &user.BirthDate, &user.About, &user.AvatarUrl)
+		QueryRow(`SELECT id, password, name, email, birth_date, about, avatar_url FROM "user" WHERE email = $1`, email).
+		Scan(&user.ID, &user.Password, &user.Name, &user.Email, &user.BirthDate, &user.About, &user.AvatarUrl)
 	if err != nil {
 		return nil, ErrUserNotFound
 	}
@@ -37,8 +37,8 @@ func (r *UserRepository) GetUser(email string) (*model.User, error) {
 func (r *UserRepository) GetUserById(id uint) (*model.User, error) {
 	user := &model.User{}
 	err := r.DB.
-		QueryRow(`SELECT id, password, name, username, email, birth_date, about, avatar_url FROM "user" WHERE id = $1`, id).
-		Scan(&user.ID, &user.Password, &user.Name, &user.Username, &user.Email, &user.BirthDate, &user.About, &user.AvatarUrl)
+		QueryRow(`SELECT id, password, name, email, birth_date, about, avatar_url FROM "user" WHERE id = $1`, id).
+		Scan(&user.ID, &user.Password, &user.Name, &user.Email, &user.BirthDate, &user.About, &user.AvatarUrl)
 	if err != nil {
 		return nil, ErrUserNotFound
 	}
@@ -50,17 +50,15 @@ func (r *UserRepository) UpdateUser(user *model.User) error {
 	_, err := r.DB.Exec(
 		`UPDATE "user" SET "password" = $1`+
 			`,"name" = $2`+
-			`,"username" = $3`+
-			`,"email" = $4`+
-			`,"birth_date" = $5`+
-			`,"about" = $6`+
-			`,"avatar_url" = $7`+
-			`WHERE id = $8`,
+			`,"email" = $3`+
+			`,"birth_date" = $4`+
+			`,"about" = $5`+
+			`,"avatar_url" = $6`+
+			`WHERE id = $7`,
 		user.Password,
 		user.Name,
-		user.Username,
 		user.Email,
-		user.BirthDate,
+		user.BirthDate.Time,
 		user.About,
 		user.AvatarUrl,
 		user.ID,
@@ -75,13 +73,12 @@ func (r *UserRepository) AddUser(user *model.User) error {
 	}
 
 	err = r.DB.QueryRow(
-		`INSERT INTO "user" ("name", "username", "password", "email", "birth_date", "about", "avatar_url")
-        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+		`INSERT INTO "user" ("name", "password", "email", "birth_date", "about", "avatar_url")
+        VALUES ($1, $2, $3, $4, $5, $6)`,
 		user.Name,
-		user.Username,
 		user.Password,
 		user.Email,
-		user.BirthDate,
+		user.BirthDate.Time,
 		user.About,
 		user.AvatarUrl,
 	).Scan()

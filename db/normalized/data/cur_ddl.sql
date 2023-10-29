@@ -3,7 +3,6 @@ CREATE TABLE
         id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         NAME VARCHAR(30) NOT NULL,
         PASSWORD VARCHAR(100) NOT NULL,
-        username VARCHAR(30) UNIQUE NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         birth_date date not null,
         about TEXT,
