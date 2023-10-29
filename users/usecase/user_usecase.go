@@ -209,7 +209,7 @@ func (u *UserUsecase) IsValidUser(user *model.User) error {
 }
 
 func (u *UserUsecase) UploadAvatar(image []byte, id uint) (string, error) {
-	const avatarPath = "image/avatar/"
+	const avatarPath = "../../images/avatars/"
 
 	oldAvatar, err := u.repo.GetUserAvatarUrl(id)
 	if err != nil {
@@ -235,7 +235,7 @@ func (u *UserUsecase) UploadAvatar(image []byte, id uint) (string, error) {
 	if err != nil {
 		os.Remove(filename)
 	} else {
-		os.Remove(*oldAvatar)
+		os.Remove(oldAvatar)
 	}
 
 	return filename, nil

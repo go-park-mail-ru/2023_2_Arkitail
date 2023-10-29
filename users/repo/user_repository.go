@@ -68,12 +68,12 @@ func (r *UserRepository) UpdateUserAvatar(id uint, avatarUrl string) error {
 	return err
 }
 
-func (r *UserRepository) GetUserAvatarUrl(id uint) (*string, error) {
-	var avatarUrl *string
+func (r *UserRepository) GetUserAvatarUrl(id uint) (string, error) {
+	var avatarUrl string
 	err := r.DB.QueryRow(
-		`SELECT avatar_url from "user" WHERE id = $1`, id).Scan(avatarUrl)
+		`SELECT avatar_url from "user" WHERE id = $1`, id).Scan(&avatarUrl)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	return avatarUrl, nil
 }
