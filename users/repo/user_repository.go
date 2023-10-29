@@ -68,6 +68,16 @@ func (r *UserRepository) UpdateUserAvatar(id uint, avatarUrl string) error {
 	return err
 }
 
+func (r *UserRepository) GetUserAvatarUrl(id uint) (*string, error) {
+	var avatarUrl *string
+	err := r.DB.QueryRow(
+		`SELECT avatar_url from "user" WHERE id = $1`, id).Scan(avatarUrl)
+	if err != nil {
+		return nil, err
+	}
+	return avatarUrl, nil
+}
+
 func (r *UserRepository) UpdateUser(user *model.User) error {
 	_, err := r.DB.Exec(
 		`UPDATE "user" SET "password" = $1`+
