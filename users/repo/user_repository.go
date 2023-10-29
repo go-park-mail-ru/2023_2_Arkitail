@@ -38,7 +38,7 @@ func (r *UserRepository) GetUserById(id uint) (*model.User, error) {
 	user := &model.User{}
 	err := r.DB.
 		QueryRow(`SELECT id, password, name, username, email, birth_date, about, avatar_url FROM "user" WHERE id = $1`, id).
-		Scan(&user.ID, &user.Password, &user.Name, &user.Username, &user.Email, user.BirthDate, &user.About, &user.AvatarUrl)
+		Scan(&user.ID, &user.Password, &user.Name, &user.Username, &user.Email, &user.BirthDate, &user.About, &user.AvatarUrl)
 	if err != nil {
 		return nil, ErrUserNotFound
 	}
