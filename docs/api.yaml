@@ -651,7 +651,7 @@ components:
           type: string
         rating:
           type: integer
-        creationDate:
+        creation_date:
             type: string
             description: RFC3339 Datetime to set
             format: date-time
