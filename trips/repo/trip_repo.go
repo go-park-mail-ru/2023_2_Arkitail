@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 
 	"project/trips/model"
 )
@@ -23,6 +24,25 @@ func (r *TripRepository) DeleteTripById(tripId uint) error {
 		err = nil
 	}
 	return err
+}
+
+func (r *TripRepository) GetTripsByUserId(userId uint) (map[string]*model.Trip, error) {
+	trips := map[string]*model.Trip{}
+	rows, err := r.DB.
+		Query(`SELECT id, description, name, is_public from trip where user_id = $1`, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		trip := &model.Trip{}
+		err = rows.Scan(&trip.ID, &trip.Description, &trip.Name, &trip.Publicity)
+		if err != nil {
+			return nil, err
+		}
+		trips[strconv.FormatUint(uint64(trip.ID), 10)] = trip
+	}
+	return trips, err
 }
 
 func (r *TripRepository) GetTripById(tripId uint) (*model.Trip, error) {
