@@ -4,7 +4,14 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/golang-jwt/jwt/v4"
 )
+
+type UserClaim struct {
+	Id uint
+	jwt.RegisteredClaims
+}
 
 func CreateErrorResponse(errorMsg string) []byte {
 	response := ErrorResponse{Error: errorMsg}
