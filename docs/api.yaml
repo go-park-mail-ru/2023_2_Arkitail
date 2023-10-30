@@ -700,6 +700,7 @@ components:
             type: object
             required:
               - place
+              - first_date
             properties:
               place:
                 $ref: '#/components/schemas/Place'
