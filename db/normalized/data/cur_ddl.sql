@@ -22,12 +22,14 @@ CREATE TABLE
         last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
     );
 
+CREATE TYPE publicity AS ENUM ('public', 'private');
 CREATE TABLE
     trip (
         id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         user_id INTEGER NOT NULL REFERENCES "user" ON DELETE CASCADE,
+        description text,
         NAME VARCHAR(30) NOT NULL,
-        is_public BOOLEAN DEFAULT FALSE NOT NULL,
+        is_public publicity DEFAULT 'private' NOT NULL,
         creation_date TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
         last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
     );
@@ -47,6 +49,7 @@ CREATE TABLE
     trip_to_place (
         place_id INTEGER NOT NULL REFERENCES place (id) ON DELETE CASCADE,
         trip_id INTEGER NOT NULL REFERENCES trip (id) ON DELETE CASCADE,
-        visit_date date,
+        first_date date,
+        last_date date,
         PRIMARY KEY (place_id, trip_id)
     );
