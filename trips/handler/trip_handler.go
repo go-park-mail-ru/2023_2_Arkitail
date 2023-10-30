@@ -5,13 +5,17 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"time"
 
 	"project/trips/model"
 	"project/trips/usecase"
 	"project/utils"
 
 	"github.com/gorilla/mux"
+)
+
+var (
+	errInvalidTripRequest = errors.New("invalid trip request")
+	errInvalidUrlParam    = errors.New("invalid parameters passed in url")
 )
 
 type TripHandler struct {
@@ -22,177 +26,54 @@ func NewTripHandler(tripUsecase *usecase.TripUsecase) *TripHandler {
 	return &TripHandler{usecase: tripUsecase}
 }
 
-var (
-	errInvalidUrlParam = errors.New("parameter passed by url has wrong format")
-	errTokenInvalid    = errors.New("token is invalid")
-)
-
-func (h *TripHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
+func (h *TripHandler) GetTripByTripId(w http.ResponseWriter, r *http.Request) {
 	userClaim := r.Context().Value("userClaim")
 	if userClaim == nil {
-		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(errTokenInvalid.Error()))
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(utils.ErrTokenInvalid.Error()))
 		return
 	}
 
-	user, err := h.usecase.GetUserFromClaims(userClaim.(*usecase.UserClaim))
-	if err != nil {
-		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	response, err := h.CreateUserResponse(user)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	utils.WriteResponse(w, http.StatusOK, response)
-}
-
-func (h *TripHandler) GetCleanUser(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(mux.Vars(r)["user_id"])
-	if err != nil || id < 0 {
+	id, err := strconv.Atoi(mux.Vars(r)["tripId"])
+	if err != nil || id < 1 {
 		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
 		return
 	}
 
-	user, err := h.usecase.GetCleanUserInfoById(uint(id))
-	if err != nil {
-		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	response, err := h.CreateUserResponse(user)
+	tripResponse, err := h.usecase.GetTripReponseById(uint(id))
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
-	utils.WriteResponse(w, http.StatusOK, response)
+	h.WriteTripResponse(w, http.StatusOK, tripResponse)
 }
 
-func (h *TripHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
+func (h *TripHandler) GetTripByUserId(w http.ResponseWriter, r *http.Request) {
 	userClaim := r.Context().Value("userClaim")
 	if userClaim == nil {
-		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(errTokenInvalid.Error()))
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(utils.ErrTokenInvalid.Error()))
 		return
 	}
 
-	user, err := h.usecase.GetUserFromClaims(userClaim.(*usecase.UserClaim))
-	if err != nil {
-		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	err = h.ParseUserFromJsonBody(user, r)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	err = h.usecase.IsValidUser(user)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	err = h.usecase.UpdateUser(user)
+	tripResponse, err := h.usecase.GetTripsByUserId(userClaim.)
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
-	response, err := h.CreateUserResponse(user)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	utils.WriteResponse(w, http.StatusOK, response)
+	h.WriteTripResponse(w, http.StatusOK, tripResponse)
 }
 
-func (h *TripHandler) Login(w http.ResponseWriter, r *http.Request) {
-	user := &model.User{}
-	err := h.ParseUserFromJsonBody(user, r)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(errTokenInvalid.Error()))
-		return
-	}
-
-	cookie, err := h.usecase.Login(user.Email, user.Password)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(errTokenInvalid.Error()))
-		return
-	}
-	http.SetCookie(w, cookie)
-
-	utils.WriteResponse(w, http.StatusNoContent, nil)
-}
-
-func (h *TripHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
-	userClaim := r.Context().Value("userClaim")
-	if userClaim == nil {
-		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(errTokenInvalid.Error()))
-		return
-	}
-	utils.WriteResponse(w, http.StatusNoContent, nil)
-}
-
-func (h *TripHandler) Signup(w http.ResponseWriter, r *http.Request) {
-	user := &model.User{}
-	err := h.ParseUserFromJsonBody(user, r)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	err = h.usecase.IsValidUser(user)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	err = h.usecase.Signup(user)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	cookie, err := h.usecase.CreateSessionCookie(user)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	http.SetCookie(w, cookie)
-	utils.WriteResponse(w, http.StatusNoContent, nil)
-}
-
-func (h *TripHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	_, err := r.Cookie("session_id")
-	if err != nil {
-		return
-	}
-
-	expire := time.Now().Add(-7 * 24 * time.Hour)
-	cookie := http.Cookie{
-		Name:    "session_id",
-		Value:   "value",
-		Expires: expire,
-	}
-	http.SetCookie(w, &cookie)
-	utils.WriteResponse(w, http.StatusNoContent, nil)
-}
-
-func (h *TripHandler) ParseUserFromJsonBody(user *model.User, r *http.Request) error {
+func ParseTripRequestFromBody(trip *model.TripRequest, r *http.Request) error {
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(user); err != nil {
-		return usecase.ErrInvalidCredentials
+	if err := decoder.Decode(trip); err != nil {
+		return errInvalidTripRequest
 	}
 	return nil
 }
 
-func (h *TripHandler) CreateUserResponse(user *model.User) ([]byte, error) {
-	responseJson, err := json.Marshal(user)
-	return responseJson, err
+func (h *TripHandler) WriteTripResponse(w http.ResponseWriter, status int, tripResponse *model.TripResponse) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(tripResponse)
 }

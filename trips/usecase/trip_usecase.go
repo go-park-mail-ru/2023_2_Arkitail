@@ -55,7 +55,7 @@ func (u *TripUsecase) AddTrip(tripRequest *model.TripRequest) (*model.TripRespon
 	return tripResponse, nil
 }
 
-func (u *TripUsecase) GetTripById(tripId uint) (*model.TripResponse, error) {
+func (u *TripUsecase) GetTripReponseById(tripId uint) (*model.TripResponse, error) {
 	trip, err := u.repo.GetTripById(tripId)
 	if err != nil {
 		return nil, err
