@@ -47,9 +47,9 @@ CREATE TABLE
 
 CREATE TABLE
     trip_to_place (
+        id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         place_id INTEGER NOT NULL REFERENCES place (id) ON DELETE CASCADE,
         trip_id INTEGER NOT NULL REFERENCES trip (id) ON DELETE CASCADE,
-        first_date date,
-        last_date date,
-        PRIMARY KEY (place_id, trip_id)
+        first_date date NOT NULL,
+        last_date date
     );

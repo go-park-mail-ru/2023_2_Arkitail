@@ -29,7 +29,7 @@ func (r *ReviewRepository) AddReview(review *model.Review) error {
 		review.Rating,
 	).Scan(&insertedId, &review.CreationDate)
 	if err != nil {
-		return fmt.Errorf("error adding place in a database: %v", err)
+		return fmt.Errorf("error adding review in a database: %v", err)
 	}
 	return nil
 }
