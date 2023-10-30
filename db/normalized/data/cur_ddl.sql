@@ -51,5 +51,5 @@ CREATE TABLE
         place_id INTEGER NOT NULL REFERENCES place (id) ON DELETE CASCADE,
         trip_id INTEGER NOT NULL REFERENCES trip (id) ON DELETE CASCADE,
         first_date date NOT NULL,
-        last_date date
+        last_date date CHECK(last_date is null or last_date > first_date)
     );
