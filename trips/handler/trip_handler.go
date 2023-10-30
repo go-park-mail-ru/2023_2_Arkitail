@@ -55,13 +55,13 @@ func (h *TripHandler) GetTripByUserId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tripResponse, err := h.usecase.GetTripsByUserId(userClaim.)
+	tripResponses, err := h.usecase.GetTripsByUserId(userClaim.(*utils.UserClaim).Id)
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
-	h.WriteTripResponse(w, http.StatusOK, tripResponse)
+	h.WriteTripResponseMap(w, http.StatusOK, tripResponses)
 }
 
 func ParseTripRequestFromBody(trip *model.TripRequest, r *http.Request) error {
@@ -76,4 +76,10 @@ func (h *TripHandler) WriteTripResponse(w http.ResponseWriter, status int, tripR
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(tripResponse)
+}
+
+func (h *TripHandler) WriteTripResponseMap(w http.ResponseWriter, status int, tripResponses map[string]*model.TripResponse) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(tripResponses)
 }
