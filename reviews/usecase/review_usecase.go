@@ -9,7 +9,7 @@ type ReviewUseCase struct {
 	repo *repo.ReviewRepository
 }
 
-func NewUserUsecase(repo *repo.ReviewRepository) *ReviewUseCase {
+func NewReviewUsecase(repo *repo.ReviewRepository) *ReviewUseCase {
 	return &ReviewUseCase{
 		repo: repo,
 	}

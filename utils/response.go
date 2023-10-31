@@ -5,7 +5,14 @@ import (
 	"errors"
 	"log"
 	"net/http"
+
+	"github.com/golang-jwt/jwt/v4"
 )
+
+type UserClaim struct {
+	Id uint
+	jwt.RegisteredClaims
+}
 
 var ErrTokenInvalid = errors.New("token is invalid")
 
