@@ -20,6 +20,7 @@ var (
 		api.Places:       http.MethodGet,
 		api.UserById:     http.MethodGet,
 		api.PlaceReviews: http.MethodGet,
+		api.TripById:     http.MethodGet,
 	}
 	NoSessionNames = map[string]string{
 		api.Login:  http.MethodPost,
