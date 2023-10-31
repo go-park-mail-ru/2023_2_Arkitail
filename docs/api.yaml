@@ -32,7 +32,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/v1/signup:
     post:
-      summary: Signs up and returns the authentication  cookie
+      summary: Signs up and returns the authentication cookie
       requestBody:
         required: true
         content:
@@ -63,8 +63,6 @@ paths:
   /api/v1/logout:
     delete:
       summary: Logs out by deleting sessionId cookie
-      security:
-        - cookieAuth: []
       responses:
         '204':
           description: Ok
@@ -83,47 +81,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaceMap'
-    post:
-      security:
-        - cookieAuth: []
-      summary: Create a new place
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreatePlaceRequest'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Place'
-  /api/v1/places/{placeId}:
-    get:
-      summary: Get a place by id
-      security: []    # no authentication
-      parameters:
-        - in: path
-          name: placeId
-          schema:
-            type: integer
-          required: true
-          description: Numeric id of the place to get
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Place'
-        '404':
-          description: Cant find a place with id = {placeId}
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+  # /api/v1/places/{placeId}:
+  #   get:
+  #     summary: Get a place by id
+  #     security: []    # no authentication
+  #     parameters:
+  #       - in: path
+  #         name: placeId
+  #         schema:
+  #           type: integer
+  #         required: true
+  #         description: Numeric id of the place to get
+  #     responses:
+  #       '200':
+  #         description: Success
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Place'
+  #       '404':
+  #         description: Cant find a place with id = {placeId}
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ErrorResponse'
   /api/v1/auth:
     get:
       summary: Checks if you have valid sessionId
@@ -156,6 +137,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      summary: Changes data of logged in user
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchUserRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Not logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/v1/users/{userId}:
     get:
       summary: Returns data of user with id = {userId}
@@ -173,45 +178,42 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/CleanUser'
         '404':
           description: Couldnt find user
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-    patch:
-      summary: Changes data of user with id = {userId}
+
+  /api/v1/user/avatar:
+    post:
+      summary: uploads new avatar and sets user avatar_url to it
       security:
         - cookieAuth: []
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: integer
-          required: true
-          description: Integer userId of the user to patch data for
       requestBody:
         required: true
         content:
-          application/json:
+          application/octet-stream:
+            # any media type is accepted, functionally equivalent to `*/*`
             schema:
-              $ref: '#/components/schemas/User'
+              # a binary file of any type
+              type: string
+              format: binary
       responses:
-        '200':
-          description: Success
+        '201':
+          description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                required:
+                  - avatar_url
+                properties:
+                  avatar_url:
+                    type: string
         '401':
-          description: Trip is private and you dont have the rights to change it
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Couldnt find a user
+          description: Unauthorized
           content:
             application/json:
               schema:
@@ -220,30 +222,31 @@ paths:
 
 
 
-  /api/v1/users/{userId}/reviews:
-    get:
-      summary: Returns all reviews from user
-      security: []    # no authentication
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: integer
-          required: true
-          description: Integer userId of the user to get reviews from
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ReviewMap'
-        '404':
-          description: Couldnt find user
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+
+  # /api/v1/users/{userId}/reviews:
+  #   get:
+  #     summary: Returns all reviews from user
+  #     security: []    # no authentication
+  #     parameters:
+  #       - in: path
+  #         name: userId
+  #         schema:
+  #           type: integer
+  #         required: true
+  #         description: Integer userId of the user to get reviews from
+  #     responses:
+  #       '200':
+  #         description: Success
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ReviewMap'
+  #       '404':
+  #         description: Couldnt find user
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ErrorResponse'
   /api/v1/places/{placeId}/reviews:
     get:
       summary: Returns all reviews for place
@@ -261,7 +264,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewMap'
+                $ref: '#/components/schemas/ReviewsWithAuthors'
         '404':
           description: Couldnt find place
           content:
@@ -269,29 +272,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/v1/reviews/{reviewId}:
-    get:
-      summary: Returns a review with id = reviewId
-      security: []    # no authentication
-      parameters:
-        - in: path
-          name: reviewId
-          schema:
-            type: integer
-          required: true
-          description: Numeric id the review to get
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Review'
-        '404':
-          description: Couldnt find review
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+    # get:
+    #   summary: Returns a review with id = reviewId
+    #   security: []    # no authentication
+    #   parameters:
+    #     - in: path
+    #       name: reviewId
+    #       schema:
+    #         type: integer
+    #       required: true
+    #       description: Numeric id the review to get
+    #   responses:
+    #     '200':
+    #       description: Success
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: '#/components/schemas/Review'
+    #     '404':
+    #       description: Couldnt find review
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: Deletes a review
       security:
@@ -328,19 +331,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Review'
-        '400':
-          description: Contents of request are wrong
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+        # '400':
+        #   description: Contents of request are wrong
+        #   content:
+        #     application/json:
+        #       schema:
+        #         $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /api/v1/trip/{tripId}:
+  /api/v1/trips/{tripId}:
     get:
       summary: get a trip by {id}
       security: []
@@ -386,7 +389,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Trip'
+              $ref: '#/components/schemas/PatchTripRequest'
       responses:
         '200':
           description: Success
@@ -424,17 +427,35 @@ paths:
           description: Unauthorized
         '404':
           description: Couldnt find a trip
-  /api/v1/{userId}/trips:
+  # /api/v1/{userId}/trips:
+  #   get:
+  #     summary: Returns trips of a user with userId
+  #     security: []    # no authentication
+  #     parameters:
+  #       - in: path
+  #         name: userId
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Integer id of a user to get trips from
+  #     responses:
+  #       '200':
+  #         description: Success
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/TripMap'
+  #       '404':
+  #         description: User doesnt exist
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/trips:
     get:
-      summary: Returns trips of a user with userId
-      security: []    # no authentication
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: string
-          required: true
-          description: Integer id of a user to get trips from
+      summary: Returns trips of logged in user
+      security:
+        - cookieAuth: []
       responses:
         '200':
           description: Success
@@ -442,6 +463,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TripMap'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: User doesnt exist
           content:
@@ -484,8 +511,11 @@ components:
   schemas:
     LoginRequest:
       type: object
+      required:  # List the required properties here
+        - email
+        - password
       properties:
-        login:
+        email:
           type: string
         password:
           type: string
@@ -493,36 +523,97 @@ components:
           pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])"
     User:
       type: object
+      required:
+        - id
+        - name
+        - email
+        - birth_date
       properties:
         id:
           type: integer
         name:
           type: string
-        username:
-          description: Уникальный username, потом используем в стиле @{username}
+        email:
+          description: Используем для авторизации
+          type: string
+        birth_date:
+          type: string
+          example: "2017-01-01"
+          format: date
+        about:
+          type: string
+        avatar_url:
+          type: string
+    PatchUserRequest:
+      type: object
+      properties:
+        name:
           type: string
         email:
           description: Используем для авторизации
           type: string
-        location:
+        birth_date:
           type: string
-        web-site:
+          example: "2017-01-01"
+          format: date
+        about:
+          type: string
+    CleanUser:
+      type: object
+      required:
+        - id
+        - name
+        - birth_date
+      properties:
+        id:
+          type: integer
+        name:
           type: string
         about:
           type: string
-        avatarUrl:
+        birth_date:
           type: string
-    SignupRequest:
+          example: "2017-01-01"
+          format: date
+        avatar_url:
+          type: string
+    CleanUserMap:
       type: object
       properties:
-        login:
+        CleanUserMapBody:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CleanUser'
+    SignupRequest:
+      type: object
+      required:  # List the required properties here
+        - name
+        - email
+        - password
+        - birth_date
+      properties:
+        name:
+          type: string
+        email:
           type: string
         password:
           type: string
           minLength: 8
           pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])"
+        birth_date:
+          type: string
+          example: "2017-01-01"
+          format: date
+
     Place:
       type: object
+      required:
+        - id
+        - name
+        - description
+        - rating
+        - cost
+        - adress
       properties:
         id:
           type: integer
@@ -534,14 +625,36 @@ components:
           type: number
         cost:
           type: string
-        imageUrl:
+        adress:
+          type: string
+        phone_number:
+          type: string
+        review_count:
+          type: integer
+        web-site:
+          type: string
+        email:
+          type: string
+        open_hour:
+          type: string
+        close_hour:
+          type: string
+        image_url:
           type: string
     PlaceMap:
       type: object
-      additionalProperties:
-        $ref: '#/components/schemas/Place'
+      properties:
+        placeMapBody:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Place'
     Review:
       type: object
+      required:
+        - id
+        - user_id
+        - place_id
+        - rating
       properties:
         id:
           type: integer
@@ -553,15 +666,24 @@ components:
           type: string
         rating:
           type: integer
+        creation_date:
+            type: string
+            description: RFC3339 Datetime to set
+            format: date-time
+            example: "2021-06-20T01:02:03+00:00"
     ReviewMap:
       type: object
-      additionalProperties:
-        $ref: '#/components/schemas/Review'
+      properties:
+        reviewMapBody:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Review'
     AddReviewRequest:
       type: object
+      required:  # List the required properties here
+        - place_id
+        - rating
       properties:
-        user_id:
-          type: integer
         place_id:
           type: integer
         text:
@@ -569,6 +691,11 @@ components:
         rating:
           type: integer
     Trip:
+      required:
+        - id
+        - user_id
+        - name
+        - publicity
       type: object
       properties:
         id:
@@ -580,44 +707,93 @@ components:
         publicity:
           type: string
           example: public or private
+        description:
+          type: string
         places_in_trip:
-          type: array
-          items:
+          type: object
+          additionalProperties:
             type: object
+            required:
+              - place
+              - first_date
             properties:
               place:
                 $ref: '#/components/schemas/Place'
-              date:
+              first_date:
                 type: string
-              comment:
+                example: "2017-01-01"
+                format: date
+              last_date:
                 type: string
-    AddTripRequest:
+                example: "2017-01-02"
+                format: date
+    PatchTripRequest:
       type: object
       properties:
-        user_id:
-          type: integer
         name:
           type: string
-        isPublic:
-          type: boolean
+        publicity:
+          type: string
           example: public or private
+        description:
+          type: string
         places_in_trip:
-          type: array
-          items:
+          type: object
+          additionalProperties:
             type: object
+            required:  # List the required properties here
+              - place_id
             properties:
-              place:
-                $ref: '#/components/schemas/Place'
-              date:
+              place_id:
+                type: integer
+              first_date:
                 type: string
-              comment:
+                example: "2017-01-01"
+                format: date
+              last_date:
                 type: string
+                example: "2017-01-02"
+                format: date
+    AddTripRequest:
+      type: object
+      required:  # List the required properties here
+        - name
+      properties:
+        name:
+          type: string
+        publicity:
+          type: string
+          example: public or private
+        description:
+          type: string
+        places_in_trip:
+          type: object
+          additionalProperties:
+            type: object
+            required:  # List the required properties here
+              - place_id
+            properties:
+              place_id:
+                type: integer
+              first_date:
+                type: string
+                example: "2017-01-01"
+                format: date
+              last_date:
+                type: string
+                example: "2017-01-02"
+                format: date
     TripMap:
       type: object
-      additionalProperties:
-        $ref: '#/components/schemas/Trip'
+      properties:
+        tripMapBody:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Trip'
     ErrorResponse:
       type: object
+      required:
+        - error
       properties:
         error:
           type: string
@@ -632,8 +808,19 @@ components:
           type: number
         cost:
           type: string
-        imageUrl:
+        image_url:
           type: string
+    ReviewsWithAuthors:
+      type: object
+      properties:
+        reviews:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Review'
+        authors:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CleanUser'
 
 
 
