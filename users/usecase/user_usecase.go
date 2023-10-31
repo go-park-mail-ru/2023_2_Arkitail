@@ -3,7 +3,9 @@ package usecase
 import (
 	"errors"
 	"net/http"
+	"os"
 	"regexp"
+	"strconv"
 	"time"
 
 	"project/users/model"
@@ -23,6 +25,7 @@ type UserUseCase interface {
 	GetUserFromClaims(UserClaim *utils.UserClaim) (*model.User, error)
 	IsValidUser(user *model.User) error
 	GetUserInfoById(id uint) (*model.User, error)
+	UploadAvatar(image []byte, id uint) (string, error)
 }
 
 var (
@@ -199,4 +202,37 @@ func (u *UserUsecase) IsValidUser(user *model.User) error {
 		return err
 	}
 	return nil
+}
+
+func (u *UserUsecase) UploadAvatar(image []byte, id uint) (string, error) {
+	const avatarPath = "../../images/avatars/"
+
+	oldAvatar, err := u.repo.GetUserAvatarUrl(id)
+	if err != nil {
+		return "", err
+	}
+
+	filename := avatarPath + strconv.FormatInt(time.Now().UnixNano(), 10) + ".jpeg"
+	file, err := os.Create(filename)
+	if err != nil {
+		return "", err
+	}
+
+	defer file.Close()
+
+	_, err = file.Write(image)
+	if err != nil {
+		return "", err
+	}
+
+	file.Sync()
+
+	err = u.repo.UpdateUserAvatar(id, filename)
+	if err != nil {
+		os.Remove(filename)
+	} else {
+		os.Remove(oldAvatar)
+	}
+
+	return filename, nil
 }

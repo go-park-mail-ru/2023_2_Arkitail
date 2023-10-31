@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -168,6 +169,34 @@ func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	utils.WriteResponse(w, http.StatusNoContent, nil)
 }
 
+func (h *UserHandler) UploadAvatar(w http.ResponseWriter, r *http.Request) {
+	userClaim := r.Context().Value("userClaim")
+	if userClaim == nil {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(errTokenInvalid.Error()))
+		return
+	}
+
+	image, err := h.ReadImageFromBody(r)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	imageUrl, err := h.usecase.UploadAvatar(image, userClaim.(*usecase.UserClaim).Id)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	body, err := h.CreateImageUrlResponse(imageUrl)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	utils.WriteResponse(w, http.StatusCreated, body)
+}
+
 func (h *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	_, err := r.Cookie("session_id")
 	if err != nil {
@@ -195,4 +224,18 @@ func (h *UserHandler) ParseUserFromJsonBody(user *model.User, r *http.Request) e
 func (h *UserHandler) CreateUserResponse(user *model.User) ([]byte, error) {
 	responseJson, err := json.Marshal(user)
 	return responseJson, err
+}
+
+func (h *UserHandler) CreateImageUrlResponse(imageUrl string) ([]byte, error) {
+	responseJson, err := json.Marshal(imageUrl)
+	return responseJson, err
+}
+
+func (h *UserHandler) ReadImageFromBody(r *http.Request) ([]byte, error) {
+	data, err := io.ReadAll(r.Body)
+	if err != nil {
+		return data, err
+	}
+	defer r.Body.Close()
+	return data, nil
 }
