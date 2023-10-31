@@ -113,8 +113,6 @@ func (r *TripRepository) AddTrip(trip *model.Trip) error {
 	return nil
 }
 
-// Если мне всегда будут кидать все place в trip, то сделать PATCH не так сложно(хотя все еще сложно)
-// Если мне кидают только измененные, то там нужно будет решать задачу календаря...
 // func (r *TripRepository) UpdatePlacesInTrip(tripId uint, places map[string]*model.PlaceInTripRequest) error {
 // 	for _, place := range places {
 // 		err := r.DB.QueryRow(

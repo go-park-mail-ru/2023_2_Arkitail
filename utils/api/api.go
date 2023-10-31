@@ -12,4 +12,7 @@ const (
 	Review       = "/review"
 	PlaceReviews = "/places/{placeId}/reviews"
 	UserReviews  = "/users/{userId}/reviews"
+	Trip         = "/trip"
+	Trips        = "/trips"
+	TripById     = "/trips/{tripId}"
 )

@@ -25,6 +25,10 @@ import (
 	placeRepo "project/places/repo"
 	placeUsecase "project/places/usecase"
 
+	tripHandler "project/trips/handler"
+	tripRepo "project/trips/repo"
+	tripUsecase "project/trips/usecase"
+
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/stdlib"
 )
@@ -97,6 +101,10 @@ func main() {
 	reviewUseCase := reviewUsecase.NewUserUsecase(reviewRepo)
 	reviewHandler := reviewHandler.NewReviewHandler(reviewUseCase)
 
+	tripRepo := tripRepo.NewTripRepository(db)
+	tripUseCase := tripUsecase.NewTripUsecase(tripRepo)
+	tripHandler := tripHandler.NewTripHandler(tripUseCase)
+
 	r := mux.NewRouter()
 
 	apiPath := "/api/v1"
@@ -112,9 +120,11 @@ func main() {
 	r.HandleFunc(apiPath+api.Review, reviewHandler.AddReview).Methods("POST").Name(api.Review)
 	r.HandleFunc(apiPath+api.PlaceReviews, reviewHandler.GetPlaceReviews).Methods("GET").Name(api.PlaceReviews)
 
-	h := router.AddCors(r, []string{"http://localhost:8080/"})
-
 	r.HandleFunc(apiPath+api.Places, placeHandler.GetPlaces).Methods("GET").Name(api.Places)
+
+	r.HandleFunc(apiPath + api.Trip)
+
+	h := router.AddCors(r, []string{"http://localhost:8080/"})
 
 	r.Use(middleware.Auth(userUsecase))
 	r.Use(middleware.AccessLog)
