@@ -39,7 +39,7 @@ func (r *PlaceRepository) AddPlace(place *model.Place) error {
 func (r *PlaceRepository) GetPlaces() (map[string]*model.Place, error) {
 	places := make(map[string]*model.Place)
 	rows, err := r.DB.Query("SELECT id, name, description, cost, image_url, (select avg(rating) from review where review.place_id = place.id) as rating," +
-		"adress, open_time, close_time, COALESCE(web_site, ''), COALESCE(email, ''), COALESCE(phone_number, ''), (select count(id) from review where place.id = place_id) as review_count FROM place")
+		"adress, open_time, close_time, web_site, email, phone_number, (select count(id) from review where place.id = place_id) as review_count FROM place")
 	if err != nil {
 		return nil, err
 	}
