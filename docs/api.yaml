@@ -635,6 +635,10 @@ components:
           type: string
         email:
           type: string
+        open_hour:
+          type: string
+        close_hour:
+          type: string
         imageUrl:
           type: string
     PlaceMap:
