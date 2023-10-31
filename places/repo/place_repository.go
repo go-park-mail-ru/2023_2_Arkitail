@@ -3,7 +3,6 @@ package repo
 import (
 	"database/sql"
 	"fmt"
-	"math"
 
 	"project/places/model"
 )
@@ -38,23 +37,22 @@ func (r *PlaceRepository) AddPlace(place *model.Place) error {
 
 func (r *PlaceRepository) GetPlaces() (map[string]*model.Place, error) {
 	places := make(map[string]*model.Place)
-	rows, err := r.DB.Query("SELECT id, name, description, cost, image_url, (select avg(rating) from review where review.place_id = place.id) as rating," +
-		"adress, open_time, close_time, web_site, email, phone_number, (select count(id) from review where place.id = place_id) as review_count FROM place")
+	rows, err := r.DB.Query(`SELECT id, name, description, cost, image_url,
+		(select avg(rating) from review where review.place_id = place.id) as rating,
+		adress, open_time, close_time, web_site, email, phone_number,
+		(select count(id) from review where place.id = place_id) as review_count FROM place`)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		placeDb := &model.PlaceDb{}
-		rating := sql.NullFloat64{}
 		var reviewCount uint
-		err = rows.Scan(&placeDb.ID, &placeDb.Name, &placeDb.Description, &placeDb.Cost, &placeDb.ImageURL, &rating, &placeDb.Adress, &placeDb.OpenTime, &placeDb.CloseTime, &placeDb.WebSite, &placeDb.Email, &placeDb.PhoneNumber, &reviewCount)
+		err = rows.Scan(&placeDb.ID, &placeDb.Name, &placeDb.Description, &placeDb.Cost,
+			&placeDb.ImageURL, &placeDb.Rating, &placeDb.Adress, &placeDb.OpenTime,
+			&placeDb.CloseTime, &placeDb.WebSite, &placeDb.Email, &placeDb.PhoneNumber, &reviewCount)
 
 		place := model.PlaceDbToPlace(placeDb)
-		if rating.Valid {
-			rating.Float64 = math.Floor(rating.Float64*100) / 100
-			place.Rating = &rating.Float64
-		}
 		place.ReviewCount = reviewCount
 		if err != nil {
 			return nil, err

@@ -62,7 +62,7 @@ func (h *TripHandler) DeleteTripByTripId(w http.ResponseWriter, r *http.Request)
 	}
 
 	tripResponse, err := h.usecase.GetTripReponseById(uint(id))
-	if tripResponse.UserId != userClaim.(*utils.UserClaim).Id {
+	if tripResponse.UserId != strconv.FormatUint(uint64(userClaim.(*utils.UserClaim).Id), 10) {
 		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(utils.ErrTokenInvalid.Error()))
 		return
 	}

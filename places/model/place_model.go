@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"math"
 	"strconv"
 )
 
@@ -21,6 +22,7 @@ type Place struct {
 	ImageURL    string   `json:"image_url,omitempty"`
 }
 
+// Не набирает поля для агрегации(review count)
 type PlaceDb struct {
 	ID          uint
 	Name        string
@@ -33,6 +35,7 @@ type PlaceDb struct {
 	WebSite     sql.NullString
 	Email       sql.NullString
 	PhoneNumber sql.NullString
+	Rating      sql.NullFloat64
 }
 
 func PlaceDbToPlace(placeDb *PlaceDb) *Place {
@@ -45,6 +48,10 @@ func PlaceDbToPlace(placeDb *PlaceDb) *Place {
 	if placeDb.OpenTime.Valid && placeDb.CloseTime.Valid {
 		place.OpenTime = placeDb.OpenTime.String[:5]
 		place.CloseTime = placeDb.CloseTime.String[:5]
+	}
+	if placeDb.Rating.Valid {
+		rating := math.Floor(placeDb.Rating.Float64*100) / 100
+		place.Rating = &rating
 	}
 	return place
 }

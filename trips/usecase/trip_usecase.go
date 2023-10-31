@@ -17,21 +17,13 @@ func NewTripUsecase(repo *repo.TripRepository) *TripUsecase {
 
 // TODO: Patchtrip
 
-func TripFromTripRequest(trip *model.TripRequest) *model.Trip {
-	return &model.Trip{UserId: trip.UserId, Description: trip.Description, Name: trip.Name, Publicity: trip.Publicity}
-}
-
-func TripResponseFromTrip(trip *model.Trip) *model.TripResponse {
-	return &model.TripResponse{UserId: trip.UserId, Description: trip.Description, Name: trip.Name, Publicity: trip.Publicity}
-}
-
 func (u *TripUsecase) DeleteTripById(tripId uint) error {
 	err := u.repo.DeleteTripById(tripId)
 	return err
 }
 
 func (u *TripUsecase) AddTrip(tripRequest *model.TripRequest) (*model.TripResponse, error) {
-	trip := TripFromTripRequest(tripRequest)
+	trip := model.TripFromTripRequest(tripRequest)
 	err := u.repo.AddTrip(trip)
 	if err != nil {
 		return nil, err
@@ -50,7 +42,7 @@ func (u *TripUsecase) AddTrip(tripRequest *model.TripRequest) (*model.TripRespon
 		return nil, err
 	}
 
-	tripResponse := TripResponseFromTrip(trip)
+	tripResponse := model.TripResponseFromTrip(trip)
 	tripResponse.Places = tripResponsePlaces
 	return tripResponse, nil
 }
@@ -66,7 +58,7 @@ func (u *TripUsecase) GetTripReponseById(tripId uint) (*model.TripResponse, erro
 		return nil, err
 	}
 
-	tripResponse := TripResponseFromTrip(trip)
+	tripResponse := model.TripResponseFromTrip(trip)
 	tripResponse.Places = places
 	return tripResponse, err
 }
@@ -84,7 +76,7 @@ func (u *TripUsecase) GetTripsByUserId(userId uint) (map[string]*model.TripRespo
 			return nil, err
 		}
 
-		tripResponse := TripResponseFromTrip(trip)
+		tripResponse := model.TripResponseFromTrip(trip)
 		tripResponse.Places = places
 
 		tripResponses[id] = tripResponse

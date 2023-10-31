@@ -3,7 +3,6 @@ package repo
 import (
 	"database/sql"
 	"fmt"
-	"math"
 	"strconv"
 
 	"project/trips/model"
@@ -67,34 +66,30 @@ func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]*model
 	places := make(map[string]*model.PlaceInTripResponse)
 	rows, err := r.DB.Query(`SELECT place.id, name, description, cost, image_url,
 		(select avg(rating) from review where review.place_id = place.id) as rating,
-		adress, open_time, close_time, COALESCE(web_site, ''),
-		COALESCE(email, ''), COALESCE(phone_number, ''),
+		adress, open_time, close_time, web_site,
+		email, phone_number,
 		(select count(id) from review where place.id = place_id) as review_count,
-		res.first_date, res.last_date
+		res.first_date, res.last_date, res.id
 		FROM place join (select * from trip_to_place where trip_to_place.trip_id = $1) as res on place.id = res.place_id`, tripId)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		rating := sql.NullFloat64{}
-		openTime := sql.NullString{}
-		closeTime := sql.NullString{}
-		place := &model.PlaceInTripResponse{}
-		err = rows.Scan(&place.Place.ID, &place.Place.Name, &place.Place.Description, &place.Place.Cost, &place.Place.ImageURL,
-			&rating, &place.Place.Adress, &openTime, &closeTime, &place.Place.WebSite, &place.Place.Email, &place.Place.PhoneNumber, &place.Place.ReviewCount,
-			&place.FirstDate, &place.LastDate)
+		var reviewCount sql.NullFloat64
+		placeInTripDb := &model.PlaceInTripDb{}
+		err = rows.Scan(&placeInTripDb.Place.ID, &placeInTripDb.Place.Name, &placeInTripDb.Place.Description,
+			&placeInTripDb.Place.Cost, &placeInTripDb.Place.ImageURL, &placeInTripDb.Place.Rating,
+			&placeInTripDb.Place.Adress, &placeInTripDb.Place.OpenTime, &placeInTripDb.Place.CloseTime,
+			&placeInTripDb.Place.WebSite, &placeInTripDb.Place.Email, &placeInTripDb.Place.PhoneNumber,
+			&reviewCount, &placeInTripDb.FirstDate, &placeInTripDb.LastDate, &placeInTripDb.ID)
 
-		rating.Float64 = math.Floor(rating.Float64*100) / 100
-		place.Place.Rating = &rating.Float64
-		if openTime.Valid && closeTime.Valid {
-			place.Place.OpenTime = openTime.String[:5]
-			place.Place.CloseTime = closeTime.String[:5]
-		}
+		placeInTrip := model.PlaceInTripResponseFromDb(placeInTripDb)
+		placeInTrip.Place.Rating = &reviewCount.Float64
 		if err != nil {
 			return nil, err
 		}
-		places[place.Place.ID] = place
+		places[placeInTrip.Place.ID] = placeInTrip
 	}
 	return places, err
 }
