@@ -613,6 +613,7 @@ components:
         - description
         - rating
         - cost
+        - adress
       properties:
         id:
           type: integer
@@ -623,6 +624,16 @@ components:
         rating:
           type: number
         cost:
+          type: string
+        adress:
+          type: string
+        phone_number:
+          type: string
+        review_count:
+          type: integer
+        web-site:
+          type: string
+        email:
           type: string
         imageUrl:
           type: string
