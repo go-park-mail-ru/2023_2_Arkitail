@@ -18,6 +18,12 @@ CREATE TABLE
         description TEXT NOT NULL,
         COST VARCHAR(10) NOT NULL,
         image_url VARCHAR(255),
+        open_time time,
+        close_time time CHECK(open_time is null or close_time > open_time),
+        adress text,
+        web_site varchar(40),
+        email varchar(40),
+        phone_number varchar(30),
         creation_date TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
         last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
     );
