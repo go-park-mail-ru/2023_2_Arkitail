@@ -20,7 +20,7 @@ CREATE TABLE
         image_url VARCHAR(255),
         open_time time,
         close_time time CHECK(open_time is null or close_time > open_time),
-        adress text,
+        adress text not null,
         web_site varchar(40),
         email varchar(40),
         phone_number varchar(30),

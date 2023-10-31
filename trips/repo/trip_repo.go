@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"fmt"
+	"math"
 	"strconv"
 
 	"project/trips/model"
@@ -35,8 +36,10 @@ func (r *TripRepository) GetTripsByUserId(userId uint) (map[string]*model.Trip, 
 	}
 	defer rows.Close()
 	for rows.Next() {
+		description := sql.NullString{}
 		trip := &model.Trip{}
-		err = rows.Scan(&trip.ID, &trip.Description, &trip.Name, &trip.Publicity)
+		err = rows.Scan(&trip.ID, &description, &trip.Name, &trip.Publicity)
+		trip.Description = description.String
 		if err != nil {
 			return nil, err
 		}
@@ -47,9 +50,11 @@ func (r *TripRepository) GetTripsByUserId(userId uint) (map[string]*model.Trip, 
 
 func (r *TripRepository) GetTripById(tripId uint) (*model.Trip, error) {
 	trip := &model.Trip{}
+	description := sql.NullString{}
 	err := r.DB.
 		QueryRow(`SELECT user_id, description, name, is_public from trip where id = $1`, tripId).
-		Scan(&trip.UserId, &trip.Description, &trip.Name, &trip.Publicity)
+		Scan(&trip.UserId, &description, &trip.Name, &trip.Publicity)
+	trip.Description = description.String
 	if err != nil {
 		return nil, err
 	}
@@ -60,14 +65,32 @@ func (r *TripRepository) GetTripById(tripId uint) (*model.Trip, error) {
 
 func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]*model.PlaceInTripResponse, error) {
 	places := make(map[string]*model.PlaceInTripResponse)
-	rows, err := r.DB.Query(`SELECT place.id, name, description, cost, image_url, res.first_date, res.last_date FROM place join (select * from trip_to_place where trip_to_place.trip_id = $1) as res on place.id = res.place_id;`, tripId)
+	rows, err := r.DB.Query(`SELECT place.id, name, description, cost, image_url,
+		(select avg(rating) from review where review.place_id = place.id) as rating,
+		adress, open_time, close_time, COALESCE(web_site, ''),
+		COALESCE(email, ''), COALESCE(phone_number, ''),
+		(select count(id) from review where place.id = place_id) as review_count,
+		res.first_date, res.last_date
+		FROM place join (select * from trip_to_place where trip_to_place.trip_id = $1) as res on place.id = res.place_id`, tripId)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
+		rating := sql.NullFloat64{}
+		openTime := sql.NullString{}
+		closeTime := sql.NullString{}
 		place := &model.PlaceInTripResponse{}
-		err = rows.Scan(&place.Place.ID, &place.Place.Name, &place.Place.Description, &place.Place.Cost, &place.Place.ImageURL, &place.FirstDate, &place.LastDate)
+		err = rows.Scan(&place.Place.ID, &place.Place.Name, &place.Place.Description, &place.Place.Cost, &place.Place.ImageURL,
+			&rating, &place.Place.Adress, &openTime, &closeTime, &place.Place.WebSite, &place.Place.Email, &place.Place.PhoneNumber, &place.Place.ReviewCount,
+			&place.FirstDate, &place.LastDate)
+
+		rating.Float64 = math.Floor(rating.Float64*100) / 100
+		place.Place.Rating = &rating.Float64
+		if openTime.Valid && closeTime.Valid {
+			place.Place.OpenTime = openTime.String[:5]
+			place.Place.CloseTime = closeTime.String[:5]
+		}
 		if err != nil {
 			return nil, err
 		}

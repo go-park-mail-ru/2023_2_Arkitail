@@ -45,22 +45,21 @@ func (r *PlaceRepository) GetPlaces() (map[string]*model.Place, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		place := &model.Place{}
+		placeDb := &model.PlaceDb{}
 		rating := sql.NullFloat64{}
-		openTime := sql.NullString{}
-		closeTime := sql.NullString{}
-		err = rows.Scan(&place.ID, &place.Name, &place.Description, &place.Cost, &place.ImageURL, &rating, &place.Adress, &openTime, &closeTime, &place.WebSite, &place.Email, &place.PhoneNumber, &place.ReviewCount)
+		var reviewCount uint
+		err = rows.Scan(&placeDb.ID, &placeDb.Name, &placeDb.Description, &placeDb.Cost, &placeDb.ImageURL, &rating, &placeDb.Adress, &placeDb.OpenTime, &placeDb.CloseTime, &placeDb.WebSite, &placeDb.Email, &placeDb.PhoneNumber, &reviewCount)
+
+		place := model.PlaceDbToPlace(placeDb)
 		if rating.Valid {
 			rating.Float64 = math.Floor(rating.Float64*100) / 100
 			place.Rating = &rating.Float64
 		}
-		if openTime.Valid && closeTime.Valid {
-			place.OpenTime = openTime.String[:5]
-			place.CloseTime = closeTime.String[:5]
-		}
+		place.ReviewCount = reviewCount
 		if err != nil {
 			return nil, err
 		}
+
 		places[place.ID] = place
 	}
 	if err = rows.Err(); err != nil {
