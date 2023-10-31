@@ -48,7 +48,29 @@ func (h *TripHandler) GetTripByTripId(w http.ResponseWriter, r *http.Request) {
 	h.WriteTripResponse(w, http.StatusOK, tripResponse)
 }
 
-func (h *TripHandler) GetTripByUserId(w http.ResponseWriter, r *http.Request) {
+func (h *TripHandler) DeleteTripByTripId(w http.ResponseWriter, r *http.Request) {
+	userClaim := r.Context().Value("userClaim")
+	if userClaim == nil {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(utils.ErrTokenInvalid.Error()))
+		return
+	}
+
+	id, err := strconv.Atoi(mux.Vars(r)["tripId"])
+	if err != nil || id < 1 {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
+		return
+	}
+
+	err = h.usecase.DeleteTripById(uint(id))
+	if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	utils.WriteResponse(w, http.StatusNoContent, nil)
+}
+
+func (h *TripHandler) GetTripsByUserId(w http.ResponseWriter, r *http.Request) {
 	userClaim := r.Context().Value("userClaim")
 	if userClaim == nil {
 		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(utils.ErrTokenInvalid.Error()))
@@ -62,6 +84,30 @@ func (h *TripHandler) GetTripByUserId(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.WriteTripResponseMap(w, http.StatusOK, tripResponses)
+}
+
+func (h *TripHandler) PostTripsByUserId(w http.ResponseWriter, r *http.Request) {
+	userClaim := r.Context().Value("userClaim")
+	if userClaim == nil {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(utils.ErrTokenInvalid.Error()))
+		return
+	}
+
+	var tripRequest *model.TripRequest
+	err := ParseTripRequestFromBody(tripRequest, r)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	tripRequest.UserId = userClaim.(*utils.UserClaim).Id
+	tripResponse, err := h.usecase.AddTrip(tripRequest)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	h.WriteTripResponse(w, http.StatusCreated, tripResponse)
 }
 
 func ParseTripRequestFromBody(trip *model.TripRequest, r *http.Request) error {
