@@ -11,9 +11,8 @@ import (
 )
 
 var (
-	ErrInvalidJson       = errors.New("Invalid JSON")
-	ErrFailedToAddPlace  = errors.New("Failed to add place")
-	ErrFailedToGetPlaces = errors.New("Failed to get places")
+	ErrInvalidJson      = errors.New("Invalid JSON")
+	ErrFailedToAddPlace = errors.New("Failed to add place")
 )
 
 type PlaceHandler struct {
@@ -43,7 +42,7 @@ func (h *PlaceHandler) CreatePlace(w http.ResponseWriter, r *http.Request) {
 func (h *PlaceHandler) GetPlaces(w http.ResponseWriter, r *http.Request) {
 	places, err := h.usecase.GetPlaces()
 	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(ErrFailedToGetPlaces.Error()))
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 	h.WritePlacesIntoJsonResponse(w, http.StatusOK, places)

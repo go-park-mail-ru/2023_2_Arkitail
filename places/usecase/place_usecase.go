@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"fmt"
+
 	"project/places/model"
 	"project/places/repo"
 )
@@ -24,7 +26,7 @@ func (uc *PlaceUseCase) AddPlace(place *model.Place) error {
 func (uc *PlaceUseCase) GetPlaces() (map[string]*model.Place, error) {
 	places, err := uc.repo.GetPlaces()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting places from database: %v", err)
 	}
 	return places, nil
 }
