@@ -3,6 +3,7 @@ package model
 import (
 	"project/places/model"
 	"strconv"
+	"time"
 
 	"github.com/jackc/pgx/pgtype"
 )
@@ -32,14 +33,14 @@ type TripRequest struct {
 
 type PlaceInTripDb struct {
 	ID        uint
-	Place     *model.PlaceDb
+	Place     model.PlaceDb
 	FirstDate pgtype.Date
 	LastDate  pgtype.Date
 }
 
 type PlaceInTripResponse struct {
 	ID        string `json:"id,omitempty"`
-	Place     *model.Place
+	Place     model.Place
 	FirstDate string `json:"first_date"`
 	LastDate  string `json:"last_date,omitempty"`
 }
@@ -64,9 +65,9 @@ func TripResponseFromTrip(trip *Trip) *TripResponse {
 }
 
 func PlaceInTripResponseFromDb(tripDb *PlaceInTripDb) *PlaceInTripResponse {
-	placeInTrip := &PlaceInTripResponse{Place: model.PlaceDbToPlace(tripDb.Place)}
-	placeInTrip.FirstDate = tripDb.FirstDate.Time.Format("2020-10-08")
-	placeInTrip.LastDate = tripDb.FirstDate.Time.Format("2020-10-08")
+	placeInTrip := &PlaceInTripResponse{Place: *model.PlaceDbToPlace(&tripDb.Place)}
+	placeInTrip.FirstDate = tripDb.FirstDate.Time.Format(time.DateOnly)
+	placeInTrip.LastDate = tripDb.FirstDate.Time.Format(time.DateOnly)
 	placeInTrip.ID = strconv.FormatUint(uint64(tripDb.ID), 10)
 
 	return placeInTrip

@@ -44,6 +44,9 @@ func (r *TripRepository) GetTripsByUserId(userId uint) (map[string]*model.Trip, 
 		}
 		trips[strconv.FormatUint(uint64(trip.ID), 10)] = trip
 	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 	return trips, err
 }
 
@@ -66,11 +69,11 @@ func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]*model
 	places := make(map[string]*model.PlaceInTripResponse)
 	rows, err := r.DB.Query(`SELECT place.id, name, description, cost, image_url,
 		(select avg(rating) from review where review.place_id = place.id) as rating,
-		adress, open_time, close_time, web_site,
-		email, phone_number,
+		adress, open_time, close_time, web_site, email, phone_number,
 		(select count(id) from review where place.id = place_id) as review_count,
 		res.first_date, res.last_date, res.id
-		FROM place join (select * from trip_to_place where trip_to_place.trip_id = $1) as res on place.id = res.place_id`, tripId)
+		FROM place join (select * from trip_to_place where trip_to_place.trip_id = $1) as res
+		on place.id = res.place_id`, tripId)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +92,10 @@ func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]*model
 		if err != nil {
 			return nil, err
 		}
-		places[placeInTrip.Place.ID] = placeInTrip
+		places[placeInTrip.ID] = placeInTrip
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 	return places, err
 }
