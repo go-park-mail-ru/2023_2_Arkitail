@@ -182,7 +182,7 @@ func (h *UserHandler) UploadAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	imageUrl, err := h.usecase.UploadAvatar(image, userClaim.(*usecase.UserClaim).Id)
+	imageUrl, err := h.usecase.UploadAvatar(image, userClaim.(*utils.UserClaim).Id)
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
