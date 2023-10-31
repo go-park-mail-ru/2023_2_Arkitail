@@ -137,35 +137,6 @@ func (r *TripRepository) AddTrip(trip *model.Trip) error {
 	return nil
 }
 
-// func (r *TripRepository) UpdatePlacesInTrip(tripId uint, places map[string]*model.PlaceInTripRequest) error {
-// 	for _, place := range places {
-// 		err := r.DB.QueryRow(
-// 			`IF EXISTS (SELECT id FROM trip_to_place WHERE id = $1)
-// 			BEGIN
-// 				UPDATE trip_to_place
-// 				SET
-// 				WHERE UniqueColumn = 'Something';
-// 			END
-// 			ELSE
-// 			BEGIN
-// 				INSERT INTO Tbl
-// 				SELECT ...
-// 			END`,
-// 			place.PlaceId,
-// 			tripId,
-// 			place.FirstDate,
-// 			place.LastDate,
-// 		).Scan()
-// 		if err == sql.ErrNoRows {
-// 			err = nil
-// 		}
-// 		if err != nil {
-// 			return fmt.Errorf("error adding trip in a database: %v", err)
-// 		}
-// 	}
-// 	return nil
-// }
-
 func (r *TripRepository) UpdateTrip(trip *model.Trip) error {
 	_, err := r.DB.Exec(
 		`UPDATE trip SET "publicity" = $1, "description" = $2 where id = $3`,
