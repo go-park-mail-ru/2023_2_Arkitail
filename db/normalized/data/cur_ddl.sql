@@ -18,6 +18,8 @@ CREATE TABLE
         description TEXT NOT NULL,
         COST VARCHAR(10) NOT NULL,
         image_url VARCHAR(255),
+        open_time time NOT NULL,
+        close_time  time NOT NULL,
         creation_date TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
         last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
     );
