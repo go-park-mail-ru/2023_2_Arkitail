@@ -18,27 +18,26 @@ func NewReviewRepository(db *sql.DB) *ReviewRepository {
 	}
 }
 
-func (r *ReviewRepository) AddReview(review *model.Review) (uint, error) {
-	var insertedId uint
+func (r *ReviewRepository) AddReview(review *model.Review) error {
 	err := r.DB.QueryRow(
 		`INSERT INTO review ("user_id", "place_id", "content", "rating")
-        VALUES ($1, $2, $3, $4) returning id`,
+        VALUES ($1, $2, $3, $4) returning id, DATE_TRUNC('second', creation_date)`,
 		review.UserId,
 		review.PlaceId,
 		review.Content,
 		review.Rating,
-	).Scan(&insertedId)
+	).Scan(&review.ID, &review.CreationDate)
 	if err != nil {
-		return insertedId, fmt.Errorf("error adding place in a database: %v", err)
+		return fmt.Errorf("error adding place in a database: %v", err)
 	}
-	return insertedId, nil
+	return nil
 }
 
 func (r *ReviewRepository) GetReviewById(id uint) (*model.Review, error) {
 	review := &model.Review{}
 	err := r.DB.
-		QueryRow("SELECT id, user_id, place_id, content, rating FROM review where id = $1", id).
-		Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating)
+		QueryRow("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where id = $1", id).
+		Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating, &review.CreationDate)
 	if err == sql.ErrNoRows {
 		err = nil
 	}
@@ -50,14 +49,14 @@ func (r *ReviewRepository) GetReviewById(id uint) (*model.Review, error) {
 
 func (r *ReviewRepository) GetReviewsByUserId(userId uint) (map[string]*model.Review, error) {
 	reviews := make(map[string]*model.Review)
-	rows, err := r.DB.Query("SELECT id, user_id, place_id, content, rating FROM review where user_id = $1", userId)
+	rows, err := r.DB.Query("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where user_id = $1", userId)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		review := &model.Review{}
-		err = rows.Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating)
+		err = rows.Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating, &review.CreationDate)
 		if err != nil {
 			return nil, err
 		}
@@ -68,7 +67,7 @@ func (r *ReviewRepository) GetReviewsByUserId(userId uint) (map[string]*model.Re
 
 func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (map[string]*model.Review, error) {
 	reviews := make(map[string]*model.Review)
-	rows, err := r.DB.Query("SELECT id, user_id, place_id, content, rating FROM review where place_id = $1", placeId)
+	rows, err := r.DB.Query("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where place_id = $1", placeId)
 
 	if err != nil {
 		return nil, err
@@ -76,7 +75,7 @@ func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (map[string]*model.
 	defer rows.Close()
 	for rows.Next() {
 		review := &model.Review{}
-		err = rows.Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating)
+		err = rows.Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating, &review.CreationDate)
 		if err != nil {
 			return nil, err
 		}

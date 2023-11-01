@@ -4,11 +4,17 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"project/users/model"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
+type UserClaim struct {
+	Id uint
+	jwt.RegisteredClaims
+}
+
 func CreateErrorResponse(errorMsg string) []byte {
-	response := model.ErrorResponse{Error: errorMsg}
+	response := ErrorResponse{Error: errorMsg}
 	responseJson, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err)
@@ -25,4 +31,8 @@ func WriteResponse(w http.ResponseWriter, status int, body []byte) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	w.Write(body)
+}
+
+type ErrorResponse struct {
+	Error string `json:"error"`
 }

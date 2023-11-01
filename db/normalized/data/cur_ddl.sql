@@ -3,10 +3,8 @@ CREATE TABLE
         id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         NAME VARCHAR(30) NOT NULL,
         PASSWORD VARCHAR(100) NOT NULL,
-        username VARCHAR(30) UNIQUE NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
-        LOCATION VARCHAR(100),
-        web_site TEXT,
+        birth_date date not null,
         about TEXT,
         avatar_url VARCHAR(255),
         creation_date TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
@@ -19,7 +17,7 @@ CREATE TABLE
         NAME VARCHAR(100) NOT NULL,
         description TEXT NOT NULL,
         COST VARCHAR(10) NOT NULL,
-        image_url VARCHAR(255) NOT NULL,
+        image_url VARCHAR(255),
         creation_date TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
         last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
     );

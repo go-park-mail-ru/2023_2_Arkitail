@@ -94,7 +94,7 @@ func main() {
 	placeHandler := placeHandler.NewPlaceHandler(placeUseCase)
 
 	reviewRepo := reviewRepo.NewReviewRepository(db)
-	reviewUseCase := reviewUsecase.NewUserUsecase(reviewRepo)
+	reviewUseCase := reviewUsecase.NewReviewUsecase(reviewRepo)
 	reviewHandler := reviewHandler.NewReviewHandler(reviewUseCase)
 
 	r := mux.NewRouter()
@@ -105,17 +105,15 @@ func main() {
 	r.HandleFunc(apiPath+api.Signup, userHandler.Signup).Methods("POST").Name(api.Signup)
 	r.HandleFunc(apiPath+api.Logout, userHandler.Logout).Methods("DELETE").Name(api.Logout)
 	r.HandleFunc(apiPath+api.User, userHandler.GetUserInfo).Methods("GET").Name(api.User)
-	r.HandleFunc(apiPath+api.UserById, userHandler.PatchUser).Methods("Patch").Name(api.UserById)
+	r.HandleFunc(apiPath+api.User, userHandler.PatchUser).Methods("Patch").Name(api.User)
+	r.HandleFunc(apiPath+api.UserById, userHandler.GetCleanUser).Methods("GET").Name(api.UserById)
 
-	r.HandleFunc(apiPath+api.ReviewById, reviewHandler.GetReview).Methods("GET").Name(api.ReviewById)
 	r.HandleFunc(apiPath+api.ReviewById, reviewHandler.DeleteReview).Methods("Delete").Name(api.ReviewById)
 	r.HandleFunc(apiPath+api.Review, reviewHandler.AddReview).Methods("POST").Name(api.Review)
 	r.HandleFunc(apiPath+api.PlaceReviews, reviewHandler.GetPlaceReviews).Methods("GET").Name(api.PlaceReviews)
-	r.HandleFunc(apiPath+api.UserReviews, reviewHandler.GetUserReviews).Methods("GET").Name(api.UserReviews)
 
 	h := router.AddCors(r, []string{"http://localhost:8080/"})
 
-	r.HandleFunc(apiPath+api.Places, placeHandler.CreatePlace).Methods("POST").Name(api.Places)
 	r.HandleFunc(apiPath+api.Places, placeHandler.GetPlaces).Methods("GET").Name(api.Places)
 
 	r.Use(middleware.Auth(userUsecase))

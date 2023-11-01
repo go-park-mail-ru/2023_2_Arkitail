@@ -9,6 +9,7 @@ import (
 
 	"project/users/model"
 	"project/users/usecase"
+	"project/utils"
 	"project/utils/api"
 
 	"github.com/gorilla/mux"
@@ -17,9 +18,8 @@ import (
 var (
 	NoAuthNames = map[string]string{
 		api.Places:       http.MethodGet,
-		api.ReviewById:   http.MethodGet,
+		api.UserById:     http.MethodGet,
 		api.PlaceReviews: http.MethodGet,
-		api.UserReviews:  http.MethodGet,
 	}
 	NoSessionNames = map[string]string{
 		api.Login:  http.MethodPost,
@@ -77,7 +77,7 @@ func Auth(ucase usecase.UserUseCase) mux.MiddlewareFunc {
 }
 
 func createErrorResponse(errorMsg string) []byte {
-	response := model.ErrorResponse{Error: errorMsg}
+	response := utils.ErrorResponse{Error: errorMsg}
 	responseJson, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err)
