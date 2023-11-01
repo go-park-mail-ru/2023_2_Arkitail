@@ -65,8 +65,8 @@ func (r *TripRepository) GetTripById(tripId uint) (*model.Trip, error) {
 	return trip, err
 }
 
-func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]*model.PlaceInTripResponse, error) {
-	places := make(map[string]*model.PlaceInTripResponse)
+func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]model.PlaceInTripResponse, error) {
+	places := make(map[string]model.PlaceInTripResponse)
 	rows, err := r.DB.Query(`SELECT place.id, name, description, cost, image_url,
 		(select avg(rating) from review where review.place_id = place.id) as rating,
 		adress, open_time, close_time, web_site, email, phone_number,
@@ -92,7 +92,7 @@ func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]*model
 		if err != nil {
 			return nil, err
 		}
-		places[placeInTrip.ID] = placeInTrip
+		places[placeInTrip.ID] = *placeInTrip
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
@@ -100,15 +100,15 @@ func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]*model
 	return places, err
 }
 
-func (r *TripRepository) AddPlacesToTrip(tripId uint, places map[string]*model.PlaceInTripRequest) error {
+func (r *TripRepository) AddPlacesToTrip(tripId uint, places map[string]model.PlaceInTripRequest) error {
 	for _, place := range places {
 		err := r.DB.QueryRow(
 			`INSERT INTO trip_to_place ("place_id", "trip_id", "first_date", "last_date")
 			VALUES ($1, $2, $3, $4)`,
 			place.PlaceId,
 			tripId,
-			place.FirstDate,
-			place.LastDate,
+			place.FirstDate.Time,
+			place.LastDate.Time,
 		).Scan()
 		if err == sql.ErrNoRows {
 			err = nil
@@ -120,10 +120,15 @@ func (r *TripRepository) AddPlacesToTrip(tripId uint, places map[string]*model.P
 	return nil
 }
 
+// нужно выделить тип специально под бд и с ним работать тут. Также сделать для мест в трипе и в review
 func (r *TripRepository) AddTrip(trip *model.Trip) error {
+	if trip.Publicity == "" {
+		trip.Publicity = "private"
+	}
 	err := r.DB.QueryRow(
-		`INSERT INTO trip ("user_id", "publicity", "description")
-        VALUES ($1, $2, $3) returning id`,
+		`INSERT INTO trip ("name", "user_id", "publicity", "description")
+        VALUES ($1, $2, $3, $4) returning id`,
+		trip.Name,
 		trip.UserId,
 		trip.Publicity,
 		trip.Description,

@@ -35,7 +35,7 @@ CREATE TABLE
         user_id INTEGER NOT NULL REFERENCES "user" ON DELETE CASCADE,
         description text,
         NAME VARCHAR(30) NOT NULL,
-        is_public publicity DEFAULT 'private' NOT NULL,
+        publicity publicity DEFAULT 'private' NOT NULL,
         creation_date TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
         last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
     );
@@ -56,6 +56,6 @@ CREATE TABLE
         id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         place_id INTEGER NOT NULL REFERENCES place (id) ON DELETE CASCADE,
         trip_id INTEGER NOT NULL REFERENCES trip (id) ON DELETE CASCADE,
-        first_date date NOT NULL,
+        first_date date,
         last_date date CHECK(last_date is null or last_date > first_date)
     );

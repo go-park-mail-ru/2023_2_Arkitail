@@ -18,17 +18,17 @@ type Trip struct {
 
 type PlaceInTripRequest struct {
 	PlaceId   uint        `json:"place_id"`
-	FirstDate pgtype.Date `json:"first_date"`
+	FirstDate pgtype.Date `json:"first_date,omitempty"`
 	LastDate  pgtype.Date `json:"last_date,omitempty"`
 }
 
 type TripRequest struct {
-	ID          uint                           `json:"id"`
-	UserId      uint                           `json:"user_id"`
-	Description string                         `json:"description,omitempty"`
-	Name        string                         `json:"name"`
-	Publicity   string                         `json:"publicity"`
-	Places      map[string]*PlaceInTripRequest `json:"places_in_trip"`
+	ID          uint                          `json:"id"`
+	UserId      uint                          `json:"user_id"`
+	Description string                        `json:"description,omitempty"`
+	Name        string                        `json:"name"`
+	Publicity   string                        `json:"publicity"`
+	Places      map[string]PlaceInTripRequest `json:"places_in_trip"`
 }
 
 type PlaceInTripDb struct {
@@ -46,12 +46,12 @@ type PlaceInTripResponse struct {
 }
 
 type TripResponse struct {
-	ID          string                          `json:"id,omitempty"`
-	UserId      string                          `json:"user_id,omitempty"`
-	Description string                          `json:"description,omitempty"`
-	Name        string                          `json:"name,omitempty"`
-	Publicity   string                          `json:"publicity,omitempty"`
-	Places      map[string]*PlaceInTripResponse `json:"places_in_trip,omitempty"`
+	ID          string                         `json:"id,omitempty"`
+	UserId      string                         `json:"user_id,omitempty"`
+	Description string                         `json:"description,omitempty"`
+	Name        string                         `json:"name,omitempty"`
+	Publicity   string                         `json:"publicity,omitempty"`
+	Places      map[string]PlaceInTripResponse `json:"places_in_trip,omitempty"`
 }
 
 func TripFromTripRequest(trip *TripRequest) *Trip {

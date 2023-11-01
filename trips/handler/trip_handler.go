@@ -103,15 +103,15 @@ func (h *TripHandler) PostTripsByUserId(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var tripRequest *model.TripRequest
-	err := ParseTripRequestFromBody(tripRequest, r)
+	var tripRequest model.TripRequest
+	err := ParseTripRequestFromBody(&tripRequest, r)
 	if err != nil {
 		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	tripRequest.UserId = userClaim.(*utils.UserClaim).Id
-	tripResponse, err := h.usecase.AddTrip(tripRequest)
+	tripResponse, err := h.usecase.AddTrip(&tripRequest)
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
