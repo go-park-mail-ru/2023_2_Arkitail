@@ -104,7 +104,7 @@ func (r *UserRepository) AddUser(user *model.User) error {
 
 	err = r.DB.QueryRow(
 		`INSERT INTO "user" ("name", "password", "email", "birth_date", "about")
-        VALUES ($1, $2, $3, $4, $5, $6)`,
+        VALUES ($1, $2, $3, $4, $5)`,
 		user.Name,
 		user.Password,
 		user.Email,
