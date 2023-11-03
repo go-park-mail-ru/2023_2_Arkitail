@@ -94,7 +94,7 @@ func main() {
 	placeHandler := placeHandler.NewPlaceHandler(placeUseCase)
 
 	reviewRepo := reviewRepo.NewReviewRepository(db)
-	reviewUseCase := reviewUsecase.NewUserUsecase(reviewRepo)
+	reviewUseCase := reviewUsecase.NewReviewUsecase(reviewRepo)
 	reviewHandler := reviewHandler.NewReviewHandler(reviewUseCase)
 
 	r := mux.NewRouter()
