@@ -36,7 +36,6 @@ func (r *PlaceRepository) AddPlace(place *model.Place) error {
 	return nil
 }
 
-// TODO: протестировать при нулевых значениях времени
 func (r *PlaceRepository) GetPlaces() (map[string]*model.Place, error) {
 	places := make(map[string]*model.Place)
 	rows, err := r.DB.Query("SELECT id, name, description, cost, image_url, (select avg(rating) from review where review.place_id = place.id) as rating," +
