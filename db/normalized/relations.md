@@ -1,29 +1,43 @@
 #Relation Users:
-{id, name, username, email} -> location, webSite, about, avatarUrl, creationDate, lastUpdated
+
+{id} -> name, password, location, web_site, about, avatar_url, creation_date, last_updated
+{username} -> name, password, location, web_site, about, avatar_url, creation_date, last_updated
+{email} -> name, password, location, web_site, about, avatar_url, creation_date, last_updated
 
 Таблица с пользователями.
 
 #Relation Reviews:
-{id} -> userId, placeId, text, rating, creationDate, lastUpdated
+
+{id} -> user_id, place_id, content, rating, creation_date, last_updated
 
 Таблица с отзывами.
 
-#Relation Places:
-{id} -> name, description, cost, imageUrl, creationDate, lastUpdated
+#Relation Place:
+
+{id} -> name, description, cost, creation_date, last_updated
 
 Таблица с достопримечательностями.
 
-#Relation Trips:
-{id} -> userId, name, isPublic, creationDate, lastUpdated
+#Relation Trip:
+
+{id} -> user_id, name, is_public, creation_date, last_updated
 
 Таблица с поездками.
 
-#Relation Trips_to_places:
-{id} -> placeId, tripId
+#Relation Trip_to_place:
 
-Таблица для отношения многие ко многим между поездками и достопримечательностями.
+{place_id, trip_id} -> visit_date
+
+Таблица для отношения многие ко многим между поездками и достопримечательностями + дата посещения места в поездке.
+
+#Relation place_photo
+
+{id} -> place_id, image_url, creation_date, last_updated
+
+Таблица с фотографиями мест
 
 #Нормальные формы
+
 - 1ая нормальная форма:
 Каждая таблица содержит только 1 значение для каждого атрибута из кортежа.
 
@@ -37,4 +51,5 @@
 Все функциональные зависимости имеют в качестве детерминанты потенциальные ключи.
 
 #ERD
-[Ссылка на mermaid](https://www.mermaidchart.com/raw/59050c22-2cb9-4145-aba7-8a0d3e338bcc?version=v0.1&theme=light&format=svg)
+
+![Alt text](image.png)
