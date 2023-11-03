@@ -10,6 +10,7 @@ import (
 
 	"project/users/model"
 	"project/users/repo"
+	"project/utils"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -20,8 +21,8 @@ type UserUseCase interface {
 	CheckAuth(tokenString string) error
 	Signup(user *model.User) error
 	Logout() error
-	ValidateToken(tokenString string) (*UserClaim, error)
-	GetUserFromClaims(userClaim *UserClaim) (*model.User, error)
+	ValidateToken(tokenString string) (*utils.UserClaim, error)
+	GetUserFromClaims(UserClaim *utils.UserClaim) (*model.User, error)
 	IsValidUser(user *model.User) error
 	GetUserInfoById(id uint) (*model.User, error)
 	UploadAvatar(image []byte, id uint) (string, error)
@@ -34,11 +35,6 @@ var (
 	ErrInvalidPasswordSymbols = errors.New("password should contain letters, digits, and special characters")
 	ErrInvalidEmail           = errors.New("email should contain @ and letters, digits, or special characters")
 )
-
-type UserClaim struct {
-	Id uint
-	jwt.RegisteredClaims
-}
 
 type AuthConfig struct {
 	Secret []byte
@@ -76,7 +72,7 @@ func (u *UserUsecase) UpdateUser(user *model.User) error {
 }
 
 func (u *UserUsecase) CreateSessionCookie(user *model.User) (*http.Cookie, error) {
-	claim := UserClaim{
+	claim := utils.UserClaim{
 		Id: user.ID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
@@ -162,7 +158,7 @@ func (u *UserUsecase) Logout() error {
 	return nil
 }
 
-func (u *UserUsecase) GetUserFromClaims(userClaim *UserClaim) (*model.User, error) {
+func (u *UserUsecase) GetUserFromClaims(userClaim *utils.UserClaim) (*model.User, error) {
 	user, err := u.repo.GetUserById(userClaim.Id)
 	if err != nil {
 		return nil, err
@@ -170,8 +166,8 @@ func (u *UserUsecase) GetUserFromClaims(userClaim *UserClaim) (*model.User, erro
 	return user, err
 }
 
-func (u *UserUsecase) ValidateToken(tokenString string) (*UserClaim, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &UserClaim{},
+func (u *UserUsecase) ValidateToken(tokenString string) (*utils.UserClaim, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &utils.UserClaim{},
 		func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, ErrInvalidToken
@@ -183,7 +179,7 @@ func (u *UserUsecase) ValidateToken(tokenString string) (*UserClaim, error) {
 		return nil, err
 	}
 
-	if claims, ok := token.Claims.(*UserClaim); ok && token.Valid {
+	if claims, ok := token.Claims.(*utils.UserClaim); ok && token.Valid {
 		return claims, nil
 	}
 	return nil, ErrInvalidToken

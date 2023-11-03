@@ -6,5 +6,5 @@ type Place struct {
 	Description string  `json:"description,omitempty"`
 	Rating      float64 `json:"rating"`
 	Cost        string  `json:"cost,omitempty"`
-	ImageURL    string  `json:"imageUrl,omitempty"`
+	ImageURL    string  `json:"image_url,omitempty"`
 }

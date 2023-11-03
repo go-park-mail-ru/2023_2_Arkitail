@@ -34,7 +34,7 @@ func (h *ReviewHandler) AddReview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	review := &model.Review{}
+	review := &model.Review{UserId: userClaim.(*utils.UserClaim).Id}
 	err := h.ParseReviewFromBody(review, r)
 	if err != nil {
 		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
@@ -65,6 +65,16 @@ func (h *ReviewHandler) DeleteReview(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["reviewId"])
 	if err != nil || id < 1 {
 		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
+		return
+	}
+
+	review, err := h.usecase.GetReviewById(uint(id))
+	if err != nil || id < 1 {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
+		return
+	}
+	if review.ID != userClaim.(*utils.UserClaim).Id {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
 

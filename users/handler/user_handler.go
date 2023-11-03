@@ -35,7 +35,7 @@ func (h *UserHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.usecase.GetUserFromClaims(userClaim.(*usecase.UserClaim))
+	user, err := h.usecase.GetUserFromClaims(userClaim.(*utils.UserClaim))
 	if err != nil {
 		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
 		return
@@ -79,7 +79,7 @@ func (h *UserHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.usecase.GetUserFromClaims(userClaim.(*usecase.UserClaim))
+	user, err := h.usecase.GetUserFromClaims(userClaim.(*utils.UserClaim))
 	if err != nil {
 		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
 		return
@@ -182,7 +182,7 @@ func (h *UserHandler) UploadAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	imageUrl, err := h.usecase.UploadAvatar(image, userClaim.(*usecase.UserClaim).Id)
+	imageUrl, err := h.usecase.UploadAvatar(image, userClaim.(*utils.UserClaim).Id)
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
