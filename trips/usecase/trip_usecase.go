@@ -124,3 +124,15 @@ func (u *TripUsecase) CheckAuthOfPlaceInTrip(userId uint, placeInTripId uint) (b
 	}
 	return true, nil
 }
+
+func (u *TripUsecase) CheckAuthOfTrip(userId uint, tripId uint) (bool, error) {
+	ownerId, err := u.repo.GetUserIdOfTrip(tripId)
+	if err != nil {
+		return false, err
+	}
+
+	if ownerId != userId {
+		return false, nil
+	}
+	return true, nil
+}

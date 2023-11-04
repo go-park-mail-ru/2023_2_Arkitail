@@ -198,3 +198,12 @@ func (r *TripRepository) GetUserIdOfPlaceInTrip(placeInTripId uint) (uint, error
 	)
 	return userId, err
 }
+
+func (r *TripRepository) GetUserIdOfTrip(tripId uint) (uint, error) {
+	var userId uint
+	_, err := r.DB.Exec(
+		`SELECT user_id from trip where id = $1`,
+		&tripId,
+	)
+	return userId, err
+}

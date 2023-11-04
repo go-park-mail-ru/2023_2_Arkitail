@@ -55,23 +55,24 @@ func (h *TripHandler) DeleteTripByTripId(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	id, err := strconv.Atoi(mux.Vars(r)["tripId"])
-	if err != nil || id < 1 {
+	tripId, err := strconv.Atoi(mux.Vars(r)["tripId"])
+	if err != nil || tripId < 1 {
 		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
 		return
 	}
 
-	tripResponse, err := h.usecase.GetTripReponseById(uint(id))
+	userId := userClaim.(*utils.UserClaim).Id
+	authorized, err := h.usecase.CheckAuthOfTrip(userId, uint(tripId))
 	if err != nil {
-		utils.WriteResponse(w, http.StatusNoContent, nil)
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
 		return
 	}
-	if tripResponse.UserId != strconv.FormatUint(uint64(userClaim.(*utils.UserClaim).Id), 10) {
-		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(utils.ErrTokenInvalid.Error()))
+	if !authorized {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
-	err = h.usecase.DeleteTripById(uint(id))
+	err = h.usecase.DeleteTripById(uint(tripId))
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
@@ -127,8 +128,8 @@ func (h *TripHandler) PatchTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := strconv.Atoi(mux.Vars(r)["placeInTripId"])
-	if err != nil || id < 1 {
+	placeInTripId, err := strconv.Atoi(mux.Vars(r)["placeInTripId"])
+	if err != nil || placeInTripId < 1 {
 		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
 		return
 	}
@@ -140,8 +141,18 @@ func (h *TripHandler) PatchTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tripRequest.ID = uint(id)
+	tripRequest.ID = uint(placeInTripId)
 	tripRequest.UserId = userClaim.(*utils.UserClaim).Id
+	authorized, err := h.usecase.CheckAuthOfTrip(tripRequest.UserId, tripRequest.ID)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+	if !authorized {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
 	tripResponse, err := h.usecase.PatchTrip(&tripRequest)
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
