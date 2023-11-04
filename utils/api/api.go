@@ -17,5 +17,5 @@ const (
 	Trips           = "/trips"
 	TripById        = "/trips/{tripId}"
 	PlaceInTrip     = "/trips/{tripId}/place"
-	PlaceInTripById = "/trips/places/{placeInTripid}"
+	PlaceInTripById = "/trips/places/{placeInTripId}"
 )

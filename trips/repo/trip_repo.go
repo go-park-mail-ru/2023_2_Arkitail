@@ -194,7 +194,7 @@ func (r *TripRepository) GetUserIdOfPlaceInTrip(placeInTripId uint) (uint, error
 	err := r.DB.QueryRow(
 		`SELECT user_id from trip join (select trip_id from trip_to_place where id = $1) as res
 		on res.trip_id = trip.id`,
-		&userId,
+		&placeInTripId,
 	).Scan(&userId)
 	return userId, err
 }
@@ -207,4 +207,14 @@ func (r *TripRepository) GetUserIdOfTrip(tripId uint) (uint, error) {
 	).Scan(&userId)
 
 	return userId, err
+}
+
+func (r *TripRepository) GetPlaceInTripById(placeInTripId uint) (*model.PlaceInTripRequest, error) {
+	var placeInTrip model.PlaceInTripRequest
+	err := r.DB.QueryRow(
+		`SELECT first_date, last_date from trip_to_place where id = $1`,
+		&placeInTripId,
+	).Scan(&placeInTrip.FirstDate, &placeInTrip.LastDate)
+	placeInTrip.ID = placeInTripId
+	return &placeInTrip, err
 }

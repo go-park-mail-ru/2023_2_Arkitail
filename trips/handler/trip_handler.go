@@ -174,13 +174,6 @@ func (h *TripHandler) PatchPlaceInTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var placeInTripRequest model.PlaceInTripRequest
-	err = ParsePlaceInTripRequestFromBody(&placeInTripRequest, r)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
 	placeInTripId := uint(id)
 	userId := userClaim.(*utils.UserClaim).Id
 	authorized, err := h.usecase.CheckAuthOfPlaceInTrip(userId, placeInTripId)
@@ -193,12 +186,24 @@ func (h *TripHandler) PatchPlaceInTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.usecase.PatchPlaceInTrip(&placeInTripRequest)
+	placeInTripRequest, err := h.usecase.GetPlaceInTripById(placeInTripId)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	err = ParsePlaceInTripRequestFromBody(placeInTripRequest, r)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	err = h.usecase.PatchPlaceInTrip(placeInTripRequest)
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
 	}
-	h.WritePlaceInTrip(w, http.StatusOK, &placeInTripRequest)
+	h.WritePlaceInTrip(w, http.StatusOK, placeInTripRequest)
 }
 
 func (h *TripHandler) AddPlaceInTrip(w http.ResponseWriter, r *http.Request) {

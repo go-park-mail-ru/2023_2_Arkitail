@@ -24,7 +24,7 @@ func (v *JsonDate) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	if x != nil {
+	if x != nil && *x != "" {
 		v.Time, err = time.Parse("2006-01-02", *x)
 		if err != nil {
 			return err

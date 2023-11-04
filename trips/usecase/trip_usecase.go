@@ -136,3 +136,11 @@ func (u *TripUsecase) CheckAuthOfTrip(userId uint, tripId uint) (bool, error) {
 	}
 	return true, nil
 }
+
+func (u *TripUsecase) GetPlaceInTripById(placeInTripId uint) (*model.PlaceInTripRequest, error) {
+	placeInTripRequest, err := u.repo.GetPlaceInTripById(placeInTripId)
+	if err != nil {
+		return nil, err
+	}
+	return placeInTripRequest, nil
+}
