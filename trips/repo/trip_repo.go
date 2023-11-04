@@ -26,9 +26,9 @@ func (r *TripRepository) DeleteTripById(tripId uint) error {
 	return err
 }
 
-func (r *TripRepository) DeleteTripToPlaceById(tripToPlaceId uint) error {
+func (r *TripRepository) DeletePlaceInTripById(placeInTripId uint) error {
 	err := r.DB.
-		QueryRow("DELETE from trip_to_place where id = $1", tripToPlaceId).
+		QueryRow("DELETE from trip_to_place where id = $1", placeInTripId).
 		Scan()
 	if err == sql.ErrNoRows {
 		err = nil
@@ -187,4 +187,14 @@ func (r *TripRepository) UpdatePlaceInTrip(placeInTrip *model.PlaceInTripRequest
 		placeInTrip.ID,
 	)
 	return err
+}
+
+func (r *TripRepository) GetUserIdOfPlaceInTrip(placeInTripId uint) (uint, error) {
+	var userId uint
+	_, err := r.DB.Exec(
+		`SELECT user_id from trip join (select trip_id from trip_to_place where id = $1) as res
+		on res.trip_id = trip.id`,
+		&userId,
+	)
+	return userId, err
 }

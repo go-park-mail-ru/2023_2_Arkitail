@@ -127,7 +127,7 @@ func (h *TripHandler) PatchTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := strconv.Atoi(mux.Vars(r)["tripId"])
+	id, err := strconv.Atoi(mux.Vars(r)["placeInTripId"])
 	if err != nil || id < 1 {
 		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
 		return
@@ -150,12 +150,66 @@ func (h *TripHandler) PatchTrip(w http.ResponseWriter, r *http.Request) {
 	h.WriteTripResponse(w, http.StatusOK, tripResponse)
 }
 
+func (h *TripHandler) PatchPlaceInTrip(w http.ResponseWriter, r *http.Request) {
+	userClaim := r.Context().Value("userClaim")
+	if userClaim == nil {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(utils.ErrTokenInvalid.Error()))
+		return
+	}
+
+	id, err := strconv.Atoi(mux.Vars(r)["placeInTripId"])
+	if err != nil || id < 1 {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
+		return
+	}
+
+	var placeInTripRequest model.PlaceInTripRequest
+	err = ParsePlaceInTripRequestFromBody(&placeInTripRequest, r)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	placeInTripId := uint(id)
+	userId := userClaim.(*utils.UserClaim).Id
+	authorized, err := h.usecase.CheckAuthOfPlaceInTrip(userId, placeInTripId)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+	if !authorized {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	err = h.usecase.PatchPlaceInTrip(&placeInTripRequest)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+	h.WritePlaceInTrip(w, http.StatusOK, &placeInTripRequest)
+}
+
 func ParseTripRequestFromBody(trip *model.TripRequest, r *http.Request) error {
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(trip); err != nil {
 		return errInvalidTripRequest
 	}
 	return nil
+}
+
+func ParsePlaceInTripRequestFromBody(trip *model.PlaceInTripRequest, r *http.Request) error {
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(trip); err != nil {
+		return errInvalidTripRequest
+	}
+	return nil
+}
+
+func (h *TripHandler) WritePlaceInTrip(w http.ResponseWriter, status int, placeInTrip *model.PlaceInTripRequest) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(placeInTrip)
 }
 
 func (h *TripHandler) WriteTripResponse(w http.ResponseWriter, status int, tripResponse *model.TripResponse) {

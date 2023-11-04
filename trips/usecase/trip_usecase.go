@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"errors"
+
 	"project/trips/model"
 	"project/trips/repo"
 )
@@ -8,6 +10,10 @@ import (
 type TripUsecase struct {
 	repo *repo.TripRepository
 }
+
+var (
+	errCantChangePlaceInTrip = errors.New("not authorized to change a trip")
+)
 
 func NewTripUsecase(repo *repo.TripRepository) *TripUsecase {
 	return &TripUsecase{
@@ -90,4 +96,31 @@ func (u *TripUsecase) GetTripsByUserId(userId uint) (map[string]*model.TripRespo
 		tripResponses[id] = tripResponse
 	}
 	return tripResponses, err
+}
+
+func (u *TripUsecase) PatchPlaceInTrip(placeInTrip *model.PlaceInTripRequest) error {
+	err := u.repo.UpdatePlaceInTrip(placeInTrip)
+	return err
+}
+
+func (u *TripUsecase) DeletePlaceInTripById(placeInTripId uint) error {
+	err := u.repo.DeletePlaceInTripById(placeInTripId)
+	return err
+}
+
+func (u *TripUsecase) AddPlaceInTripById(tripId uint, placeInTrip *model.PlaceInTripRequest) error {
+	err := u.repo.AddPlaceToTrip(tripId, placeInTrip)
+	return err
+}
+
+func (u *TripUsecase) CheckAuthOfPlaceInTrip(userId uint, placeInTripId uint) (bool, error) {
+	ownerId, err := u.repo.GetUserIdOfPlaceInTrip(placeInTripId)
+	if err != nil {
+		return false, err
+	}
+
+	if ownerId != userId {
+		return false, nil
+	}
+	return true, nil
 }
