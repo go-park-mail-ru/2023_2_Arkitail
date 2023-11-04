@@ -12,7 +12,7 @@ type JsonDate struct {
 
 func (v JsonDate) MarshalJSON() ([]byte, error) {
 	if v.Valid {
-		return json.Marshal(v.Time)
+		return json.Marshal(v.Time.Format("2006-01-02"))
 	} else {
 		return json.Marshal("")
 	}
