@@ -128,6 +128,9 @@ func main() {
 	r.HandleFunc(apiPath+api.TripById, tripHandler.GetTripByTripId).Methods("Get").Name(api.TripById)
 	r.HandleFunc(apiPath+api.TripById, tripHandler.DeleteTripByTripId).Methods("Delete").Name(api.TripById)
 	r.HandleFunc(apiPath+api.TripById, tripHandler.PatchTrip).Methods("Patch").Name(api.TripById)
+	r.HandleFunc(apiPath+api.PlaceInTrip, tripHandler.AddPlaceInTrip).Methods("Post").Name(api.PlaceInTrip)
+	r.HandleFunc(apiPath+api.PlaceInTripById, tripHandler.PatchPlaceInTrip).Methods("Patch").Name(api.PlaceInTripById)
+	r.HandleFunc(apiPath+api.PlaceInTripById, tripHandler.DeletePlaceInTrip).Methods("Delete").Name(api.PlaceInTripById)
 
 	h := router.AddCors(r, []string{"http://localhost:8080/"})
 
