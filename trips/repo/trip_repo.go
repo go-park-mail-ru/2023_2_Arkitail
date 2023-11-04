@@ -26,6 +26,16 @@ func (r *TripRepository) DeleteTripById(tripId uint) error {
 	return err
 }
 
+func (r *TripRepository) DeleteTripToPlaceById(tripToPlaceId uint) error {
+	err := r.DB.
+		QueryRow("DELETE from trip_to_place where id = $1", tripToPlaceId).
+		Scan()
+	if err == sql.ErrNoRows {
+		err = nil
+	}
+	return err
+}
+
 func (r *TripRepository) GetTripsByUserId(userId uint) (map[string]*model.Trip, error) {
 	trips := map[string]*model.Trip{}
 	rows, err := r.DB.
@@ -104,18 +114,36 @@ func (r *TripRepository) AddPlacesToTrip(tripId uint, places map[string]model.Pl
 	for _, place := range places {
 		err := r.DB.QueryRow(
 			`INSERT INTO trip_to_place ("place_id", "trip_id", "first_date", "last_date")
-			VALUES ($1, $2, $3, $4)`,
+			VALUES ($1, $2, $3, $4) returning trip_to_place.id`,
 			place.PlaceId,
 			tripId,
 			place.FirstDate,
 			place.LastDate,
-		).Scan()
+		).Scan(&place.ID)
 		if err == sql.ErrNoRows {
 			err = nil
 		}
 		if err != nil {
 			return fmt.Errorf("error adding trip in a database: %v", err)
 		}
+	}
+	return nil
+}
+
+func (r *TripRepository) AddPlaceToTrip(tripId uint, place *model.PlaceInTripRequest) error {
+	err := r.DB.QueryRow(
+		`INSERT INTO trip_to_place ("place_id", "trip_id", "first_date", "last_date")
+		VALUES ($1, $2, $3, $4) returning trip_to_place.id`,
+		place.PlaceId,
+		tripId,
+		place.FirstDate,
+		place.LastDate,
+	).Scan(&place.ID)
+	if err == sql.ErrNoRows {
+		err = nil
+	}
+	if err != nil {
+		return fmt.Errorf("error adding trip in a database: %v", err)
 	}
 	return nil
 }
@@ -147,6 +175,16 @@ func (r *TripRepository) UpdateTrip(trip *model.Trip) error {
 		tripBd.Description,
 		tripBd.Name,
 		tripBd.ID,
+	)
+	return err
+}
+
+func (r *TripRepository) UpdatePlaceInTrip(placeInTrip *model.PlaceInTripRequest) error {
+	_, err := r.DB.Exec(
+		`UPDATE trip_to_place SET "first_date" = $1, "last_date" = $2 where id = $3`,
+		placeInTrip.FirstDate,
+		placeInTrip.LastDate,
+		placeInTrip.ID,
 	)
 	return err
 }

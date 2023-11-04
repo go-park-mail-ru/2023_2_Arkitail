@@ -27,6 +27,7 @@ type Trip struct {
 }
 
 type PlaceInTripRequest struct {
+	ID        uint           `json:"id"`
 	PlaceId   uint           `json:"place_id"`
 	FirstDate utils.JsonDate `json:"first_date,omitempty"`
 	LastDate  utils.JsonDate `json:"last_date,omitempty"`
