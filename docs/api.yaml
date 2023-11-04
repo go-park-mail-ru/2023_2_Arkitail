@@ -505,6 +505,98 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/trips/{tripId}/place:
+    post:
+      summary: Post a place in trip with {id} = {tripId}
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: tripId
+          schema:
+            type: integer
+          required: true
+          description: Numeric id of the trip to add place into
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaceInTrip'
+      responses:
+        '204':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '400':
+          description: Contents of request are wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/trips/places/{placeInTripId}:
+    patch:
+      summary: change a place in trip with {id} = {placeInTripId}
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: placeInTripId
+          schema:
+            type: integer
+          required: true
+          description: Numeric id of the place in trip to patch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchPlaceInTripRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceInTrip'
+        '401':
+          description: Trip is private and you dont have the rights to change it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Couldnt find a place in trip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: change a place in trip with {id} = {placeInTripId}
+      security:
+        - cookieAuth: []
+      parameters:
+      - in: path
+        name: placeInTripId
+        schema:
+          type: integer
+        required: true
+        description: Numeric id of the place in trip to delete
+      responses:
+        '204':
+          description: Success
+        '401':
+          description: Unauthorized
+        '404':
+          description: Couldnt find a place in trip
 
 
 components:
@@ -604,7 +696,6 @@ components:
           type: string
           example: "2017-01-01"
           format: date
-
     Place:
       type: object
       required:
@@ -737,23 +828,50 @@ components:
           example: public or private
         description:
           type: string
-        places_in_trip:
-          type: object
-          additionalProperties:
-            type: object
-            required:  # List the required properties here
-              - place_id
-            properties:
-              place_id:
-                type: integer
-              first_date:
-                type: string
-                example: "2017-01-01"
-                format: date
-              last_date:
-                type: string
-                example: "2017-01-02"
-                format: date
+    PatchPlaceInTripRequest:
+      type: object
+      properties:
+        first_date:
+          type: string
+          example: "2017-01-01"
+          format: date
+        last_date:
+          type: string
+          example: "2017-01-02"
+          format: date
+    AddPlaceInTripRequest:
+      type: object
+      required:
+        - place_id
+      properties:
+        place_id:
+          type: integer
+        first_date:
+          type: string
+          example: "2017-01-01"
+          format: date
+        last_date:
+          type: string
+          example: "2017-01-02"
+          format: date
+    PlaceInTrip:
+      type: object
+      required:
+        - place_id
+        - id
+      properties:
+        id:
+          type: integer
+        place_id:
+          type: integer
+        first_date:
+          type: string
+          example: "2017-01-01"
+          format: date
+        last_date:
+          type: string
+          example: "2017-01-02"
+          format: date
     AddTripRequest:
       type: object
       required:  # List the required properties here
@@ -772,7 +890,10 @@ components:
             type: object
             required:  # List the required properties here
               - place_id
+              - id
             properties:
+              id:
+                type: integer
               place_id:
                 type: integer
               first_date:
