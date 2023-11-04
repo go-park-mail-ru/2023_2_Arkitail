@@ -191,19 +191,20 @@ func (r *TripRepository) UpdatePlaceInTrip(placeInTrip *model.PlaceInTripRequest
 
 func (r *TripRepository) GetUserIdOfPlaceInTrip(placeInTripId uint) (uint, error) {
 	var userId uint
-	_, err := r.DB.Exec(
+	err := r.DB.QueryRow(
 		`SELECT user_id from trip join (select trip_id from trip_to_place where id = $1) as res
 		on res.trip_id = trip.id`,
 		&userId,
-	)
+	).Scan(&userId)
 	return userId, err
 }
 
 func (r *TripRepository) GetUserIdOfTrip(tripId uint) (uint, error) {
 	var userId uint
-	_, err := r.DB.Exec(
+	err := r.DB.QueryRow(
 		`SELECT user_id from trip where id = $1`,
 		&tripId,
-	)
+	).Scan(&userId)
+
 	return userId, err
 }

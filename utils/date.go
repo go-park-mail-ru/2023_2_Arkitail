@@ -14,7 +14,7 @@ func (v JsonDate) MarshalJSON() ([]byte, error) {
 	if v.Valid {
 		return json.Marshal(v.Time)
 	} else {
-		return json.Marshal(nil)
+		return json.Marshal("")
 	}
 }
 

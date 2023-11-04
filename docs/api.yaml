@@ -522,14 +522,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PlaceInTrip'
+              $ref: '#/components/schemas/AddPlaceInTripRequest'
       responses:
         '204':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Trip'
+                $ref: '#/components/schemas/PlaceInTrip'
         '400':
           description: Contents of request are wrong
           content:
