@@ -201,6 +201,78 @@ func (h *TripHandler) PatchPlaceInTrip(w http.ResponseWriter, r *http.Request) {
 	h.WritePlaceInTrip(w, http.StatusOK, &placeInTripRequest)
 }
 
+func (h *TripHandler) AddPlaceInTrip(w http.ResponseWriter, r *http.Request) {
+	userClaim := r.Context().Value("userClaim")
+	if userClaim == nil {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(utils.ErrTokenInvalid.Error()))
+		return
+	}
+
+	tripId, err := strconv.Atoi(mux.Vars(r)["tripId"])
+	if err != nil || tripId < 1 {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
+		return
+	}
+
+	var placeInTripRequest model.PlaceInTripRequest
+	err = ParsePlaceInTripRequestFromBody(&placeInTripRequest, r)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	userId := userClaim.(*utils.UserClaim).Id
+	authorized, err := h.usecase.CheckAuthOfTrip(userId, uint(tripId))
+	if err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+	if !authorized {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	err = h.usecase.AddPlaceInTripById(uint(tripId), &placeInTripRequest)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+	h.WritePlaceInTrip(w, http.StatusOK, &placeInTripRequest)
+}
+
+func (h *TripHandler) DeletePlaceInTrip(w http.ResponseWriter, r *http.Request) {
+	userClaim := r.Context().Value("userClaim")
+	if userClaim == nil {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(utils.ErrTokenInvalid.Error()))
+		return
+	}
+
+	id, err := strconv.Atoi(mux.Vars(r)["placeInTripId"])
+	if err != nil || id < 1 {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
+		return
+	}
+
+	placeInTripId := uint(id)
+	userId := userClaim.(*utils.UserClaim).Id
+	authorized, err := h.usecase.CheckAuthOfPlaceInTrip(userId, placeInTripId)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+	if !authorized {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	err = h.usecase.DeletePlaceInTripById(placeInTripId)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+	h.WritePlaceInTrip(w, http.StatusNoContent, nil)
+}
+
 func ParseTripRequestFromBody(trip *model.TripRequest, r *http.Request) error {
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(trip); err != nil {
