@@ -120,6 +120,36 @@ func (h *TripHandler) PostTripByUserId(w http.ResponseWriter, r *http.Request) {
 	h.WriteTripResponse(w, http.StatusCreated, tripResponse)
 }
 
+func (h *TripHandler) PatchTrip(w http.ResponseWriter, r *http.Request) {
+	userClaim := r.Context().Value("userClaim")
+	if userClaim == nil {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(utils.ErrTokenInvalid.Error()))
+		return
+	}
+
+	id, err := strconv.Atoi(mux.Vars(r)["tripId"])
+	if err != nil || id < 1 {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
+		return
+	}
+
+	var tripRequest model.TripRequest
+	err = ParseTripRequestFromBody(&tripRequest, r)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	tripRequest.ID = uint(id)
+	tripRequest.UserId = userClaim.(*utils.UserClaim).Id
+	tripResponse, err := h.usecase.PatchTrip(&tripRequest)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+	h.WriteTripResponse(w, http.StatusOK, tripResponse)
+}
+
 func ParseTripRequestFromBody(trip *model.TripRequest, r *http.Request) error {
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(trip); err != nil {

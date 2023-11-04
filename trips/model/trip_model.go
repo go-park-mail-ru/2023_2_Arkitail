@@ -65,12 +65,12 @@ type TripResponse struct {
 }
 
 func TripFromTripRequest(trip *TripRequest) *Trip {
-	return &Trip{UserId: trip.UserId, Description: trip.Description,
+	return &Trip{ID: trip.ID, UserId: trip.UserId, Description: trip.Description,
 		Name: trip.Name, Publicity: trip.Publicity}
 }
 
 func TripResponseFromTrip(trip *Trip) *TripResponse {
-	return &TripResponse{UserId: strconv.FormatUint(uint64(trip.UserId), 10),
+	return &TripResponse{ID: strconv.FormatUint(uint64(trip.ID), 10), UserId: strconv.FormatUint(uint64(trip.UserId), 10),
 		Description: trip.Description, Name: trip.Name, Publicity: trip.Publicity}
 }
 

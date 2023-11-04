@@ -15,7 +15,16 @@ func NewTripUsecase(repo *repo.TripRepository) *TripUsecase {
 	}
 }
 
-// TODO: Patchtrip
+func (u *TripUsecase) PatchTrip(tripRequest *model.TripRequest) (*model.TripResponse, error) {
+	trip := model.TripFromTripRequest(tripRequest)
+	err := u.repo.UpdateTrip(trip)
+	if err != nil {
+		return nil, err
+	}
+
+	tripResponse := model.TripResponseFromTrip(trip)
+	return tripResponse, err
+}
 
 func (u *TripUsecase) DeleteTripById(tripId uint) error {
 	err := u.repo.DeleteTripById(tripId)

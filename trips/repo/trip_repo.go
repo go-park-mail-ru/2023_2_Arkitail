@@ -140,11 +140,13 @@ func (r *TripRepository) AddTrip(trip *model.Trip) error {
 }
 
 func (r *TripRepository) UpdateTrip(trip *model.Trip) error {
+	tripBd := model.TripToTripBd(trip)
 	_, err := r.DB.Exec(
-		`UPDATE trip SET "publicity" = $1, "description" = $2 where id = $3`,
-		trip.Publicity,
-		trip.Description,
-		trip.ID,
+		`UPDATE trip SET "publicity" = $1, "description" = $2, "name" = $3 where id = $4`,
+		tripBd.Publicity,
+		tripBd.Description,
+		tripBd.Name,
+		tripBd.ID,
 	)
 	return err
 }
