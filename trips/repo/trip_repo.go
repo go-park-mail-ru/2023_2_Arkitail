@@ -29,14 +29,14 @@ func (r *TripRepository) DeleteTripById(tripId uint) error {
 func (r *TripRepository) GetTripsByUserId(userId uint) (map[string]*model.Trip, error) {
 	trips := map[string]*model.Trip{}
 	rows, err := r.DB.
-		Query(`SELECT id, description, name, is_public from trip where user_id = $1`, userId)
+		Query(`SELECT id, description, name, publicity from trip where user_id = $1`, userId)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		description := sql.NullString{}
-		trip := &model.Trip{}
+		trip := &model.Trip{UserId: userId}
 		err = rows.Scan(&trip.ID, &description, &trip.Name, &trip.Publicity)
 		trip.Description = description.String
 		if err != nil {
@@ -54,7 +54,7 @@ func (r *TripRepository) GetTripById(tripId uint) (*model.Trip, error) {
 	trip := &model.Trip{}
 	description := sql.NullString{}
 	err := r.DB.
-		QueryRow(`SELECT user_id, description, name, is_public from trip where id = $1`, tripId).
+		QueryRow(`SELECT user_id, description, name, publicity from trip where id = $1`, tripId).
 		Scan(&trip.UserId, &description, &trip.Name, &trip.Publicity)
 	trip.Description = description.String
 	if err != nil {
@@ -107,8 +107,8 @@ func (r *TripRepository) AddPlacesToTrip(tripId uint, places map[string]model.Pl
 			VALUES ($1, $2, $3, $4)`,
 			place.PlaceId,
 			tripId,
-			place.FirstDate.Time,
-			place.LastDate.Time,
+			place.FirstDate,
+			place.LastDate,
 		).Scan()
 		if err == sql.ErrNoRows {
 			err = nil
@@ -120,18 +120,15 @@ func (r *TripRepository) AddPlacesToTrip(tripId uint, places map[string]model.Pl
 	return nil
 }
 
-// нужно выделить тип специально под бд и с ним работать тут. Также сделать для мест в трипе и в review
 func (r *TripRepository) AddTrip(trip *model.Trip) error {
-	if trip.Publicity == "" {
-		trip.Publicity = "private"
-	}
+	tripBd := model.TripToTripBd(trip)
 	err := r.DB.QueryRow(
 		`INSERT INTO trip ("name", "user_id", "publicity", "description")
         VALUES ($1, $2, $3, $4) returning id`,
-		trip.Name,
-		trip.UserId,
-		trip.Publicity,
-		trip.Description,
+		tripBd.Name,
+		tripBd.UserId,
+		tripBd.Publicity,
+		tripBd.Description,
 	).Scan(&trip.ID)
 	if err == sql.ErrNoRows {
 		err = nil

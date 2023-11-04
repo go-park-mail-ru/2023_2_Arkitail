@@ -96,7 +96,7 @@ func (h *TripHandler) GetTripsByUserId(w http.ResponseWriter, r *http.Request) {
 	h.WriteTripResponseMap(w, http.StatusOK, tripResponses)
 }
 
-func (h *TripHandler) PostTripsByUserId(w http.ResponseWriter, r *http.Request) {
+func (h *TripHandler) PostTripByUserId(w http.ResponseWriter, r *http.Request) {
 	userClaim := r.Context().Value("userClaim")
 	if userClaim == nil {
 		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(utils.ErrTokenInvalid.Error()))

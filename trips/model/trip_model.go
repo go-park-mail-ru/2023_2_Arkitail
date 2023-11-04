@@ -1,12 +1,22 @@
 package model
 
 import (
+	"database/sql"
 	"project/places/model"
+	"project/utils"
 	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/pgtype"
 )
+
+type TripBd struct {
+	ID          uint
+	UserId      uint
+	Description sql.NullString
+	Name        string
+	Publicity   string
+}
 
 type Trip struct {
 	ID          uint   `json:"id"`
@@ -17,9 +27,9 @@ type Trip struct {
 }
 
 type PlaceInTripRequest struct {
-	PlaceId   uint        `json:"place_id"`
-	FirstDate pgtype.Date `json:"first_date,omitempty"`
-	LastDate  pgtype.Date `json:"last_date,omitempty"`
+	PlaceId   uint           `json:"place_id"`
+	FirstDate utils.JsonDate `json:"first_date,omitempty"`
+	LastDate  utils.JsonDate `json:"last_date,omitempty"`
 }
 
 type TripRequest struct {
@@ -39,10 +49,10 @@ type PlaceInTripDb struct {
 }
 
 type PlaceInTripResponse struct {
-	ID        string `json:"id,omitempty"`
-	Place     model.Place
-	FirstDate string `json:"first_date"`
-	LastDate  string `json:"last_date,omitempty"`
+	ID        string      `json:"id,omitempty"`
+	Place     model.Place `json:"place,omitempty"`
+	FirstDate string      `json:"first_date,omitempty"`
+	LastDate  string      `json:"last_date,omitempty"`
 }
 
 type TripResponse struct {
@@ -66,9 +76,25 @@ func TripResponseFromTrip(trip *Trip) *TripResponse {
 
 func PlaceInTripResponseFromDb(tripDb *PlaceInTripDb) *PlaceInTripResponse {
 	placeInTrip := &PlaceInTripResponse{Place: *model.PlaceDbToPlace(&tripDb.Place)}
-	placeInTrip.FirstDate = tripDb.FirstDate.Time.Format(time.DateOnly)
-	placeInTrip.LastDate = tripDb.FirstDate.Time.Format(time.DateOnly)
+	if tripDb.FirstDate.Status == pgtype.Present {
+		placeInTrip.FirstDate = tripDb.FirstDate.Time.Format(time.DateOnly)
+		if tripDb.LastDate.Status == pgtype.Present {
+			placeInTrip.LastDate = tripDb.FirstDate.Time.Format(time.DateOnly)
+		}
+	}
 	placeInTrip.ID = strconv.FormatUint(uint64(tripDb.ID), 10)
 
 	return placeInTrip
+}
+
+func TripToTripBd(trip *Trip) *TripBd {
+	tripBd := &TripBd{ID: trip.ID, UserId: trip.UserId, Name: trip.Name}
+	if trip.Publicity == "" {
+		tripBd.Publicity = "private"
+	}
+	if trip.Description != "" {
+		tripBd.Description.String = trip.Description
+		tripBd.Description.Valid = true
+	}
+	return tripBd
 }

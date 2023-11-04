@@ -30,7 +30,6 @@ func (u *TripUsecase) AddTrip(tripRequest *model.TripRequest) (*model.TripRespon
 	}
 
 	err = u.repo.AddPlacesToTrip(trip.ID, tripRequest.Places)
-
 	if err != nil {
 		u.repo.DeleteTripById(trip.ID)
 		return nil, err
