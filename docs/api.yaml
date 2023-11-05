@@ -589,7 +589,7 @@ components:
         - id
         - name
         - email
-        - birth_date
+        - birthDate
       properties:
         id:
           type: integer
@@ -598,13 +598,13 @@ components:
         email:
           description: Используем для авторизации
           type: string
-        birth_date:
+        birthDate:
           type: string
           example: "2017-01-01"
           format: date
         about:
           type: string
-        avatar_url:
+        avatarUrl:
           type: string
     PatchUserRequest:
       type: object
@@ -614,7 +614,7 @@ components:
         email:
           description: Используем для авторизации
           type: string
-        birth_date:
+        birthDate:
           type: string
           example: "2017-01-01"
           format: date
@@ -625,7 +625,7 @@ components:
       required:
         - id
         - name
-        - birth_date
+        - birthDate
       properties:
         id:
           type: integer
@@ -633,11 +633,11 @@ components:
           type: string
         about:
           type: string
-        birth_date:
+        birthDate:
           type: string
           example: "2017-01-01"
           format: date
-        avatar_url:
+        avatarUrl:
           type: string
     CleanUserMap:
       type: object
@@ -652,7 +652,7 @@ components:
         - name
         - email
         - password
-        - birth_date
+        - birthDate
       properties:
         name:
           type: string
@@ -662,7 +662,7 @@ components:
           type: string
           minLength: 8
           pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])"
-        birth_date:
+        birthDate:
           type: string
           example: "2017-01-01"
           format: date
@@ -688,19 +688,19 @@ components:
           type: string
         adress:
           type: string
-        phone_number:
+        phoneNumber:
           type: string
-        review_count:
+        reviewCount:
           type: integer
         web-site:
           type: string
         email:
           type: string
-        open_hour:
+        openHour:
           type: string
-        close_hour:
+        closeHour:
           type: string
-        image_url:
+        imageUrl:
           type: string
     PlaceMap:
       type: object
@@ -714,7 +714,7 @@ components:
       required:
         - id
         - user
-        - place_id
+        - placeId
         - rating
       properties:
         id:
@@ -722,22 +722,22 @@ components:
         user:
           type: object
           required:
-            - user_id
+            - userId
             - username
           properties:
-            user_id:
+            userId:
               type: integer
             username:
               type: string
-            avatar_url:
+            avatarUrl:
               type: string
-        place_id:
+        placeId:
           type: integer
         text:
           type: string
         rating:
           type: integer
-        creation_date:
+        creationDate:
             type: string
             description: RFC3339 Datetime to set
             format: date-time
@@ -752,10 +752,10 @@ components:
     AddReviewRequest:
       type: object
       required:  # List the required properties here
-        - place_id
+        - placeId
         - rating
       properties:
-        place_id:
+        placeId:
           type: integer
         text:
           type: string
@@ -764,14 +764,14 @@ components:
     Trip:
       required:
         - id
-        - user_id
+        - userId
         - name
         - publicity
       type: object
       properties:
         id:
           type: integer
-        user_id:
+        userId:
           type: integer
         name:
           type: string
@@ -780,21 +780,21 @@ components:
           example: public or private
         description:
           type: string
-        places_in_trip:
+        placesInTrip:
           type: object
           additionalProperties:
             type: object
             required:
               - place
-              - first_date
+              - firstDate
             properties:
               place:
                 $ref: '#/components/schemas/Place'
-              first_date:
+              firstDate:
                 type: string
                 example: "2017-01-01"
                 format: date
-              last_date:
+              lastDate:
                 type: string
                 example: "2017-01-02"
                 format: date
@@ -811,44 +811,44 @@ components:
     PatchPlaceInTripRequest:
       type: object
       properties:
-        first_date:
+        firstDate:
           type: string
           example: "2017-01-01"
           format: date
-        last_date:
+        lastDate:
           type: string
           example: "2017-01-02"
           format: date
     AddPlaceInTripRequest:
       type: object
       required:
-        - place_id
+        - placeId
       properties:
-        place_id:
+        placeId:
           type: integer
-        first_date:
+        firstDate:
           type: string
           example: "2017-01-01"
           format: date
-        last_date:
+        lastDate:
           type: string
           example: "2017-01-02"
           format: date
     PlaceInTrip:
       type: object
       required:
-        - place_id
+        - placeId
         - id
       properties:
         id:
           type: integer
-        place_id:
+        placeId:
           type: integer
-        first_date:
+        firstDate:
           type: string
           example: "2017-01-01"
           format: date
-        last_date:
+        lastDate:
           type: string
           example: "2017-01-02"
           format: date
@@ -864,23 +864,23 @@ components:
           example: public or private
         description:
           type: string
-        places_in_trip:
+        placesInTrip:
           type: object
           additionalProperties:
             type: object
             required:  # List the required properties here
-              - place_id
+              - placeId
               - id
             properties:
               id:
                 type: integer
-              place_id:
+              placeId:
                 type: integer
-              first_date:
+              firstDate:
                 type: string
                 example: "2017-01-01"
                 format: date
-              last_date:
+              lastDate:
                 type: string
                 example: "2017-01-02"
                 format: date
@@ -909,7 +909,7 @@ components:
           type: number
         cost:
           type: string
-        image_url:
+        imageUrl:
           type: string
     ReviewsWithAuthors:
       type: object

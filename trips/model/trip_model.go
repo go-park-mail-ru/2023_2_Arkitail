@@ -20,7 +20,7 @@ type TripBd struct {
 
 type Trip struct {
 	ID          uint   `json:"id"`
-	UserId      uint   `json:"user_id"`
+	UserId      uint   `json:"userId"`
 	Description string `json:"description,omitempty"`
 	Name        string `json:"name"`
 	Publicity   string `json:"publicity"`
@@ -29,17 +29,17 @@ type Trip struct {
 type PlaceInTripRequest struct {
 	ID        uint           `json:"id"`
 	PlaceId   uint           `json:"place_id"`
-	FirstDate utils.JsonDate `json:"first_date,omitempty"`
-	LastDate  utils.JsonDate `json:"last_date,omitempty"`
+	FirstDate utils.JsonDate `json:"firstDate,omitempty"`
+	LastDate  utils.JsonDate `json:"lastDate,omitempty"`
 }
 
 type TripRequest struct {
 	ID          uint                          `json:"id"`
-	UserId      uint                          `json:"user_id"`
+	UserId      uint                          `json:"userId"`
 	Description string                        `json:"description,omitempty"`
 	Name        string                        `json:"name"`
 	Publicity   string                        `json:"publicity"`
-	Places      map[string]PlaceInTripRequest `json:"places_in_trip"`
+	Places      map[string]PlaceInTripRequest `json:"placeInTrip"`
 }
 
 type PlaceInTripDb struct {
@@ -52,17 +52,17 @@ type PlaceInTripDb struct {
 type PlaceInTripResponse struct {
 	ID        string      `json:"id,omitempty"`
 	Place     model.Place `json:"place,omitempty"`
-	FirstDate string      `json:"first_date,omitempty"`
-	LastDate  string      `json:"last_date,omitempty"`
+	FirstDate string      `json:"firstDate,omitempty"`
+	LastDate  string      `json:"lastDate,omitempty"`
 }
 
 type TripResponse struct {
 	ID          string                         `json:"id,omitempty"`
-	UserId      string                         `json:"user_id,omitempty"`
+	UserId      string                         `json:"userId,omitempty"`
 	Description string                         `json:"description,omitempty"`
 	Name        string                         `json:"name,omitempty"`
 	Publicity   string                         `json:"publicity,omitempty"`
-	Places      map[string]PlaceInTripResponse `json:"places_in_trip,omitempty"`
+	Places      map[string]PlaceInTripResponse `json:"placeInTrip,omitempty"`
 }
 
 func TripFromTripRequest(trip *TripRequest) *Trip {

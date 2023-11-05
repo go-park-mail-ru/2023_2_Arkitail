@@ -15,11 +15,11 @@ type Place struct {
 	Adress      string   `json:"adress,omitempty"`
 	WebSite     string   `json:"web-site,omitempty"`
 	Email       string   `json:"email,omitempty"`
-	PhoneNumber string   `json:"phone_number,omitempty"`
-	ReviewCount uint     `json:"review_count,omitempty"`
-	OpenTime    string   `json:"open_hour,omitempty"`
-	CloseTime   string   `json:"close_hour,omitempty"`
-	ImageURL    string   `json:"image_url,omitempty"`
+	PhoneNumber string   `json:"phoneNumber,omitempty"`
+	ReviewCount uint     `json:"reviewCount,omitempty"`
+	OpenTime    string   `json:"openHour,omitempty"`
+	CloseTime   string   `json:"closeHour,omitempty"`
+	ImageURL    string   `json:"imageUrl,omitempty"`
 }
 
 // Не набирает поля для агрегации(review count)
