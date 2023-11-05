@@ -12,4 +12,5 @@ const (
 	Review       = "/review"
 	PlaceReviews = "/places/{placeId}/reviews"
 	UserReviews  = "/users/{userId}/reviews"
+	UserAvatar   = "/user/avatar"
 )
