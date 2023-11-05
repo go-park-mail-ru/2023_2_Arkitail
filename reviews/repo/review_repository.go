@@ -53,6 +53,7 @@ func (r *ReviewRepository) GetReviewsByUserId(userId uint) (map[string]*model.Re
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 	for rows.Next() {
 		review := &model.Review{}
@@ -62,6 +63,10 @@ func (r *ReviewRepository) GetReviewsByUserId(userId uint) (map[string]*model.Re
 		}
 		reviews[strconv.FormatUint(uint64(review.ID), 10)] = review
 	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return reviews, nil
 }
 
@@ -72,6 +77,7 @@ func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (map[string]*model.
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 	for rows.Next() {
 		review := &model.Review{}
@@ -81,6 +87,10 @@ func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (map[string]*model.
 		}
 		reviews[strconv.FormatUint(uint64(review.ID), 10)] = review
 	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return reviews, nil
 }
 
