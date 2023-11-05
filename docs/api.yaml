@@ -713,14 +713,24 @@ components:
       type: object
       required:
         - id
-        - user_id
+        - user
         - place_id
         - rating
       properties:
         id:
           type: integer
-        user_id:
-          type: integer
+        user:
+          type: object
+          required:
+            - user_id
+            - username
+          properties:
+            user_id:
+              type: integer
+            username:
+              type: string
+            avatar_url:
+              type: string
         place_id:
           type: integer
         text:
