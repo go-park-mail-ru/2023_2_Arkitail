@@ -7,6 +7,7 @@ const (
 	Logout          = "/logout"
 	User            = "/user"
 	Places          = "/places"
+	PlaceById       = "/places/{placeId}"
 	UserById        = "/users/{user_id}"
 	ReviewById      = "/reviews/{reviewId}"
 	Review          = "/review"

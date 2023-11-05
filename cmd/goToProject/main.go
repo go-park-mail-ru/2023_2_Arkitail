@@ -122,6 +122,7 @@ func main() {
 	r.HandleFunc(apiPath+api.PlaceReviews, reviewHandler.GetPlaceReviews).Methods("GET").Name(api.PlaceReviews)
 
 	r.HandleFunc(apiPath+api.Places, placeHandler.GetPlaces).Methods("GET").Name(api.Places)
+	r.HandleFunc(apiPath+api.PlaceById, placeHandler.GetPlace).Methods("GET").Name(api.PlaceById)
 
 	r.HandleFunc(apiPath+api.Trip, tripHandler.PostTripByUserId).Methods("Post").Name(api.Trip)
 	r.HandleFunc(apiPath+api.Trips, tripHandler.GetTripsByUserId).Methods("Get").Name(api.Trips)

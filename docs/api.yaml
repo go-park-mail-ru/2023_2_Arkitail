@@ -81,30 +81,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaceMap'
-  # /api/v1/places/{placeId}:
-  #   get:
-  #     summary: Get a place by id
-  #     security: []    # no authentication
-  #     parameters:
-  #       - in: path
-  #         name: placeId
-  #         schema:
-  #           type: integer
-  #         required: true
-  #         description: Numeric id of the place to get
-  #     responses:
-  #       '200':
-  #         description: Success
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Place'
-  #       '404':
-  #         description: Cant find a place with id = {placeId}
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/places/{placeId}:
+    get:
+      summary: Get a place by id
+      security: []    # no authentication
+      parameters:
+        - in: path
+          name: placeId
+          schema:
+            type: integer
+          required: true
+          description: Numeric id of the place to get
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Place'
+        '404':
+          description: Cant find a place with id = {placeId}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/auth:
     get:
       summary: Checks if you have valid sessionId
@@ -331,12 +331,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Review'
-        # '400':
-        #   description: Contents of request are wrong
-        #   content:
-        #     application/json:
-        #       schema:
-        #         $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
           content:
@@ -427,30 +421,6 @@ paths:
           description: Unauthorized
         '404':
           description: Couldnt find a trip
-  # /api/v1/{userId}/trips:
-  #   get:
-  #     summary: Returns trips of a user with userId
-  #     security: []    # no authentication
-  #     parameters:
-  #       - in: path
-  #         name: userId
-  #         schema:
-  #           type: string
-  #         required: true
-  #         description: Integer id of a user to get trips from
-  #     responses:
-  #       '200':
-  #         description: Success
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/TripMap'
-  #       '404':
-  #         description: User doesnt exist
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ErrorResponse'
   /api/v1/trips:
     get:
       summary: Returns trips of logged in user
