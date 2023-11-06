@@ -218,35 +218,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
-
-
-
-
-  # /api/v1/users/{userId}/reviews:
-  #   get:
-  #     summary: Returns all reviews from user
-  #     security: []    # no authentication
-  #     parameters:
-  #       - in: path
-  #         name: userId
-  #         schema:
-  #           type: integer
-  #         required: true
-  #         description: Integer userId of the user to get reviews from
-  #     responses:
-  #       '200':
-  #         description: Success
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ReviewMap'
-  #       '404':
-  #         description: Couldnt find user
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/users/{userId}/reviews:
+    get:
+      summary: Returns all reviews from user
+      security: []    # no authentication
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: Integer userId of the user to get reviews from
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewMap'
+        '404':
+          description: Couldnt find user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/places/{placeId}/reviews:
     get:
       summary: Returns all reviews for place
