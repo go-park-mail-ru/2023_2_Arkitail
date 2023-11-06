@@ -30,3 +30,11 @@ func (uc *PlaceUseCase) GetPlaces() (map[string]*model.Place, error) {
 	}
 	return places, nil
 }
+
+func (uc *PlaceUseCase) GetPlaceById(placeId uint) (*model.Place, error) {
+	place, err := uc.repo.GetPlaceById(placeId)
+	if err != nil {
+		return nil, fmt.Errorf("error getting places from database: %v", err)
+	}
+	return place, nil
+}

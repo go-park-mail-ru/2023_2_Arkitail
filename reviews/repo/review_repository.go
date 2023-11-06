@@ -28,7 +28,7 @@ func (r *ReviewRepository) AddReview(review *model.Review) error {
 		review.Rating,
 	).Scan(&review.ID, &review.CreationDate)
 	if err != nil {
-		return fmt.Errorf("error adding place in a database: %v", err)
+		return fmt.Errorf("error adding review in a database: %v", err)
 	}
 	return nil
 }
@@ -38,9 +38,6 @@ func (r *ReviewRepository) GetReviewById(id uint) (*model.Review, error) {
 	err := r.DB.
 		QueryRow("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where id = $1", id).
 		Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating, &review.CreationDate)
-	if err == sql.ErrNoRows {
-		err = nil
-	}
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +70,6 @@ func (r *ReviewRepository) GetReviewsByUserId(userId uint) (map[string]*model.Re
 func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (map[string]*model.Review, error) {
 	reviews := make(map[string]*model.Review)
 	rows, err := r.DB.Query("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where place_id = $1", placeId)
-
 	if err != nil {
 		return nil, err
 	}

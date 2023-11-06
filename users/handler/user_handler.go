@@ -116,13 +116,13 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	user := &model.User{}
 	err := h.ParseUserFromJsonBody(user, r)
 	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(errTokenInvalid.Error()))
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
 	cookie, err := h.usecase.Login(user.Email, user.Password)
 	if err != nil {
-		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(errTokenInvalid.Error()))
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 	http.SetCookie(w, cookie)

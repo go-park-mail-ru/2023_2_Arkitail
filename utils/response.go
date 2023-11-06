@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
@@ -12,6 +13,8 @@ type UserClaim struct {
 	Id uint
 	jwt.RegisteredClaims
 }
+
+var ErrTokenInvalid = errors.New("token is invalid")
 
 func CreateErrorResponse(errorMsg string) []byte {
 	response := ErrorResponse{Error: errorMsg}

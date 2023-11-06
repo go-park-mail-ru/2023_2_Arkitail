@@ -25,6 +25,10 @@ import (
 	placeRepo "project/places/repo"
 	placeUsecase "project/places/usecase"
 
+	tripHandler "project/trips/handler"
+	tripRepo "project/trips/repo"
+	tripUsecase "project/trips/usecase"
+
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/stdlib"
 )
@@ -97,6 +101,10 @@ func main() {
 	reviewUseCase := reviewUsecase.NewReviewUsecase(reviewRepo)
 	reviewHandler := reviewHandler.NewReviewHandler(reviewUseCase)
 
+	tripRepo := tripRepo.NewTripRepository(db)
+	tripUseCase := tripUsecase.NewTripUsecase(tripRepo)
+	tripHandler := tripHandler.NewTripHandler(tripUseCase)
+
 	r := mux.NewRouter()
 
 	apiPath := "/api/v1"
@@ -112,10 +120,22 @@ func main() {
 	r.HandleFunc(apiPath+api.ReviewById, reviewHandler.DeleteReview).Methods("Delete").Name(api.ReviewById)
 	r.HandleFunc(apiPath+api.Review, reviewHandler.AddReview).Methods("POST").Name(api.Review)
 	r.HandleFunc(apiPath+api.PlaceReviews, reviewHandler.GetPlaceReviews).Methods("GET").Name(api.PlaceReviews)
-
-	h := router.AddCors(r, []string{"http://localhost:8080/"})
+	r.HandleFunc(apiPath+api.ReviewById, reviewHandler.GetReview).Methods("GET").Name(api.ReviewById)
+	r.HandleFunc(apiPath+api.UserReviews, reviewHandler.GetUserReviews).Methods("GET").Name(api.UserReviews)
 
 	r.HandleFunc(apiPath+api.Places, placeHandler.GetPlaces).Methods("GET").Name(api.Places)
+	r.HandleFunc(apiPath+api.PlaceById, placeHandler.GetPlace).Methods("GET").Name(api.PlaceById)
+
+	r.HandleFunc(apiPath+api.Trip, tripHandler.PostTripByUserId).Methods("Post").Name(api.Trip)
+	r.HandleFunc(apiPath+api.Trips, tripHandler.GetTripsByUserId).Methods("Get").Name(api.Trips)
+	r.HandleFunc(apiPath+api.TripById, tripHandler.GetTripByTripId).Methods("Get").Name(api.TripById)
+	r.HandleFunc(apiPath+api.TripById, tripHandler.DeleteTripByTripId).Methods("Delete").Name(api.TripById)
+	r.HandleFunc(apiPath+api.TripById, tripHandler.PatchTrip).Methods("Patch").Name(api.TripById)
+	r.HandleFunc(apiPath+api.PlaceInTrip, tripHandler.AddPlaceInTrip).Methods("Post").Name(api.PlaceInTrip)
+	r.HandleFunc(apiPath+api.PlaceInTripById, tripHandler.PatchPlaceInTrip).Methods("Patch").Name(api.PlaceInTripById)
+	r.HandleFunc(apiPath+api.PlaceInTripById, tripHandler.DeletePlaceInTrip).Methods("Delete").Name(api.PlaceInTripById)
+
+	h := router.AddCors(r, []string{"http://localhost:8080/"})
 
 	r.Use(middleware.Auth(userUsecase))
 	r.Use(middleware.AccessLog)
