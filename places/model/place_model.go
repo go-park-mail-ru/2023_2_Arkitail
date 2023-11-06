@@ -22,7 +22,6 @@ type Place struct {
 	ImageURL    string   `json:"imageUrl,omitempty"`
 }
 
-// Не набирает поля для агрегации(review count)
 type PlaceDb struct {
 	ID          uint
 	Name        string

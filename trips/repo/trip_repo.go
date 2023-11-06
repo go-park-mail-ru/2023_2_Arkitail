@@ -43,26 +43,31 @@ func (r *TripRepository) GetTripsByUserId(userId uint) (map[string]*model.Trip, 
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 	for rows.Next() {
 		description := sql.NullString{}
 		trip := &model.Trip{UserId: userId}
+
 		err = rows.Scan(&trip.ID, &description, &trip.Name, &trip.Publicity)
 		trip.Description = description.String
 		if err != nil {
 			return nil, err
 		}
+
 		trips[strconv.FormatUint(uint64(trip.ID), 10)] = trip
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
+
 	return trips, err
 }
 
 func (r *TripRepository) GetTripById(tripId uint) (*model.Trip, error) {
 	trip := &model.Trip{}
 	description := sql.NullString{}
+
 	err := r.DB.
 		QueryRow(`SELECT user_id, description, name, publicity from trip where id = $1`, tripId).
 		Scan(&trip.UserId, &description, &trip.Name, &trip.Publicity)
@@ -77,6 +82,7 @@ func (r *TripRepository) GetTripById(tripId uint) (*model.Trip, error) {
 
 func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]model.PlaceInTripResponse, error) {
 	places := make(map[string]model.PlaceInTripResponse)
+
 	rows, err := r.DB.Query(`SELECT place.id, name, description, cost, image_url,
 		(select avg(rating) from review where review.place_id = place.id) as rating,
 		adress, open_time, close_time, web_site, email, phone_number,
@@ -87,10 +93,12 @@ func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]model.
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 	for rows.Next() {
 		var reviewCount sql.NullFloat64
 		placeInTripDb := &model.PlaceInTripDb{}
+
 		err = rows.Scan(&placeInTripDb.Place.ID, &placeInTripDb.Place.Name, &placeInTripDb.Place.Description,
 			&placeInTripDb.Place.Cost, &placeInTripDb.Place.ImageURL, &placeInTripDb.Place.Rating,
 			&placeInTripDb.Place.Adress, &placeInTripDb.Place.OpenTime, &placeInTripDb.Place.CloseTime,
@@ -102,11 +110,13 @@ func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]model.
 		if err != nil {
 			return nil, err
 		}
+
 		places[placeInTrip.ID] = *placeInTrip
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
+
 	return places, err
 }
 
