@@ -38,9 +38,6 @@ func (r *ReviewRepository) GetReviewById(id uint) (*model.Review, error) {
 	err := r.DB.
 		QueryRow("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where id = $1", id).
 		Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating, &review.CreationDate)
-	if err == sql.ErrNoRows {
-		err = nil
-	}
 	if err != nil {
 		return nil, err
 	}

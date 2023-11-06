@@ -272,29 +272,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/v1/reviews/{reviewId}:
-    # get:
-    #   summary: Returns a review with id = reviewId
-    #   security: []    # no authentication
-    #   parameters:
-    #     - in: path
-    #       name: reviewId
-    #       schema:
-    #         type: integer
-    #       required: true
-    #       description: Numeric id the review to get
-    #   responses:
-    #     '200':
-    #       description: Success
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Review'
-    #     '404':
-    #       description: Couldnt find review
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/ErrorResponse'
+    get:
+      summary: Returns a review with id = reviewId
+      security: []    # no authentication
+      parameters:
+        - in: path
+          name: reviewId
+          schema:
+            type: integer
+          required: true
+          description: Numeric id the review to get
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '404':
+          description: Couldnt find review
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: Deletes a review
       security:
@@ -713,24 +713,14 @@ components:
       type: object
       required:
         - id
-        - user
+        - userId
         - placeId
         - rating
       properties:
         id:
           type: integer
-        user:
-          type: object
-          required:
-            - userId
-            - username
-          properties:
-            userId:
-              type: integer
-            username:
-              type: string
-            avatarUrl:
-              type: string
+        userId:
+          type: integer
         placeId:
           type: integer
         text:

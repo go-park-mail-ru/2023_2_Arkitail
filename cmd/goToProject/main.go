@@ -120,6 +120,7 @@ func main() {
 	r.HandleFunc(apiPath+api.ReviewById, reviewHandler.DeleteReview).Methods("Delete").Name(api.ReviewById)
 	r.HandleFunc(apiPath+api.Review, reviewHandler.AddReview).Methods("POST").Name(api.Review)
 	r.HandleFunc(apiPath+api.PlaceReviews, reviewHandler.GetPlaceReviews).Methods("GET").Name(api.PlaceReviews)
+	r.HandleFunc(apiPath+api.ReviewById, reviewHandler.GetReview).Methods("GET").Name(api.ReviewById)
 
 	r.HandleFunc(apiPath+api.Places, placeHandler.GetPlaces).Methods("GET").Name(api.Places)
 	r.HandleFunc(apiPath+api.PlaceById, placeHandler.GetPlace).Methods("GET").Name(api.PlaceById)
