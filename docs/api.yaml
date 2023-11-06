@@ -335,7 +335,8 @@ paths:
   /api/v1/trips/{tripId}:
     get:
       summary: get a trip by {id}
-      security: []
+      security:
+        - cookieAuth: []
       parameters:
         - in: path
           name: tripId

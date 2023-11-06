@@ -39,6 +39,17 @@ func (h *TripHandler) GetTripByTripId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userId := userClaim.(*utils.UserClaim).Id
+	authorized, err := h.usecase.CheckAuthOfTrip(userId, uint(id))
+	if err != nil {
+		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+	if !authorized {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
 	tripResponse, err := h.usecase.GetTripReponseById(uint(id))
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
