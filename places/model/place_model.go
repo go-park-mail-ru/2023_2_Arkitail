@@ -8,18 +8,18 @@ import (
 
 type Place struct {
 	ID          string   `json:"id"`
-	Name        string   `json:"name,omitempty"`
-	Description string   `json:"description,omitempty"`
-	Rating      *float64 `json:"rating,omitempty"`
-	Cost        string   `json:"cost,omitempty"`
-	Adress      string   `json:"adress,omitempty"`
-	WebSite     string   `json:"web-site,omitempty"`
-	Email       string   `json:"email,omitempty"`
-	PhoneNumber string   `json:"phoneNumber,omitempty"`
-	ReviewCount uint     `json:"reviewCount,omitempty"`
-	OpenTime    string   `json:"openHour,omitempty"`
-	CloseTime   string   `json:"closeHour,omitempty"`
-	ImageURL    string   `json:"imageUrl,omitempty"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Rating      *float64 `json:"rating"`
+	Cost        string   `json:"cost"`
+	Adress      string   `json:"adress"`
+	WebSite     string   `json:"web-site"`
+	Email       string   `json:"email"`
+	PhoneNumber string   `json:"phoneNumber"`
+	ReviewCount uint     `json:"reviewCount"`
+	OpenTime    string   `json:"openHour"`
+	CloseTime   string   `json:"closeHour"`
+	ImageURL    string   `json:"imageUrl"`
 }
 
 type PlaceDb struct {

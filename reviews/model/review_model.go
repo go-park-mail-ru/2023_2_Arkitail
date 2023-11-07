@@ -6,7 +6,7 @@ type Review struct {
 	ID           uint      `json:"id"`
 	UserId       uint      `json:"userId"`
 	PlaceId      uint      `json:"placeId"`
-	Content      string    `json:"content,omitempty"`
+	Content      string    `json:"content"`
 	Rating       uint      `json:"rating"`
 	CreationDate time.Time `json:"creationDate"`
 }

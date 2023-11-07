@@ -6,15 +6,15 @@ import (
 
 type User struct {
 	ID        uint        `json:"id"`
-	Password  string      `json:"password,omitempty"`
-	Email     string      `json:"email,omitempty"`
-	Name      string      `json:"name,omitempty"`
+	Password  string      `json:"password"`
+	Email     string      `json:"email"`
+	Name      string      `json:"name"`
 	BirthDate pgtype.Date `json:"birthDate"`
-	About     string      `json:"about,omitempty"`
-	AvatarUrl string      `json:"avatarUrl,omitempty"`
+	About     string      `json:"about"`
+	AvatarUrl string      `json:"avatarUrl"`
 }
 
 type OldUserSignup struct {
-	Password string `json:"password,omitempty"`
-	Login    string `json:"login,omitempty"`
+	Password string `json:"password"`
+	Login    string `json:"login"`
 }
