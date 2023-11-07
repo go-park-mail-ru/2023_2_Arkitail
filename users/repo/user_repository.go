@@ -65,11 +65,15 @@ func (r *UserRepository) GetUser(email string) (*model.User, error) {
 func (r *UserRepository) GetUserById(id uint) (*model.User, error) {
 	user := &model.User{}
 	var avatarUrl sql.NullString
+	var about sql.NullString
 	err := r.DB.
 		QueryRow(`SELECT id, password, name, email, birth_date, about, avatar_url FROM "user" WHERE id = $1`, id).
-		Scan(&user.ID, &user.Password, &user.Name, &user.Email, &user.BirthDate, &user.About, &avatarUrl)
+		Scan(&user.ID, &user.Password, &user.Name, &user.Email, &user.BirthDate, &about, &avatarUrl)
 	if avatarUrl.Valid {
 		user.AvatarUrl = avatarUrl.String
+	}
+	if about.Valid {
+		user.About = about.String
 	}
 	if err != nil {
 		return nil, ErrUserNotFound
