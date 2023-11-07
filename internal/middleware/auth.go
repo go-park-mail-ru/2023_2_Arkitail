@@ -23,12 +23,11 @@ var (
 		api.ReviewById:   http.MethodGet,
 		api.UserReviews:  http.MethodGet,
 		api.PlaceById:    http.MethodGet,
+		api.Login:        http.MethodPost,
+		api.Signup:       http.MethodPost,
 	}
-	NoSessionNames = map[string]string{
-		api.Login:  http.MethodPost,
-		api.Signup: http.MethodPost,
-	}
-	apiPath = "api/v1"
+	NoSessionNames = map[string]string{}
+	apiPath        = "api/v1"
 )
 
 var (

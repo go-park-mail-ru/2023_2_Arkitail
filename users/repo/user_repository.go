@@ -24,9 +24,13 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 
 func (r *UserRepository) GetCleanUserById(id uint) (*model.User, error) {
 	user := &model.User{}
+	var avatarUrl sql.NullString
 	err := r.DB.
 		QueryRow(`SELECT id, name, birth_date, about, avatar_url FROM "user" WHERE id = $1`, id).
-		Scan(&user.ID, &user.Name, &user.BirthDate, &user.About, &user.AvatarUrl)
+		Scan(&user.ID, &user.Name, &user.BirthDate, &user.About, &avatarUrl)
+	if avatarUrl.Valid {
+		user.AvatarUrl = avatarUrl.String
+	}
 	if err != nil {
 		return nil, ErrUserNotFound
 	}
@@ -36,9 +40,13 @@ func (r *UserRepository) GetCleanUserById(id uint) (*model.User, error) {
 
 func (r *UserRepository) GetUser(email string) (*model.User, error) {
 	user := &model.User{}
+	var avatarUrl sql.NullString
 	err := r.DB.
 		QueryRow(`SELECT id, password, name, email, birth_date, about, avatar_url FROM "user" WHERE email = $1`, email).
-		Scan(&user.ID, &user.Password, &user.Name, &user.Email, &user.BirthDate, &user.About, &user.AvatarUrl)
+		Scan(&user.ID, &user.Password, &user.Name, &user.Email, &user.BirthDate, &user.About, &avatarUrl)
+	if avatarUrl.Valid {
+		user.AvatarUrl = avatarUrl.String
+	}
 	if err != nil {
 		return nil, ErrUserNotFound
 	}
@@ -48,9 +56,13 @@ func (r *UserRepository) GetUser(email string) (*model.User, error) {
 
 func (r *UserRepository) GetUserById(id uint) (*model.User, error) {
 	user := &model.User{}
+	var avatarUrl sql.NullString
 	err := r.DB.
 		QueryRow(`SELECT id, password, name, email, birth_date, about, avatar_url FROM "user" WHERE id = $1`, id).
-		Scan(&user.ID, &user.Password, &user.Name, &user.Email, &user.BirthDate, &user.About, &user.AvatarUrl)
+		Scan(&user.ID, &user.Password, &user.Name, &user.Email, &user.BirthDate, &user.About, &avatarUrl)
+	if avatarUrl.Valid {
+		user.AvatarUrl = avatarUrl.String
+	}
 	if err != nil {
 		return nil, ErrUserNotFound
 	}
@@ -104,13 +116,13 @@ func (r *UserRepository) AddUser(user *model.User) error {
 
 	err = r.DB.QueryRow(
 		`INSERT INTO "user" ("name", "password", "email", "birth_date", "about")
-        VALUES ($1, $2, $3, $4, $5)`,
+        VALUES ($1, $2, $3, $4, $5) RETURNING id`,
 		user.Name,
 		user.Password,
 		user.Email,
 		user.BirthDate.Time,
 		user.About,
-	).Scan()
+	).Scan(&user.ID)
 	if err == sql.ErrNoRows {
 		err = nil
 	}
@@ -125,13 +137,13 @@ func (r *UserRepository) BadAddUser(oldUser *model.OldUserSignup) (*model.User, 
 
 	err := r.DB.QueryRow(
 		`INSERT INTO "user" ("name", "password", "email", "birth_date", "about")
-        VALUES ($1, $2, $3, $4, $5)`,
+        VALUES ($1, $2, $3, $4, $5) RETURNING id`,
 		user.Name,
 		user.Password,
 		user.Email,
 		user.BirthDate.Time,
 		user.About,
-	).Scan()
+	).Scan(&user.ID)
 	if err == sql.ErrNoRows {
 		err = nil
 	}
