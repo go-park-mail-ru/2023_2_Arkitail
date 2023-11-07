@@ -25,11 +25,15 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 func (r *UserRepository) GetCleanUserById(id uint) (*model.User, error) {
 	user := &model.User{}
 	var avatarUrl sql.NullString
+	var about sql.NullString
 	err := r.DB.
 		QueryRow(`SELECT id, name, birth_date, about, avatar_url FROM "user" WHERE id = $1`, id).
-		Scan(&user.ID, &user.Name, &user.BirthDate, &user.About, &avatarUrl)
+		Scan(&user.ID, &user.Name, &user.BirthDate, &about, &avatarUrl)
 	if avatarUrl.Valid {
 		user.AvatarUrl = avatarUrl.String
+	}
+	if about.Valid {
+		user.About = about.String
 	}
 	if err != nil {
 		return nil, ErrUserNotFound
