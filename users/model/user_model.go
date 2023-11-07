@@ -13,3 +13,8 @@ type User struct {
 	About     string      `json:"about,omitempty"`
 	AvatarUrl string      `json:"avatarUrl,omitempty"`
 }
+
+type OldUserSignup struct {
+	Password string `json:"password,omitempty"`
+	Login    string `json:"login,omitempty"`
+}

@@ -109,8 +109,11 @@ func main() {
 
 	apiPath := "/api/v1"
 	r.HandleFunc(apiPath+api.Auth, userHandler.CheckAuth).Methods("GET").Name(api.Auth)
-	r.HandleFunc(apiPath+api.Login, userHandler.Login).Methods("POST").Name(api.Login)
-	r.HandleFunc(apiPath+api.Signup, userHandler.Signup).Methods("POST").Name(api.Signup)
+	// r.HandleFunc(apiPath+api.Login, userHandler.Login).Methods("POST").Name(api.Login)
+	r.HandleFunc(apiPath+api.Login, userHandler.BadLogin).Methods("POST").Name(api.Login)
+
+	// r.HandleFunc(apiPath+api.Signup, userHandler.Signup).Methods("POST").Name(api.Signup)
+	r.HandleFunc(apiPath+api.Signup, userHandler.BadSignup).Methods("POST").Name(api.Signup)
 	r.HandleFunc(apiPath+api.Logout, userHandler.Logout).Methods("DELETE").Name(api.Logout)
 	r.HandleFunc(apiPath+api.User, userHandler.GetUserInfo).Methods("GET").Name(api.User)
 	r.HandleFunc(apiPath+api.User, userHandler.PatchUser).Methods("Patch").Name(api.User)

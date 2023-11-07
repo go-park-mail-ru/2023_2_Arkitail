@@ -130,6 +130,24 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	utils.WriteResponse(w, http.StatusNoContent, nil)
 }
 
+func (h *UserHandler) BadLogin(w http.ResponseWriter, r *http.Request) {
+	user := &model.OldUserSignup{}
+	err := h.ParseBadUserFromJsonBody(user, r)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	cookie, err := h.usecase.Login(user.Login, user.Password)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+	http.SetCookie(w, cookie)
+
+	utils.WriteResponse(w, http.StatusNoContent, nil)
+}
+
 func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	userClaim := r.Context().Value("userClaim")
 	if userClaim == nil {
@@ -154,6 +172,30 @@ func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = h.usecase.Signup(user)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	cookie, err := h.usecase.CreateSessionCookie(user)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	http.SetCookie(w, cookie)
+	utils.WriteResponse(w, http.StatusNoContent, nil)
+}
+
+func (h *UserHandler) BadSignup(w http.ResponseWriter, r *http.Request) {
+	badUser := &model.OldUserSignup{}
+	err := h.ParseBadUserFromJsonBody(badUser, r)
+	if err != nil {
+		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
+		return
+	}
+
+	user, err := h.usecase.BadSignup(badUser)
 	if err != nil {
 		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
 		return
@@ -214,6 +256,14 @@ func (h *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) ParseUserFromJsonBody(user *model.User, r *http.Request) error {
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(user); err != nil {
+		return usecase.ErrInvalidCredentials
+	}
+	return nil
+}
+
+func (h *UserHandler) ParseBadUserFromJsonBody(user *model.OldUserSignup, r *http.Request) error {
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(user); err != nil {
 		return usecase.ErrInvalidCredentials

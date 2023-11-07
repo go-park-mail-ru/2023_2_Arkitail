@@ -154,6 +154,11 @@ func (u *UserUsecase) Signup(user *model.User) error {
 	return err
 }
 
+func (u *UserUsecase) BadSignup(user *model.OldUserSignup) (*model.User, error) {
+	newUser, err := u.repo.BadAddUser(user)
+	return newUser, err
+}
+
 func (u *UserUsecase) Logout() error {
 	return nil
 }
