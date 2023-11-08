@@ -93,13 +93,13 @@ func (r *UserRepository) UpdateUserAvatar(id uint, avatarUrl string) error {
 }
 
 func (r *UserRepository) GetUserAvatarUrl(id uint) (string, error) {
-	var avatarUrl string
+	var avatarUrl sql.NullString
 	err := r.DB.QueryRow(
 		`SELECT avatar_url from "user" WHERE id = $1`, id).Scan(&avatarUrl)
 	if err != nil {
 		return "", err
 	}
-	return avatarUrl, nil
+	return avatarUrl.String, nil
 }
 
 func (r *UserRepository) UpdateUser(user *model.User) error {
