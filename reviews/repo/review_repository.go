@@ -46,7 +46,7 @@ func (r *ReviewRepository) GetReviewById(id uint) (*model.Review, error) {
 
 func (r *ReviewRepository) GetReviewsByUserId(userId uint) (map[string]*model.Review, error) {
 	reviews := make(map[string]*model.Review)
-	rows, err := r.DB.Query("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where user_id = $1", userId)
+	rows, err := r.DB.Query("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where user_id = $1 order by creation_date", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (r *ReviewRepository) GetReviewsByUserId(userId uint) (map[string]*model.Re
 
 func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (map[string]*model.Review, error) {
 	reviews := make(map[string]*model.Review)
-	rows, err := r.DB.Query("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where place_id = $1", placeId)
+	rows, err := r.DB.Query("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where place_id = $1 order by creation_date", placeId)
 	if err != nil {
 		return nil, err
 	}
