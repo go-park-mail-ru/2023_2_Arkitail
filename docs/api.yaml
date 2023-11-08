@@ -719,7 +719,7 @@ components:
           type: integer
         placeId:
           type: integer
-        text:
+        content:
           type: string
         rating:
           type: integer
@@ -743,7 +743,7 @@ components:
       properties:
         placeId:
           type: integer
-        text:
+        content:
           type: string
         rating:
           type: integer
