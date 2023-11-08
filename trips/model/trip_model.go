@@ -62,7 +62,7 @@ type TripResponse struct {
 	Description string                         `json:"description"`
 	Name        string                         `json:"name"`
 	Publicity   string                         `json:"publicity"`
-	Places      map[string]PlaceInTripResponse `json:"placeInTrip"`
+	Places      map[string]PlaceInTripResponse `json:"placesInTrip"`
 }
 
 func TripFromTripRequest(trip *TripRequest) *Trip {
