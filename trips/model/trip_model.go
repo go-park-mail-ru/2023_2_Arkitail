@@ -28,7 +28,7 @@ type Trip struct {
 
 type PlaceInTripRequest struct {
 	ID        uint           `json:"id"`
-	PlaceId   uint           `json:"place_id"`
+	PlaceId   uint           `json:"placeId"`
 	FirstDate utils.JsonDate `json:"firstDate"`
 	LastDate  utils.JsonDate `json:"lastDate"`
 }
