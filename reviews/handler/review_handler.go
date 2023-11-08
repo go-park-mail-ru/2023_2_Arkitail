@@ -72,7 +72,7 @@ func (h *ReviewHandler) DeleteReview(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.WriteResponse(w, http.StatusNoContent, nil)
 	}
-	if review.ID != userClaim.(*utils.UserClaim).Id {
+	if review.UserId != userClaim.(*utils.UserClaim).Id {
 		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(errTokenInvalid.Error()))
 		return
 	}
