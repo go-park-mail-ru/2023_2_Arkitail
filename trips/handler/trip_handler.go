@@ -139,7 +139,7 @@ func (h *TripHandler) PatchTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	placeInTripId, err := strconv.Atoi(mux.Vars(r)["placeInTripId"])
+	placeInTripId, err := strconv.Atoi(mux.Vars(r)["tripId"])
 	if err != nil || placeInTripId < 1 {
 		utils.WriteResponse(w, http.StatusBadRequest, utils.CreateErrorResponse(errInvalidUrlParam.Error()))
 		return
