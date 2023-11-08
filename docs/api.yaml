@@ -856,10 +856,7 @@ components:
             type: object
             required:  # List the required properties here
               - placeId
-              - id
             properties:
-              id:
-                type: integer
               placeId:
                 type: integer
               firstDate:

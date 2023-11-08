@@ -39,7 +39,7 @@ type TripRequest struct {
 	Description string                        `json:"description"`
 	Name        string                        `json:"name"`
 	Publicity   string                        `json:"publicity"`
-	Places      map[string]PlaceInTripRequest `json:"placeInTrip"`
+	Places      map[string]PlaceInTripRequest `json:"placesInTrip"`
 }
 
 type PlaceInTripDb struct {
@@ -92,6 +92,8 @@ func TripToTripBd(trip *Trip) *TripBd {
 	tripBd := &TripBd{ID: trip.ID, UserId: trip.UserId, Name: trip.Name}
 	if trip.Publicity == "" {
 		tripBd.Publicity = "private"
+	} else {
+		tripBd.Publicity = trip.Publicity
 	}
 	if trip.Description != "" {
 		tripBd.Description.String = trip.Description
