@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"time"
@@ -226,11 +227,17 @@ func (u *UserUsecase) UploadAvatar(image []byte, id uint) (string, error) {
 	defer file.Close()
 
 	_, err = file.Write(image)
+
 	if err != nil {
 		return "", err
 	}
 
 	file.Sync()
+
+	filename, err = filepath.Abs(filename)
+	if err != nil {
+		return "", err
+	}
 
 	err = u.repo.UpdateUserAvatar(id, filename)
 	if err != nil {
