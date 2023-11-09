@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"time"
@@ -211,15 +210,15 @@ func (u *UserUsecase) IsValidUser(user *model.User) error {
 }
 
 func (u *UserUsecase) UploadAvatar(image []byte, id uint) (string, error) {
-	const avatarPath = "../../images/avatars/"
+	const avatarPath = "../../../public/"
 
 	oldAvatar, err := u.repo.GetUserAvatarUrl(id)
 	if err != nil {
 		return "", err
 	}
 
-	filename := avatarPath + strconv.FormatInt(time.Now().UnixNano(), 10) + ".jpeg"
-	file, err := os.Create(filename)
+	filename := strconv.FormatInt(time.Now().UnixNano(), 10) + ".jpeg"
+	file, err := os.Create(avatarPath + filename)
 	if err != nil {
 		return "", err
 	}
@@ -227,14 +226,12 @@ func (u *UserUsecase) UploadAvatar(image []byte, id uint) (string, error) {
 	defer file.Close()
 
 	_, err = file.Write(image)
-
 	if err != nil {
 		return "", err
 	}
 
 	file.Sync()
 
-	filename, err = filepath.Abs(filename)
 	if err != nil {
 		return "", err
 	}
