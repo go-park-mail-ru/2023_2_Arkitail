@@ -18,3 +18,7 @@ type OldUserSignup struct {
 	Password string `json:"password"`
 	Login    string `json:"login"`
 }
+
+type UserAvatar struct {
+	AvatarUrl string `json:"avatarUrl"`
+}

@@ -277,7 +277,8 @@ func (h *UserHandler) CreateUserResponse(user *model.User) ([]byte, error) {
 }
 
 func (h *UserHandler) CreateImageUrlResponse(imageUrl string) ([]byte, error) {
-	responseJson, err := json.Marshal(imageUrl)
+	avatarUrl := model.UserAvatar{AvatarUrl: imageUrl}
+	responseJson, err := json.Marshal(avatarUrl)
 	return responseJson, err
 }
 

@@ -188,7 +188,7 @@ paths:
 
   /api/v1/user/avatar:
     post:
-      summary: uploads new avatar and sets user avatar_url to it
+      summary: uploads new avatar and sets user avatarUrl to it
       security:
         - cookieAuth: []
       requestBody:
@@ -208,9 +208,9 @@ paths:
               schema:
                 type: object
                 required:
-                  - avatar_url
+                  - avatarUrl
                 properties:
-                  avatar_url:
+                  avatarUrl:
                     type: string
         '401':
           description: Unauthorized
