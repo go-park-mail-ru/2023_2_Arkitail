@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"time"
@@ -25,7 +26,7 @@ type UserUseCase interface {
 	GetUserFromClaims(UserClaim *utils.UserClaim) (*model.User, error)
 	IsValidUser(user *model.User) error
 	GetUserInfoById(id uint) (*model.User, error)
-	UploadAvatar(image []byte, id uint) (string, error)
+	UploadAvatar(image []byte, id uint) error
 }
 
 var (
@@ -154,11 +155,6 @@ func (u *UserUsecase) Signup(user *model.User) error {
 	return err
 }
 
-func (u *UserUsecase) BadSignup(user *model.OldUserSignup) (*model.User, error) {
-	newUser, err := u.repo.BadAddUser(user)
-	return newUser, err
-}
-
 func (u *UserUsecase) Logout() error {
 	return nil
 }
@@ -209,31 +205,32 @@ func (u *UserUsecase) IsValidUser(user *model.User) error {
 	return nil
 }
 
-func (u *UserUsecase) UploadAvatar(image []byte, id uint) (string, error) {
-	const avatarPath = "../../../public/"
+func (u *UserUsecase) UploadAvatar(image []byte, id uint) error {
+	const avatarPath = "../../images/avatars/"
 
 	oldAvatar, err := u.repo.GetUserAvatarUrl(id)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	filename := strconv.FormatInt(time.Now().UnixNano(), 10) + ".jpeg"
 	file, err := os.Create(avatarPath + filename)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	defer file.Close()
 
 	_, err = file.Write(image)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	file.Sync()
 
+	filename, err = filepath.Abs(filename)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	err = u.repo.UpdateUserAvatar(id, filename)
@@ -243,5 +240,19 @@ func (u *UserUsecase) UploadAvatar(image []byte, id uint) (string, error) {
 		os.Remove(oldAvatar)
 	}
 
-	return filename, nil
+	return nil
+}
+
+func (u *UserUsecase) GetUserAvatar(id uint) ([]byte, error) {
+	avatar, err := u.repo.GetUserAvatarUrl(id)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := os.ReadFile(avatar)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }

@@ -143,24 +143,3 @@ func (r *UserRepository) AddUser(user *model.User) error {
 	}
 	return nil
 }
-
-func (r *UserRepository) BadAddUser(oldUser *model.OldUserSignup) (*model.User, error) {
-	user := &model.User{Name: "username", Password: oldUser.Password, Email: oldUser.Login}
-
-	err := r.DB.QueryRow(
-		`INSERT INTO "user" ("name", "password", "email", "birth_date", "about")
-        VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-		user.Name,
-		user.Password,
-		user.Email,
-		user.BirthDate.Time,
-		user.About,
-	).Scan(&user.ID)
-	if err == sql.ErrNoRows {
-		err = nil
-	}
-	if err != nil {
-		return nil, fmt.Errorf("error adding user in a database: %v", err)
-	}
-	return user, nil
-}

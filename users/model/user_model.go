@@ -13,12 +13,3 @@ type User struct {
 	About     string      `json:"about"`
 	AvatarUrl string      `json:"avatarUrl"`
 }
-
-type OldUserSignup struct {
-	Password string `json:"password"`
-	Login    string `json:"login"`
-}
-
-type UserAvatar struct {
-	AvatarUrl string `json:"avatarUrl"`
-}

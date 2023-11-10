@@ -130,24 +130,6 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	utils.WriteResponse(w, http.StatusNoContent, nil)
 }
 
-func (h *UserHandler) BadLogin(w http.ResponseWriter, r *http.Request) {
-	user := &model.OldUserSignup{}
-	err := h.ParseBadUserFromJsonBody(user, r)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	cookie, err := h.usecase.Login(user.Login, user.Password)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-	http.SetCookie(w, cookie)
-
-	utils.WriteResponse(w, http.StatusNoContent, nil)
-}
-
 func (h *UserHandler) CheckAuth(w http.ResponseWriter, r *http.Request) {
 	userClaim := r.Context().Value("userClaim")
 	if userClaim == nil {
@@ -187,30 +169,6 @@ func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	utils.WriteResponse(w, http.StatusNoContent, nil)
 }
 
-func (h *UserHandler) BadSignup(w http.ResponseWriter, r *http.Request) {
-	badUser := &model.OldUserSignup{}
-	err := h.ParseBadUserFromJsonBody(badUser, r)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	user, err := h.usecase.BadSignup(badUser)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusUnauthorized, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	cookie, err := h.usecase.CreateSessionCookie(user)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	http.SetCookie(w, cookie)
-	utils.WriteResponse(w, http.StatusNoContent, nil)
-}
-
 func (h *UserHandler) UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	userClaim := r.Context().Value("userClaim")
 	if userClaim == nil {
@@ -224,19 +182,13 @@ func (h *UserHandler) UploadAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	imageUrl, err := h.usecase.UploadAvatar(image, userClaim.(*utils.UserClaim).Id)
+	err = h.usecase.UploadAvatar(image, userClaim.(*utils.UserClaim).Id)
 	if err != nil {
 		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
 		return
 	}
 
-	body, err := h.CreateImageUrlResponse(imageUrl)
-	if err != nil {
-		utils.WriteResponse(w, http.StatusInternalServerError, utils.CreateErrorResponse(err.Error()))
-		return
-	}
-
-	utils.WriteResponse(w, http.StatusCreated, body)
+	WriteImageResponse(w, http.StatusCreated, image)
 }
 
 func (h *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
@@ -263,22 +215,8 @@ func (h *UserHandler) ParseUserFromJsonBody(user *model.User, r *http.Request) e
 	return nil
 }
 
-func (h *UserHandler) ParseBadUserFromJsonBody(user *model.OldUserSignup, r *http.Request) error {
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(user); err != nil {
-		return usecase.ErrInvalidCredentials
-	}
-	return nil
-}
-
 func (h *UserHandler) CreateUserResponse(user *model.User) ([]byte, error) {
 	responseJson, err := json.Marshal(user)
-	return responseJson, err
-}
-
-func (h *UserHandler) CreateImageUrlResponse(imageUrl string) ([]byte, error) {
-	avatarUrl := model.UserAvatar{AvatarUrl: imageUrl}
-	responseJson, err := json.Marshal(avatarUrl)
 	return responseJson, err
 }
 
@@ -289,4 +227,14 @@ func (h *UserHandler) ReadImageFromBody(r *http.Request) ([]byte, error) {
 	}
 	defer r.Body.Close()
 	return data, nil
+}
+
+func WriteImageResponse(w http.ResponseWriter, status int, body []byte) {
+	if body == nil {
+		w.WriteHeader(status)
+		return
+	}
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.WriteHeader(status)
+	w.Write(body)
 }
