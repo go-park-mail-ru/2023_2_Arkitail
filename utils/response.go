@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/microcosm-cc/bluemonday"
 )
 
 type UserClaim struct {
@@ -32,8 +31,8 @@ func WriteResponse(w http.ResponseWriter, status int, body []byte) {
 		w.WriteHeader(status)
 		return
 	}
-	sanitizer := bluemonday.UGCPolicy()
-	body = sanitizer.SanitizeBytes(body)
+	// sanitizer := bluemonday.UGCPolicy()
+	// body = sanitizer.SanitizeBytes(body)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
