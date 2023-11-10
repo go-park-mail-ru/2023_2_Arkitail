@@ -13,6 +13,7 @@ import (
 	"project/utils"
 
 	"github.com/gorilla/mux"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 type UserHandler struct {
@@ -234,6 +235,9 @@ func WriteImageResponse(w http.ResponseWriter, status int, body []byte) {
 		w.WriteHeader(status)
 		return
 	}
+	sanitizer := bluemonday.UGCPolicy()
+	body = sanitizer.SanitizeBytes(body)
+
 	w.Header().Set("Content-Type", "application/octet-stream")
 	w.WriteHeader(status)
 	w.Write(body)
