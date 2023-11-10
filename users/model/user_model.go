@@ -11,5 +11,5 @@ type User struct {
 	Name      string      `json:"name"`
 	BirthDate pgtype.Date `json:"birthDate"`
 	About     string      `json:"about"`
-	AvatarUrl string      `json:"avatarUrl"`
+	Avatar    []byte      `json:"avatar"`
 }

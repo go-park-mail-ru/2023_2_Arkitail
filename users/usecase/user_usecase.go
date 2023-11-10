@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"time"
@@ -213,8 +212,8 @@ func (u *UserUsecase) UploadAvatar(image []byte, id uint) error {
 		return err
 	}
 
-	filename := strconv.FormatInt(time.Now().UnixNano(), 10) + ".jpeg"
-	file, err := os.Create(avatarPath + filename)
+	filename := avatarPath + strconv.FormatInt(time.Now().UnixNano(), 10) + ".jpeg"
+	file, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
@@ -228,7 +227,6 @@ func (u *UserUsecase) UploadAvatar(image []byte, id uint) error {
 
 	file.Sync()
 
-	filename, err = filepath.Abs(filename)
 	if err != nil {
 		return err
 	}

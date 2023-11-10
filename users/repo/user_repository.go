@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
 
 	"project/users/model"
 )
@@ -13,9 +14,10 @@ type UserRepository struct {
 }
 
 var (
-	ErrUserNotFound  = errors.New("user not found")
-	ErrUserExists    = errors.New("user already exists")
-	ErrWrongPassword = errors.New("wrong password")
+	ErrUserNotFound      = errors.New("user not found")
+	ErrUserExists        = errors.New("user already exists")
+	ErrWrongPassword     = errors.New("wrong password")
+	ErrAvatarDoesntExist = errors.New("avatar doesnt exist")
 )
 
 func NewUserRepository(db *sql.DB) *UserRepository {
@@ -30,7 +32,11 @@ func (r *UserRepository) GetCleanUserById(id uint) (*model.User, error) {
 		QueryRow(`SELECT id, name, birth_date, about, avatar_url FROM "user" WHERE id = $1`, id).
 		Scan(&user.ID, &user.Name, &user.BirthDate, &about, &avatarUrl)
 	if avatarUrl.Valid {
-		user.AvatarUrl = avatarUrl.String
+		user.Avatar, err = os.ReadFile(avatarUrl.String)
+		if err != nil {
+			user.Avatar = []byte("")
+			err = nil
+		}
 	}
 	if about.Valid {
 		user.About = about.String
@@ -50,7 +56,11 @@ func (r *UserRepository) GetUser(email string) (*model.User, error) {
 		QueryRow(`SELECT id, password, name, email, birth_date, about, avatar_url FROM "user" WHERE email = $1`, email).
 		Scan(&user.ID, &user.Password, &user.Name, &user.Email, &user.BirthDate, &about, &avatarUrl)
 	if avatarUrl.Valid {
-		user.AvatarUrl = avatarUrl.String
+		user.Avatar, err = os.ReadFile(avatarUrl.String)
+		if err != nil {
+			user.Avatar = []byte("")
+			err = nil
+		}
 	}
 	if about.Valid {
 		user.About = about.String
@@ -70,7 +80,11 @@ func (r *UserRepository) GetUserById(id uint) (*model.User, error) {
 		QueryRow(`SELECT id, password, name, email, birth_date, about, avatar_url FROM "user" WHERE id = $1`, id).
 		Scan(&user.ID, &user.Password, &user.Name, &user.Email, &user.BirthDate, &about, &avatarUrl)
 	if avatarUrl.Valid {
-		user.AvatarUrl = avatarUrl.String
+		user.Avatar, err = os.ReadFile(avatarUrl.String)
+		if err != nil {
+			user.Avatar = []byte("")
+			err = nil
+		}
 	}
 	if about.Valid {
 		user.About = about.String

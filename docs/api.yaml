@@ -188,7 +188,7 @@ paths:
 
   /api/v1/user/avatar:
     post:
-      summary: uploads new avatar and sets user avatarUrl to it
+      summary: uploads new avatar and sets user avatar to it
       security:
         - cookieAuth: []
       requestBody:
@@ -208,9 +208,9 @@ paths:
               schema:
                 type: object
                 required:
-                  - avatarUrl
+                  - avatar
                 properties:
-                  avatarUrl:
+                  avatar:
                     type: string
         '401':
           description: Unauthorized
@@ -600,7 +600,7 @@ components:
           format: date
         about:
           type: string
-        avatarUrl:
+        avatar:
           type: string
     PatchUserRequest:
       type: object
@@ -633,7 +633,7 @@ components:
           type: string
           example: "2017-01-01"
           format: date
-        avatarUrl:
+        avatar:
           type: string
     CleanUserMap:
       type: object
