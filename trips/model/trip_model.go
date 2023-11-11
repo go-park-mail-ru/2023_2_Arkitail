@@ -34,12 +34,12 @@ type PlaceInTripRequest struct {
 }
 
 type TripRequest struct {
-	ID          uint                          `json:"id"`
-	UserId      uint                          `json:"userId"`
-	Description string                        `json:"description"`
-	Name        string                        `json:"name"`
-	Publicity   string                        `json:"publicity"`
-	Places      map[string]PlaceInTripRequest `json:"placesInTrip"`
+	ID          uint                  `json:"id"`
+	UserId      uint                  `json:"userId"`
+	Description string                `json:"description"`
+	Name        string                `json:"name"`
+	Publicity   string                `json:"publicity"`
+	Places      []*PlaceInTripRequest `json:"placesInTrip"`
 }
 
 type PlaceInTripDb struct {
@@ -57,12 +57,12 @@ type PlaceInTripResponse struct {
 }
 
 type TripResponse struct {
-	ID          string                         `json:"id"`
-	UserId      string                         `json:"userId"`
-	Description string                         `json:"description"`
-	Name        string                         `json:"name"`
-	Publicity   string                         `json:"publicity"`
-	Places      map[string]PlaceInTripResponse `json:"placesInTrip"`
+	ID          string                 `json:"id"`
+	UserId      string                 `json:"userId"`
+	Description string                 `json:"description"`
+	Name        string                 `json:"name"`
+	Publicity   string                 `json:"publicity"`
+	Places      []*PlaceInTripResponse `json:"placesInTrip"`
 }
 
 func TripFromTripRequest(trip *TripRequest) *Trip {

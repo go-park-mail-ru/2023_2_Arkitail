@@ -3,7 +3,6 @@ package repo
 import (
 	"database/sql"
 	"fmt"
-	"strconv"
 
 	"project/trips/model"
 )
@@ -36,8 +35,8 @@ func (r *TripRepository) DeletePlaceInTripById(placeInTripId uint) error {
 	return err
 }
 
-func (r *TripRepository) GetTripsByUserId(userId uint) (map[string]*model.Trip, error) {
-	trips := map[string]*model.Trip{}
+func (r *TripRepository) GetTripsByUserId(userId uint) ([]*model.Trip, error) {
+	trips := []*model.Trip{}
 	rows, err := r.DB.
 		Query(`SELECT id, description, name, publicity from trip where user_id = $1`, userId)
 	if err != nil {
@@ -55,7 +54,7 @@ func (r *TripRepository) GetTripsByUserId(userId uint) (map[string]*model.Trip, 
 			return nil, err
 		}
 
-		trips[strconv.FormatUint(uint64(trip.ID), 10)] = trip
+		trips = append(trips, trip)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
@@ -80,8 +79,8 @@ func (r *TripRepository) GetTripById(tripId uint) (*model.Trip, error) {
 	return trip, err
 }
 
-func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]model.PlaceInTripResponse, error) {
-	places := make(map[string]model.PlaceInTripResponse)
+func (r *TripRepository) GetPlacesInTripResponse(tripId uint) ([]*model.PlaceInTripResponse, error) {
+	places := make([]*model.PlaceInTripResponse, 0)
 
 	rows, err := r.DB.Query(`SELECT place.id, name, description, cost, image_url,
 		(select avg(rating) from review where review.place_id = place.id) as rating,
@@ -111,7 +110,7 @@ func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]model.
 			return nil, err
 		}
 
-		places[placeInTrip.ID] = *placeInTrip
+		places = append(places, placeInTrip)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
@@ -120,7 +119,7 @@ func (r *TripRepository) GetPlacesInTripResponse(tripId uint) (map[string]model.
 	return places, err
 }
 
-func (r *TripRepository) AddPlacesToTrip(tripId uint, places map[string]model.PlaceInTripRequest) error {
+func (r *TripRepository) AddPlacesToTrip(tripId uint, places []*model.PlaceInTripRequest) error {
 	for _, place := range places {
 		err := r.DB.QueryRow(
 			`INSERT INTO trip_to_place ("place_id", "trip_id", "first_date", "last_date")

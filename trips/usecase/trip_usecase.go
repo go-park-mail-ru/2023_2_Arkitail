@@ -77,14 +77,14 @@ func (u *TripUsecase) GetTripReponseById(tripId uint) (*model.TripResponse, erro
 	return tripResponse, err
 }
 
-func (u *TripUsecase) GetTripsByUserId(userId uint) (map[string]*model.TripResponse, error) {
+func (u *TripUsecase) GetTripsByUserId(userId uint) ([]*model.TripResponse, error) {
 	trips, err := u.repo.GetTripsByUserId(userId)
 	if err != nil {
 		return nil, err
 	}
 
-	tripResponses := make(map[string]*model.TripResponse)
-	for id, trip := range trips {
+	tripResponses := make([]*model.TripResponse, 0)
+	for _, trip := range trips {
 		places, err := u.repo.GetPlacesInTripResponse(trip.ID)
 		if err != nil {
 			return nil, err
@@ -93,7 +93,7 @@ func (u *TripUsecase) GetTripsByUserId(userId uint) (map[string]*model.TripRespo
 		tripResponse := model.TripResponseFromTrip(trip)
 		tripResponse.Places = places
 
-		tripResponses[id] = tripResponse
+		tripResponses = append(tripResponses, tripResponse)
 	}
 	return tripResponses, err
 }

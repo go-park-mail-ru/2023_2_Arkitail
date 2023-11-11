@@ -317,7 +317,7 @@ func (h *TripHandler) WriteTripResponse(w http.ResponseWriter, status int, tripR
 	json.NewEncoder(w).Encode(tripResponse)
 }
 
-func (h *TripHandler) WriteTripResponseMap(w http.ResponseWriter, status int, tripResponses map[string]*model.TripResponse) {
+func (h *TripHandler) WriteTripResponseMap(w http.ResponseWriter, status int, tripResponses []*model.TripResponse) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(tripResponses)
