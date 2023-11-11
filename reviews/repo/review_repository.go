@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	"project/reviews/model"
 )
@@ -66,9 +67,14 @@ func (r *ReviewRepository) GetReviewsByUserId(userId uint) ([]*model.Review, err
 	return reviews, nil
 }
 
-func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) ([]*model.Review, error) {
-	reviews := make([]*model.Review, 0)
-	rows, err := r.DB.Query("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where place_id = $1 order by creation_date", placeId)
+func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (*model.ReviewsWithAuthors, error) {
+	reviewsWithAuthors := &model.ReviewsWithAuthors{Authors: make(map[string]*model.ReviewAuthor)}
+	rows, err := r.DB.Query(`SELECT review.id, user_id, place_id, content, rating,
+							DATE_TRUNC('second', review.creation_date), avatar_url, name, "user".id
+							FROM review join "user"
+							on review.user_id = "user".id
+							where place_id = $1
+							order by review.creation_date`, placeId)
 	if err != nil {
 		return nil, err
 	}
@@ -76,17 +82,32 @@ func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) ([]*model.Review, e
 	defer rows.Close()
 	for rows.Next() {
 		review := &model.Review{}
-		err = rows.Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating, &review.CreationDate)
+		author := &model.ReviewAuthor{}
+		var avatarUrl sql.NullString
+		err = rows.Scan(&review.ID, &review.UserId, &review.PlaceId, &review.Content, &review.Rating, &review.CreationDate,
+			&avatarUrl, &author.Name, &author.ID)
 		if err != nil {
 			return nil, err
 		}
-		reviews = append(reviews, review)
+		if avatarUrl.Valid {
+			author.Avatar, err = os.ReadFile(avatarUrl.String)
+			if err != nil {
+				author.Avatar = []byte("")
+				err = nil
+			}
+		}
+		reviewsWithAuthors.Reviews = append(reviewsWithAuthors.Reviews, review)
+
+		_, isPresent := reviewsWithAuthors.Authors[author.ID]
+		if !isPresent {
+			reviewsWithAuthors.Authors[author.ID] = author
+		}
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return reviews, nil
+	return reviewsWithAuthors, nil
 }
 
 func (r *ReviewRepository) DeleteReviewsById(id uint) error {

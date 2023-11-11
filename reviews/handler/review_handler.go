@@ -136,7 +136,7 @@ func (h *ReviewHandler) GetPlaceReviews(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	h.WriteReviewSliceResponse(w, http.StatusOK, reviews)
+	h.WriteReviewWithAuthorsResponse(w, http.StatusOK, reviews)
 }
 
 func (h *ReviewHandler) ParseReviewFromBody(review *model.Review, r *http.Request) error {
@@ -153,6 +153,12 @@ func (h *ReviewHandler) CreateReviewResponse(review *model.Review) ([]byte, erro
 }
 
 func (h *ReviewHandler) WriteReviewSliceResponse(w http.ResponseWriter, status int, reviews []*model.Review) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(reviews)
+}
+
+func (h *ReviewHandler) WriteReviewWithAuthorsResponse(w http.ResponseWriter, status int, reviews *model.ReviewsWithAuthors) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(reviews)

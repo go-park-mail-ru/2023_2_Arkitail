@@ -33,7 +33,7 @@ func (u *ReviewUseCase) GetReviewsByUserId(userId uint) ([]*model.Review, error)
 	return reviews, err
 }
 
-func (u *ReviewUseCase) GetReviewsByPlaceId(placeId uint) ([]*model.Review, error) {
+func (u *ReviewUseCase) GetReviewsByPlaceId(placeId uint) (*model.ReviewsWithAuthors, error) {
 	reviews, err := u.repo.GetReviewsByPlaceId(placeId)
 	if err != nil {
 		return nil, err
