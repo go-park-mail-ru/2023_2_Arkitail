@@ -80,7 +80,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlaceMap'
+                $ref: '#/components/schemas/PlaceArray'
   /api/v1/places/{placeId}:
     get:
       summary: Get a place by id
@@ -235,7 +235,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewMap'
+                $ref: '#/components/schemas/ReviewArray'
         '404':
           description: Couldnt find user
           content:
@@ -428,7 +428,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TripMap'
+                $ref: '#/components/schemas/TripArray'
         '401':
           description: Unauthorized
           content:
@@ -616,6 +616,19 @@ components:
           format: date
         about:
           type: string
+    ReviewUser:
+      type: object
+      required:
+        - id
+        - name
+        - avatar
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        avatar:
+          type: string
     CleanUser:
       type: object
       required:
@@ -635,12 +648,12 @@ components:
           format: date
         avatar:
           type: string
-    CleanUserMap:
+    CleanUserArray:
       type: object
       properties:
-        CleanUserMapBody:
-          type: object
-          additionalProperties:
+        Body:
+          type: array
+          items:
             $ref: '#/components/schemas/CleanUser'
     SignupRequest:
       type: object
@@ -698,13 +711,10 @@ components:
           type: string
         imageUrl:
           type: string
-    PlaceMap:
-      type: object
-      properties:
-        placeMapBody:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/Place'
+    PlaceArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Place'
     Review:
       type: object
       required:
@@ -728,13 +738,10 @@ components:
             description: RFC3339 Datetime to set
             format: date-time
             example: "2021-06-20T01:02:03+00:00"
-    ReviewMap:
-      type: object
-      properties:
-        reviewMapBody:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/Review'
+    ReviewArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Review'
     AddReviewRequest:
       type: object
       required:  # List the required properties here
@@ -867,13 +874,10 @@ components:
                 type: string
                 example: "2017-01-02"
                 format: date
-    TripMap:
-      type: object
-      properties:
-        tripMapBody:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/Trip'
+    TripArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Trip'
     ErrorResponse:
       type: object
       required:
@@ -898,13 +902,14 @@ components:
       type: object
       properties:
         reviews:
-          type: object
-          additionalProperties:
+          type: array
+          items:
             $ref: '#/components/schemas/Review'
         authors:
           type: object
           additionalProperties:
-            $ref: '#/components/schemas/CleanUser'
+            description: Map of users with avatars and names, keys are their id
+            $ref: '#/components/schemas/ReviewUser'
 
 
 
