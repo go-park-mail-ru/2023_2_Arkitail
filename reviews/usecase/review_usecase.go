@@ -24,7 +24,7 @@ func (u *ReviewUseCase) GetReviewById(id uint) (*model.Review, error) {
 	return review, err
 }
 
-func (u *ReviewUseCase) GetReviewsByUserId(userId uint) (map[string]*model.Review, error) {
+func (u *ReviewUseCase) GetReviewsByUserId(userId uint) ([]*model.Review, error) {
 	reviews, err := u.repo.GetReviewsByUserId(userId)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (u *ReviewUseCase) GetReviewsByUserId(userId uint) (map[string]*model.Revie
 	return reviews, err
 }
 
-func (u *ReviewUseCase) GetReviewsByPlaceId(placeId uint) (map[string]*model.Review, error) {
+func (u *ReviewUseCase) GetReviewsByPlaceId(placeId uint) ([]*model.Review, error) {
 	reviews, err := u.repo.GetReviewsByPlaceId(placeId)
 	if err != nil {
 		return nil, err

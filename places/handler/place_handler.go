@@ -67,7 +67,7 @@ func (h *PlaceHandler) GetPlace(w http.ResponseWriter, r *http.Request) {
 	h.WritePlaceIntoJsonResponse(w, http.StatusOK, place)
 }
 
-func (h *PlaceHandler) WritePlacesIntoJsonResponse(w http.ResponseWriter, status int, objects map[string]*model.Place) {
+func (h *PlaceHandler) WritePlacesIntoJsonResponse(w http.ResponseWriter, status int, objects []*model.Place) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(objects)

@@ -36,8 +36,8 @@ func (r *PlaceRepository) AddPlace(place *model.Place) error {
 	return nil
 }
 
-func (r *PlaceRepository) GetPlaces() (map[string]*model.Place, error) {
-	places := make(map[string]*model.Place)
+func (r *PlaceRepository) GetPlaces() ([]*model.Place, error) {
+	places := make([]*model.Place, 0)
 
 	rows, err := r.DB.Query(`SELECT id, name, description, cost, image_url,
 		(select avg(rating) from review where review.place_id = place.id) as rating,
@@ -62,7 +62,7 @@ func (r *PlaceRepository) GetPlaces() (map[string]*model.Place, error) {
 			return nil, err
 		}
 
-		places[place.ID] = place
+		places = append(places, place)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err

@@ -3,7 +3,6 @@ package repo
 import (
 	"database/sql"
 	"fmt"
-	"strconv"
 
 	"project/reviews/model"
 )
@@ -44,8 +43,8 @@ func (r *ReviewRepository) GetReviewById(id uint) (*model.Review, error) {
 	return review, nil
 }
 
-func (r *ReviewRepository) GetReviewsByUserId(userId uint) (map[string]*model.Review, error) {
-	reviews := make(map[string]*model.Review)
+func (r *ReviewRepository) GetReviewsByUserId(userId uint) ([]*model.Review, error) {
+	reviews := make([]*model.Review, 0)
 	rows, err := r.DB.Query("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where user_id = $1 order by creation_date", userId)
 	if err != nil {
 		return nil, err
@@ -58,7 +57,7 @@ func (r *ReviewRepository) GetReviewsByUserId(userId uint) (map[string]*model.Re
 		if err != nil {
 			return nil, err
 		}
-		reviews[strconv.FormatUint(uint64(review.ID), 10)] = review
+		reviews = append(reviews, review)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
@@ -67,8 +66,8 @@ func (r *ReviewRepository) GetReviewsByUserId(userId uint) (map[string]*model.Re
 	return reviews, nil
 }
 
-func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (map[string]*model.Review, error) {
-	reviews := make(map[string]*model.Review)
+func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) ([]*model.Review, error) {
+	reviews := make([]*model.Review, 0)
 	rows, err := r.DB.Query("SELECT id, user_id, place_id, content, rating, DATE_TRUNC('second', creation_date) FROM review where place_id = $1 order by creation_date", placeId)
 	if err != nil {
 		return nil, err
@@ -81,7 +80,7 @@ func (r *ReviewRepository) GetReviewsByPlaceId(placeId uint) (map[string]*model.
 		if err != nil {
 			return nil, err
 		}
-		reviews[strconv.FormatUint(uint64(review.ID), 10)] = review
+		reviews = append(reviews, review)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
